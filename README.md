@@ -68,6 +68,8 @@ Per-work evidence uses the workflow descriptor's exact registered `artifactFolde
 
 ## Build, validate, and install
 
+For a fresh Codex environment, use the [additional skill restore checklist](docs/codex-skill-restore.md) after installing the repository-managed skills.
+
 ```powershell
 python .\scripts\build.py
 python .\scripts\validate.py
