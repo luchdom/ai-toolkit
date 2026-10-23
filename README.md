@@ -88,6 +88,8 @@ Normal sync updates only marker-managed blocks in existing instruction files and
 
 ## Maintenance
 
+Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.md). Install with `npm ci`, then run `npm run lint:md:files -- ":path/to/changed.md"`; use `npm run lint:md` for an all-file audit. The Python gate remains dependency-free. Toolkit sync installs a dedicated Markdown rule in user-level Codex, Claude Code, and Copilot instructions and includes it in generated specialist agents and project routers. Install the global CLI separately for use outside this repository.
+
 - Change `src/`, regenerate `dist/`, and validate; do not edit generated output.
 - Keep tool instructions as concise routers rather than copies of the canonical protocol.
 - Keep legacy artifact-root literals limited to the validator's reviewed path-and-purpose allowlist.

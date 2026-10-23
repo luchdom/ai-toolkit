@@ -185,8 +185,24 @@ def rebuild_dist() -> None:
 
     projections: dict[Path, list[Path]] = {}
 
+    markdown_source = SRC / "tool-instructions" / "shared" / "markdown-lint.md"
+    markdown_guidance = markdown_source.read_text(encoding="utf-8")
+    markdown_output = DIST / "tool-instructions" / "shared" / "markdown-lint.md"
+    markdown_output.parent.mkdir(parents=True, exist_ok=True)
+    markdown_output.write_text(markdown_guidance, encoding="utf-8")
+    projections[markdown_source] = [markdown_output]
+
+    config_source = SRC / "tool-instructions" / "shared" / "markdownlint.json"
+    config_output = markdown_output.parent / "markdownlint-cli2.jsonc"
+    config_output.write_text(
+        json.dumps({"config": json.loads(config_source.read_text(encoding="utf-8"))}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    projections[config_source] = [config_output]
+
     for agent_path in sorted((SRC / "agents").glob("*.md")):
         meta, body = parse_frontmatter(agent_path.read_text(encoding="utf-8"))
+        body = body.rstrip() + "\n\n" + markdown_guidance
         codex_text = render_codex_toml(meta, body)
         claude_text = render_claude_agent(meta, body)
         copilot_text = render_copilot_agent(meta, body)

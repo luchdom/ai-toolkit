@@ -10,6 +10,10 @@ Use this file as the repository-specific router for shared delivery skills.
 - Additional curated docs path: `{{LUCHDOM_AI_TOOLKIT_DOCS}}`.
 - Precedence is user/system requirements and repository-specific stricter safety, then the explicit entry policy, then the shared contract. Unresolved conflict fails closed before implementation or external mutation.
 
+## Markdown linting
+
+Lint every Markdown file you create or edit before reporting completion. Use the repository's command/configuration first and explicit changed-file paths; otherwise use the installed `markdownlint-cli2` fallback described in [Markdown linting](<{{LUCHDOM_AI_TOOLKIT_DOCS}}/markdown-linting.md>). Fix findings in scope, inspect automatic fixes, and rerun the check. Report missing tooling or unresolved findings; never claim an unrun check passed.
+
 ## Three entries
 
 - `$goal-to-delivery <goal-or-selected-issue>`: semi-autonomous delivery of one user-selected goal, defaulting to tested `working-tree` output.
