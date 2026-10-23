@@ -28,12 +28,25 @@ python .\scripts\sync.py --tool all --project C:\path\to\repo
 
 ## Recommended External Installs
 
+### Markdownlint CLI2
+
+Use [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2) to check Markdown written by agents. Node.js 22 or newer is required for the pinned version. These commands work in macOS zsh and Windows PowerShell:
+
+```sh
+npm install --global markdownlint-cli2@0.24.0
+markdownlint-cli2 --help
+```
+
+For repository-local checks, run `npm ci`. Follow [Markdown linting](docs/markdown-linting.md) for exact-file checks, shared defaults, user-level sync, and recovery. Respect a target project's own Markdown lint configuration.
+
 ### .NET SDK 10
 
 Link:
+
 - [Install .NET on Windows](https://learn.microsoft.com/en-us/dotnet/core/install/windows)
 
 Recommended for:
+
 - Repos that target `net10.0`, including current Luchdom backend scaffolds.
 
 Official install example from Microsoft Learn:
@@ -51,15 +64,18 @@ dotnet --list-sdks
 ### GitHub CLI
 
 Links:
+
 - [GitHub CLI README](https://github.com/cli/cli)
 - [GitHub CLI manual](https://cli.github.com/manual/index)
 
 Recommended for:
+
 - local PR workflows
 - manual repo inspection
 - auth verification outside MCP
 
 Repo workflow:
+
 - Use `$github-cli` for safe read-first GitHub CLI workflows.
 - Use `$pr-description` before drafting or updating PR titles and bodies.
 
@@ -73,11 +89,13 @@ gh auth status
 ### yt-dlp
 
 Links:
+
 - [yt-dlp repository](https://github.com/yt-dlp/yt-dlp)
 - [Official installation guide](https://github.com/yt-dlp/yt-dlp/wiki/Installation)
 - [Official releases](https://github.com/yt-dlp/yt-dlp/releases)
 
 Recommended for:
+
 - downloading public or user-authorized video and audio
 - reading video metadata and available formats
 - preparing temporary audio for `$transcribe-videos`
@@ -109,10 +127,12 @@ Notes:
 ### RTK
 
 Links:
+
 - [RTK repository](https://github.com/rtk-ai/rtk)
 - [RTK releases](https://github.com/rtk-ai/rtk/releases)
 
 Recommended for:
+
 - reducing noisy command output before it reaches an agent context
 
 Windows setup:
@@ -134,9 +154,11 @@ Restart the agent after initialization. Native Windows supports RTK filtering, t
 ### CodeGraph
 
 Links:
+
 - [CodeGraph repository](https://github.com/colbymchenry/codegraph)
 
 Recommended for:
+
 - indexed codebase exploration in larger repositories where symbol search, call paths, or impact analysis reduce repeated file searches
 
 Official setup:
@@ -156,10 +178,12 @@ Notes:
 ### Codebase Memory MCP
 
 Links:
+
 - [Codebase Memory MCP repository](https://github.com/DeusData/codebase-memory-mcp)
 - [Codebase Memory MCP releases](https://github.com/DeusData/codebase-memory-mcp/releases)
 
 Recommended for:
+
 - persistent local knowledge-graph indexing for code discovery
 - structural symbol search, caller/callee tracing, architecture analysis, change-impact mapping, and index-coverage checks through MCP
 
@@ -203,10 +227,12 @@ $env:TEMP = "$env:USERPROFILE\cbm-stage"
 ### Graphify
 
 Links:
+
 - [Graphify repository](https://github.com/Graphify-Labs/graphify)
 - [Graphify package on PyPI](https://pypi.org/project/graphifyy/)
 
 Recommended for:
+
 - supplementary local knowledge-graph extraction and queries
 - code-only AST indexing that does not require an API key
 - a portable JSON graph that can combine multiple repositories
@@ -265,9 +291,11 @@ Notes:
 ### Ponytail
 
 Link:
+
 - [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 
 Recommended for:
+
 - YAGNI and standard-library-first implementation guidance
 - diff and repository reviews focused on unnecessary complexity
 
@@ -299,9 +327,11 @@ Notes:
 ### AWS CLI
 
 Link:
+
 - [Installing or updating the latest AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 
 Recommended for:
+
 - repos that eventually provision or inspect AWS resources outside the editor
 
 Official Windows MSI command from the AWS docs:
@@ -319,9 +349,11 @@ aws --version
 ### Playwright CLI + Skills
 
 Link:
+
 - [microsoft/playwright-cli](https://github.com/microsoft/playwright-cli)
 
 Why:
+
 - Recommended for coding-agent workflows when you want CLI + skill usage instead of MCP.
 
 Official install from the Playwright CLI README:
@@ -333,6 +365,7 @@ playwright-cli --help
 ```
 
 Notes:
+
 - The Playwright CLI README says CLI + skills is the better fit for coding agents, while MCP is better for persistent introspection-heavy loops.
 - After skill installation, restart the agent so it discovers the new skills.
 - You can prefer this over Playwright MCP in repos where token efficiency matters more than persistent browser context.
@@ -340,9 +373,11 @@ Notes:
 ### Playwright MCP
 
 Link:
+
 - [microsoft/playwright-mcp](https://github.com/microsoft/playwright-mcp)
 
 Use when:
+
 - You explicitly want MCP-based browser automation rather than Playwright CLI skills.
 
 Official examples:
@@ -363,9 +398,11 @@ args = ["@playwright/mcp@latest"]
 ### Interface Design
 
 Link:
+
 - [Dammyjay93/interface-design](https://github.com/Dammyjay93/interface-design)
 
 Recommended for:
+
 - Claude Code design-oriented UI work.
 
 Official recommended install:
@@ -385,15 +422,18 @@ cp -r .claude-plugin/* ~/.claude-plugin/
 ```
 
 Notes:
+
 - Restart Claude Code after installation.
 - The repo is plugin-oriented; do not treat it as a Codex skill unless you intentionally adapt it.
 
 ### UI/UX Pro Max
 
 Link:
+
 - [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill)
 
 Recommended for:
+
 - searchable UI/UX, accessibility, typography, color, chart, motion, and
   stack-specific implementation guidance
 - global Codex design skills with bundled local datasets and Python search tools
@@ -429,9 +469,11 @@ uipro init --ai codex --global --force
 ### Taste Skill
 
 Link:
+
 - [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill)
 
 Recommended for:
+
 - opinionated anti-generic visual direction for frontend work
 - a stricter GPT/Codex-specific design and motion skill
 
@@ -463,9 +505,11 @@ Notes:
 ### Napkin
 
 Link:
+
 - [blader/napkin](https://github.com/blader/napkin)
 
 Recommended for:
+
 - Per-repo persistent memory in Claude Code or Codex.
 
 Official install commands:
@@ -476,17 +520,20 @@ git clone https://github.com/blader/napkin.git ~/.codex/skills/napkin
 ```
 
 Notes:
+
 - The repository states that the skill activates every session.
 - It writes a per-repo markdown file for accumulated working memory.
 
 ### MemPalace
 
 Links:
+
 - [MemPalace repository](https://github.com/MemPalace/mempalace)
 - [MemPalace official documentation](https://mempalaceofficial.com/guide/getting-started.html)
 - [MemPalace MCP integration](https://mempalaceofficial.com/guide/mcp-integration.html)
 
 Recommended for:
+
 - local persistent semantic memory across projects and conversations
 - a writable MCP memory palace with project wings, rooms, entity relationships,
   and agent diaries
@@ -548,9 +595,11 @@ Notes:
 ### Firecrawl CLI + Skill
 
 Link:
+
 - [Firecrawl CLI docs](https://docs.firecrawl.dev/sdks/cli)
 
 Recommended for:
+
 - AI-agent web extraction, crawl, search, and browser workflows.
 
 Official one-shot init from the Firecrawl docs:
@@ -560,6 +609,7 @@ npx -y firecrawl-cli@latest init --all --browser
 ```
 
 The docs say:
+
 - `--all` installs the Firecrawl skill to every detected AI coding agent.
 - `--browser` opens the browser for Firecrawl authentication automatically.
 
@@ -587,12 +637,14 @@ npx -y firecrawl-cli@latest view-config
 ### PostHog CLI + Skills
 
 Links:
+
 - [PostHog CLI package](https://www.npmjs.com/package/@posthog/cli)
 - [PostHog CLI source map upload docs](https://posthog.com/docs/error-tracking/upload-source-maps/cli)
 - [PostHog skills store docs](https://posthog.com/docs/prompt-management/skills-store)
 - [PostHog AI plugin](https://github.com/PostHog/ai-plugin)
 
 Recommended for:
+
 - PostHog setup, analytics inspection, source map workflows, and product-instrumentation work where CLI + skill usage is preferred over MCP.
 
 Preferred local install:
@@ -612,6 +664,7 @@ posthog-cli --help
 ```
 
 Notes:
+
 - Prefer local skills plus `posthog-cli` commands for coding-agent workflows.
 - Use the PostHog MCP server or PostHog AI plugin only when you explicitly want remote PostHog product tools or the PostHog-hosted skills store.
 - The PostHog skills store is a centralized, versioned store for Agent Skills-style `SKILL.md` bodies plus optional bundled files.
@@ -636,10 +689,12 @@ $env:POSTHOG_MCP_URL = "https://mcp.your-posthog-instance.com/mcp"
 ### Stripe AI Skills
 
 Links:
+
 - [Stripe AI repo skills](https://github.com/stripe/ai/tree/main/skills)
 - [Build on Stripe with AI](https://docs.stripe.com/building-with-ai)
 
 Recommended for:
+
 - Stripe integration design, review, upgrade, and best-practice checks.
 - Payment, billing, Connect, webhook, sandbox, and Stripe API version work.
 
@@ -675,6 +730,7 @@ stripe sandbox create
 ```
 
 Notes:
+
 - Run the skill or plugin install from the project folder that needs Stripe guidance.
 - Manually added skills do not auto-update; pull or reinstall updates when Stripe changes the catalog.
 - `stripe sandbox create` provisions an anonymous, claimable sandbox with API keys and does not require an account up front.
@@ -683,9 +739,11 @@ Notes:
 ### OpenAI Curated Linear Skill
 
 Link:
+
 - [openai/skills linear skill](https://github.com/openai/skills/blob/main/skills/.curated/linear/SKILL.md)
 
 Recommended for:
+
 - Codex workflows that read, create, or update Linear issues using the Linear MCP server.
 
 Global install behavior:
@@ -725,9 +783,11 @@ codex --enable rmcp_client
 ### Linear MCP
 
 Link:
+
 - [Linear MCP server docs](https://linear.app/docs/mcp)
 
 Recommended for:
+
 - issue intake and status updates in repos that use Linear as the autonomous work queue
 
 Official Codex setup from the Linear docs:

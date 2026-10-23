@@ -1,0 +1,5 @@
+{
+  "config": {
+    "extends": "./src/tool-instructions/shared/markdownlint.json"
+  }
+}

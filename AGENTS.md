@@ -26,6 +26,8 @@ Read [EXTERNAL-TOOLS.md](C:/dev/luchdom/ai-toolkit/EXTERNAL-TOOLS.md) when the u
 
 ## Preferred behavior
 
+- After creating or editing Markdown, follow [Markdown linting](docs/markdown-linting.md). Run `npm run lint:md:files -- ":path/to/changed.md"` for the exact changed files, fix findings in scope, and rerun before reporting completion.
+
 - Prefer the scripts in this repo over manual copying.
 - Treat `src/` as canonical and `dist/` as generated output.
 - When the user says "install for me" without specifying a tool, default to `python .\scripts\sync.py --tool all`.

@@ -117,11 +117,37 @@ def sync_skill_dirs(src_root: Path, dest_root: Path) -> None:
         print(f"Synced skill {skill_dir.name} -> {target}")
 
 
+def sync_markdown_guidance(dest: Path) -> None:
+    """Refresh only the Markdown block, including in unmarked user instructions."""
+    shared = DIST / "tool-instructions" / "shared"
+    block = (shared / "markdown-lint.md").read_text(encoding="utf-8")
+    start = "<!-- AI-TOOLKIT-MARKDOWN:START -->"
+    end = "<!-- AI-TOOLKIT-MARKDOWN:END -->"
+    existing = ""
+    if dest.exists():
+        with dest.open(encoding="utf-8", newline="") as file:
+            existing = file.read()
+    if start in existing or end in existing:
+        if existing.count(start) != 1 or existing.count(end) != 1 or existing.index(start) >= existing.index(end):
+            raise ValueError(f"Malformed Markdown lint markers in {dest}; preserved existing content.")
+        end_position = consume_newline(existing, existing.index(end) + len(end))
+        updated = existing[:existing.index(start)] + block + existing[end_position:]
+    else:
+        separator = "" if not existing or existing.endswith("\n\n") else "\n" if existing.endswith("\n") else "\n\n"
+        updated = existing + separator + block
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with dest.open("w", encoding="utf-8", newline="") as file:
+        file.write(updated)
+    sync_file(shared / "markdownlint-cli2.jsonc", Path.home() / ".config" / "ai-toolkit" / "markdownlint-cli2.jsonc")
+    print(f"Updated Markdown lint guidance in {dest}")
+
+
 def sync_codex() -> None:
     codex_home = Path.home() / ".codex"
     for agent_file in sorted((DIST / "codex" / "agents").glob("*.toml")):
         sync_file(agent_file, codex_home / "agents" / agent_file.name)
     sync_skill_dirs(DIST / "codex" / "skills", codex_home / "skills")
+    sync_markdown_guidance(codex_home / "AGENTS.md")
 
 
 def sync_claude() -> None:
@@ -129,6 +155,7 @@ def sync_claude() -> None:
     for agent_file in sorted((DIST / "claude" / "agents").glob("*.md")):
         sync_file(agent_file, claude_home / "agents" / agent_file.name)
     sync_skill_dirs(DIST / "claude" / "skills", claude_home / "skills")
+    sync_markdown_guidance(claude_home / "CLAUDE.md")
 
 
 def sync_copilot() -> None:
@@ -136,6 +163,7 @@ def sync_copilot() -> None:
     for agent_file in sorted((DIST / "copilot" / "agents").glob("*.agent.md")):
         sync_file(agent_file, copilot_home / "agents" / agent_file.name)
     sync_skill_dirs(DIST / "copilot" / "skills", copilot_home / "skills")
+    sync_markdown_guidance(copilot_home / "copilot-instructions.md")
 
 
 def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
