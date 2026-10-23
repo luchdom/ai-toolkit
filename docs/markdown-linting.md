@@ -47,9 +47,9 @@ This one-line command also works in PowerShell. Configuration lookup starts at t
 
 The default rules check heading/list/fence spacing, whitespace, link syntax, and other Markdown structure. The shared configuration allows long lines (`MD013`), repeated heading names in separate sections (`MD024` with `siblings_only`), multiple top-level headings in composite instructions (`MD025`), inline HTML (`MD033`), fragments without an initial heading (`MD041`), and unaligned table columns (`MD060`). YAML front matter is supported by the linter. These choices accommodate agent instructions and prose without reflowing their content.
 
-`npm run lint:md` audits the repository's Markdown. Its configuration excludes dependencies, generated adapters, Git metadata, and workflow evidence. An all-file audit can expose pre-existing violations; routine editing should use the explicit-file command and repair the changed files. Lint checks syntax/style, not factual accuracy or whether local links resolve.
+`npm run lint:md` audits the repository's Markdown using `.markdownlint-audit.jsonc`, which excludes dependencies, generated adapters, Git metadata, and workflow evidence. The explicit-file commands use the separate `.markdownlint-cli2.jsonc` with no exclusions, so an explicitly named workflow file is still checked. An all-file audit can expose pre-existing violations; routine editing should use the explicit-file command and repair the changed files. Lint checks syntax/style, not factual accuracy or whether local links resolve.
 
-The Python validation gate remains dependency-free. Run Markdown lint alongside it for Markdown changes. Agent instructions require the check but are not a filesystem write hook; enforcement at commit or CI time requires a separate repository gate.
+The Python validation gate remains dependency-free. Run Markdown lint alongside it for Markdown changes. Run `npm run test:md` to verify that audit exclusions do not skip explicitly named workflow files and that fixes preserve unrelated files. Agent instructions require the check but are not a filesystem write hook; enforcement at commit or CI time requires a separate repository gate.
 
 ## Verify and undo
 

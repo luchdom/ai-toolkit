@@ -2,9 +2,10 @@
   "name": "@luchdom/ai-toolkit",
   "private": true,
   "scripts": {
-    "lint:md": "markdownlint-cli2",
+    "lint:md": "markdownlint-cli2 --config .markdownlint-audit.jsonc",
     "lint:md:files": "markdownlint-cli2 --no-globs",
-    "lint:md:fix": "markdownlint-cli2 --no-globs --fix"
+    "lint:md:fix": "markdownlint-cli2 --no-globs --fix",
+    "test:md": "node --test scripts/test_markdown_lint.mjs"
   },
   "devDependencies": {
     "markdownlint-cli2": "0.24.0"

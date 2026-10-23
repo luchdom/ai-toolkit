@@ -1,0 +1,13 @@
+{
+  "config": {
+    "extends": "./src/tool-instructions/shared/markdownlint.json"
+  },
+  "globs": [
+    "**/*.{md,markdown}",
+    "!**/node_modules/**",
+    "!dist/**",
+    "!.git/**",
+    "!.ai/**",
+    "!docs-ai/**"
+  ]
+}
