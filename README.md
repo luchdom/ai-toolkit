@@ -59,8 +59,11 @@ Memory curation and observability are intentionally modest: persist decisions an
 - `src/skills/`: canonical reusable skills and references
 - `src/tool-instructions/`: project-local routing instructions for each supported tool
 - `scripts/build.py`: generate tool adapters into `dist/`
-- `scripts/sync.py`: install generated output into user homes and optional projects
+- `scripts/sync.py`: install generated output and selected external skills into user homes and optional projects
+- `external-skills.toml`: selected upstream skill directories, pinned revisions, and compatible tools
+- `scripts/external_skills.py`: preview or install external skill imports independently
 - `scripts/validate.py`: local repository validation
+- `scripts/platform_info.py`: read-only execution-host and tool availability probe
 - `dist/tool-instructions/`: generated project-local projections for each supported tool
 - `dist/`: generated projections; never edit directly
 
@@ -68,23 +71,43 @@ Per-work evidence uses the workflow descriptor's exact registered `artifactFolde
 
 ## Build, validate, and install
 
-For a fresh Codex environment, use the [additional skill restore checklist](docs/codex-skill-restore.md) after installing the repository-managed skills.
+Start with [platform support](docs/platform-support.md): detect the execution host and shell, then choose a Python **3.11+** executable. Use the same verified interpreter throughout. The probe also runs on older Python 3.9+ so it can report an upgrade requirement.
+
+Windows / PowerShell:
 
 ```powershell
-python .\scripts\build.py
-python .\scripts\validate.py
-python .\scripts\sync.py --tool all
+py -3 scripts/platform_info.py
+py -3 scripts/build.py
+py -3 scripts/validate.py
+py -3 scripts/sync.py --tool all
 ```
 
-Install project-local tool instructions too:
+macOS / zsh:
+
+```sh
+python3 scripts/platform_info.py
+python3 scripts/build.py
+python3 scripts/validate.py
+python3 scripts/sync.py --tool all
+```
+
+Install project-local tool instructions too (use the actual target path):
 
 ```powershell
-python .\scripts\sync.py --tool all --project C:\path\to\repo
+py -3 scripts/sync.py --tool all --project "C:/path/to/repo"
+```
+
+```sh
+python3 scripts/sync.py --tool all --project "$HOME/path/to/repo"
 ```
 
 Use `--tool codex`, `claude`, `copilot`, or `cursor` to limit installation. Cursor project sync writes `AGENTS.md` plus `.cursor/rules/*.mdc`, including the projected UI design-gate, review procedure, and templates. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
 
-Normal sync updates only marker-managed blocks in existing instruction files and preserves content outside them. Existing unmarked instruction files and generated skills remain untouched unless `--force` explicitly adopts or refreshes them.
+Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). Preview them with `python3 scripts/external_skills.py --tool all --dry-run` on macOS or `py -3 scripts/external_skills.py --tool all --dry-run` on Windows. Use `--skip-external` on `scripts/sync.py` for repository-generated content only. Imports preserve unmanaged or locally modified skill directories; `--force` does not bypass their ownership checks. See [External Skills](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
+
+Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Existing unmarked instruction files, project Copilot agents/skills, and Cursor rules remain untouched unless `--force` explicitly adopts or refreshes them. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
+
+For a fresh Codex environment, start with [External Skills](EXTERNAL-SKILLS.md) for selected imports and native plugins. The [additional skill restore checklist](docs/codex-skill-restore.md) is a historical Windows inventory for system and plugin skills beyond the active manifest; follow current platform paths and package instructions when restoring it.
 
 ## Maintenance
 
@@ -94,5 +117,5 @@ Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.m
 - Keep tool instructions as concise routers rather than copies of the canonical protocol.
 - Keep legacy artifact-root literals limited to the validator's reviewed path-and-purpose allowlist.
 - Keep credentials in environment variables, never repository files.
-- Use [external tools](EXTERNAL-TOOLS.md) only when optional tooling is requested.
+- Use [External Tools](EXTERNAL-TOOLS.md) for companion CLIs, [External Skills](EXTERNAL-SKILLS.md) for imports and plugins, and [MCP Servers](MCP-SERVERS.md) for explicit server setup.
 - Preserve unrelated user changes and historical artifact evidence.

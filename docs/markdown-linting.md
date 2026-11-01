@@ -21,7 +21,7 @@ python3 scripts/sync.py --tool all
 
 On Windows, use the verified `py -3` interpreter instead of `python3`. Sync installs the fallback configuration at `~/.config/ai-toolkit/markdownlint-cli2.jsonc` on either platform and maintains a dedicated Markdown guidance block in `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, and `~/.copilot/copilot-instructions.md` for the selected tools. It preserves content outside that block, even in existing unmarked user instruction files. Malformed or duplicate Markdown markers stop that update. The existing rules for project instruction markers are unchanged.
 
-The generated specialist agents also include the shared rule. Cursor receives the rule through its generated project instructions and specialist rules; it has no user-level sync in this toolkit. Start a new agent session after syncing to load updated instructions. Sync does not install npm packages or change editor settings.
+The generated specialist agents also include the shared rule. Cursor receives the rule through its generated project instructions and specialist rules; it has no user-level sync in this toolkit. Start a new agent session after syncing to load updated instructions. Sync does not install npm packages or change editor settings. Normal sync also fetches the selected pinned [external skill imports](../EXTERNAL-SKILLS.md); use `--skip-external` for repository-generated content only. Those imports do not install the companion Markdown CLI.
 
 ## Check changed files
 
@@ -53,6 +53,6 @@ The Python validation gate remains dependency-free. Run Markdown lint alongside 
 
 ## Verify and undo
 
-Verify the CLI with `markdownlint-cli2 --help`, lint an actual file, and inspect the installed guidance and fallback configuration. Back up local agent customizations before sync: user-level generated agents and skills are refreshed, while the Markdown block update preserves surrounding user instructions.
+Verify the CLI with `markdownlint-cli2 --help`, lint an actual file, and inspect the installed guidance and fallback configuration. Back up local agent customizations before sync: repository-generated user-level agents and skills are refreshed, while the Markdown block update preserves surrounding user instructions.
 
 To undo the user-level setup, restore the backed-up instruction files or remove only their `AI-TOOLKIT-MARKDOWN` blocks, remove the installed fallback configuration if unused, and run `npm uninstall --global markdownlint-cli2`. A later normal toolkit sync reinstalls the guidance; change its canonical source if the policy should change permanently.

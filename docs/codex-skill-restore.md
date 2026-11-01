@@ -2,17 +2,17 @@
 
 Snapshot: 2026-10-20. This is the set of skills available in the Codex session on that date **in addition to** the skills maintained in this repository and `C:\dev\social-media\social-media-toolkit`. The two repositories contained 15 and 8 distinct source skills, respectively. This checklist contains 83 additional available skill IDs, counting duplicate installations once.
 
-This is an inventory and a restore target, not a claim that every listed skill lacks a source repository elsewhere. The paths below describe the original Windows installation; use the new environment's home directory when restoring.
+This is a historical inventory and restore target, not the active import selection. [external-skills.toml](../external-skills.toml) now records selected pinned upstream imports; [External Skills](../EXTERNAL-SKILLS.md) explains sync, native plugins, and conflicts. This inventory is not a claim that every listed skill lacks a source repository elsewhere. The paths below describe the original Windows installation; use the new environment's home directory when restoring.
 
 ## Request for a fresh environment
 
 > Read `docs/codex-skill-restore.md` in `ai-toolkit`. Install this repository's Codex skills using its README, then install the social-media toolkit's Codex skills using that repository's instructions. Ensure every additional skill in the inventory below is available in a **fresh Codex session**. Use the documented or official source for missing user and plugin skills; do not treat a cached `SKILL.md` as proof that Codex has loaded it. Verify any required companion CLI separately. Report each skill that cannot be restored, its source or version uncertainty, and the action needed from me. Do not silently omit or substitute a skill.
 
-The [ai-toolkit README](../README.md) documents this repository's build, validation, and sync commands. [External Tools](../EXTERNAL-TOOLS.md) documents installation and verification for some external skills and plugins. The social-media toolkit has its own install instructions. Check current tool documentation before running install commands, as plugin names and availability may change.
+The [ai-toolkit README](../README.md) documents this repository's build, validation, and sync commands. [External Skills](../EXTERNAL-SKILLS.md) documents selected imports and native plugins, [External Tools](../EXTERNAL-TOOLS.md) covers companion CLIs, and [MCP Servers](../MCP-SERVERS.md) covers server configuration and authentication. The social-media toolkit has its own install instructions. Check current tool documentation before running install commands, as plugin names and availability may change.
 
 ## How to verify
 
-1. Install the two repository-managed skill sets separately. This file covers only the additional skills below.
+1. Sync this repository and its selected external imports, then install the social-media toolkit through its own instructions. Compare the manifest with this historical inventory before restoring additional copies. This file covers only the additional skills below.
 2. Restore user-level skills to the appropriate user-level location. On the original machine these were under `C:\Users\lucas\.codex\skills` and `C:\Users\lucas\.agents\skills`. Do not assume the same home path in a new environment.
 3. Check that the Codex system skills are supplied by the installed Codex version. Install or enable the listed plugin packages through the supported plugin manager.
 4. Start a new Codex session and compare its **available skills** with all 83 qualified IDs below. Check the `SKILL.md` files for user-level skills as a secondary file check. A plugin cache directory or an old session's skill list alone is insufficient.

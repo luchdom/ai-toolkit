@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import os
 import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+# Other toolkit skills also provide a package named scripts; load our sibling exactly.
+_external_spec = importlib.util.spec_from_file_location("ai_toolkit_external_skills", Path(__file__).with_name("external_skills.py"))
+external_skills = importlib.util.module_from_spec(_external_spec)
+_external_spec.loader.exec_module(external_skills)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -216,7 +222,7 @@ def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
                 print(f"Skipped existing {target}")
 
 
-def main() -> None:
+def main() -> int:
     parser = argparse.ArgumentParser(description="Install generated Codex, Claude, Copilot, and Cursor adapters, skills, and tool instructions.")
     parser.add_argument("--tool", choices=["codex", "claude", "copilot", "cursor", "all"], default="all")
     parser.add_argument(
@@ -231,12 +237,23 @@ def main() -> None:
         action="store_true",
         help="Hard-overwrite project tool instructions and adopt unmarked legacy files.",
     )
+    parser.add_argument(
+        "--skip-external", action="store_true",
+        help="Sync repository-generated content only, without external skill imports or network access.",
+    )
     args = parser.parse_args()
+    tools = {"codex", "claude", "copilot", "cursor"} if args.tool == "all" else {args.tool}
+    entries = []
+    if not args.skip_external:
+        try:
+            entries = external_skills.load_manifest()
+            external_skills.preflight(entries, tools, [Path(path) for path in args.project])
+        except (external_skills.ImportError, OSError) as exc:
+            print(f"EXTERNAL SKILLS ERROR: {exc}", file=sys.stderr)
+            return 1
 
     if not args.no_build:
         run_build()
-
-    tools = {"codex", "claude", "copilot", "cursor"} if args.tool == "all" else {args.tool}
 
     if "codex" in tools:
         sync_codex()
@@ -248,6 +265,14 @@ def main() -> None:
     for project in args.project:
         sync_tool_instructions(Path(project), tools, args.force)
 
+    if not args.skip_external:
+        try:
+            external_skills.sync_external_skills(entries, tools, [Path(path) for path in args.project])
+        except (external_skills.ImportError, OSError) as exc:
+            print(f"EXTERNAL SKILLS ERROR: {exc}", file=sys.stderr)
+            return 1
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -1,0 +1,54 @@
+# Selected direct skill imports. See EXTERNAL-SKILLS.md for native installers,
+# supported targets, ownership protection, and how to update these pins.
+version = 1
+
+[[skills]]
+name = "napkin"
+repo = "https://github.com/blader/napkin.git"
+path = "."
+revision = "27fa60a895de4383b26a539136bc983155cb979c"
+tools = ["codex", "claude"]
+
+# Keep the existing gpt-taste identity. New upstream releases use taste-skill;
+# migrating to that skill is a separate selection change.
+[[skills]]
+name = "gpt-taste"
+repo = "https://github.com/Leonxlnx/taste-skill.git"
+path = "skills/gpt-tasteskill"
+revision = "f6831c5df8ad546c2567535442f1691a823868e3"
+tools = ["codex"]
+
+[[skills]]
+name = "stripe-best-practices"
+repo = "https://github.com/stripe/ai.git"
+path = "skills/stripe-best-practices"
+revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
+tools = ["codex", "claude", "cursor"]
+
+[[skills]]
+name = "stripe-directory"
+repo = "https://github.com/stripe/ai.git"
+path = "skills/stripe-directory"
+revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
+tools = ["codex", "claude", "cursor"]
+
+[[skills]]
+name = "stripe-projects"
+repo = "https://github.com/stripe/ai.git"
+path = "skills/stripe-projects"
+revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
+tools = ["codex", "claude", "cursor"]
+
+[[skills]]
+name = "upgrade-stripe"
+repo = "https://github.com/stripe/ai.git"
+path = "skills/upgrade-stripe"
+revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
+tools = ["codex", "claude", "cursor"]
+
+[[skills]]
+name = "linear"
+repo = "https://github.com/openai/skills.git"
+path = "skills/.curated/linear"
+revision = "49f948faa9258a0c61caceaf225e179651397431"
+tools = ["codex"]
