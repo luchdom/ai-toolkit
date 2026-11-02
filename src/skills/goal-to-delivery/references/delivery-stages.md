@@ -6,7 +6,7 @@ These stages and specialists are reusable capabilities, not a mandatory fixed ch
 |---|---|---|
 | `discover` | active agent with `$repo-discovery` | Relevant instructions, patterns, and commands |
 | `plan` | planner or active agent | Bounded approach, acceptance criteria, risks, and tests |
-| `clarify` | planner or active agent | Safe assumptions recorded or one material question raised |
+| `clarify` | planner or active agent with product-manager / staff-engineer | Bounded product or technical decision recorded, or one unresolved material question raised |
 | `design` | product-designer when `design-gates.md` requires a specification | Implementer-ready direction tied to binding design sources |
 | `task` | tasker or active agent | Ordered implementation steps when decomposition helps |
 | `audit` | independent auditor for risky or complex plans | Pre-implementation gaps and verdict |
@@ -20,6 +20,8 @@ These stages and specialists are reusable capabilities, not a mandatory fixed ch
 | `post_merge` | explicit manual stage | Optional verification requested by the user or repository |
 
 The auditor evaluates a plan before implementation; the product-designer checks rendered UI conformance; the code reviewer examines implemented changes; QA exercises behavior. Use each when its distinct evidence is valuable. Low-risk routine work may plan and task inline, but autonomous code still requires applicable UI design conformance, one code review, and applicable QA before merge.
+
+Use `product-manager` for requested PRDs, product decisions, customer-focused benchmark work with PD, and implementation evaluation against AC. Use `staff-engineer` for technical clarification, feasibility with PM/PD, simplification, engineering reviews, and requested RFCs, ADRs, or diagrams. These are selective contributions within the existing stages, not a mandatory extra sequence. Follow [clarification-policy.md](./clarification-policy.md) for decision authority. Product evaluation and staff review supplement the required independent gates; neither grants completion or publication authority.
 
 - Semi-autonomous: continue applicable stages automatically, repair scoped findings within a small retry budget, and stop at its boundary.
 - Manual: perform exactly the named stage and never auto-advance.

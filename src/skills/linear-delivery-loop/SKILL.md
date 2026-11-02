@@ -63,6 +63,7 @@ Never archive an attended pilot, a scheduled task attached to an existing long-l
 Use the lightest applicable stages. Plan and task inline for routine work; create a concise work note only when useful. Use specialists selectively based on risk, not as a mandatory chain. When frontend/UI design gates apply, initialize or resume the workflow descriptor and registered `artifactFolder` before design or implementation; non-UI routine work may continue to use Linear, commits, and the pull request as its complete record.
 
 - Prefer one branch and pull request per issue.
+- Route new product/AC clarifications to `product-manager` and technical choices or simplification to `staff-engineer`, with PD input for user experience, using the canonical [clarification policy](../goal-to-delivery/references/clarification-policy.md). Record authorized decisions through this entry before dependent work resumes. A specialist cannot resolve an existing human-decision pause in place of the required owner reply.
 - For frontend/UI work, require product-designer input when `design-gates.md` requires a pre-build specification, and require a current rendered design conformance `PASS` after implementation. Risk-based specialist selection cannot waive either applicable gate.
 - Run focused checks first and one repository-owned local validation command before merge.
 - Perform applicable UI design conformance, one independent code review, and applicable runtime QA. Use HTTP, CLI, or browser behavior only when acceptance criteria require it.
@@ -74,6 +75,8 @@ Use the lightest applicable stages. Plan and task inline for routine work; creat
 For safe interruptions or the run-time limit, commit and push coherent work when safe, add a concise Linear checkpoint with branch/PR, completed checks, and next action, leave the issue active, and stop. After bounded repair attempts, treat a technical blocker as a human decision instead of looping indefinitely.
 
 ## Ask for a decision
+
+Use this path when the canonical clarification policy leaves a material choice unresolved after the relevant product or engineering consultation. Include the specialist recommendation and its evidence; agreement among agents does not count as the owner's decision.
 
 Keep the issue active, add the configured human-decision label, and comment with:
 

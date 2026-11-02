@@ -442,7 +442,9 @@ class DeliveryContractTests(unittest.TestCase):
             root = Path(directory)
             specialists = (
                 "planner",
+                "product-manager",
                 "product-designer",
+                "staff-engineer",
                 "tasker",
                 "auditor",
                 "dotnet",
@@ -455,7 +457,7 @@ class DeliveryContractTests(unittest.TestCase):
             write(
                 root,
                 "src/skills/goal-to-delivery/references/delivery-stages.md",
-                "planner product-designer tasker auditor matching implementer design_review "
+                "planner product-manager product-designer staff-engineer tasker auditor matching implementer design_review "
                 "code-reviewer qa docs-as-code proven not to affect rendered UI or interaction",
             )
             write(

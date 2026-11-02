@@ -5,6 +5,8 @@ The caller entry policy controls advancement and authority throughout.
 | Owner | Owns | Must not own |
 |---|---|---|
 | `planner` | Discovery-backed plan and clarification record | Tasks, audit verdict, implementation |
+| `product-manager` | Scoped product decisions, requested PRDs, benchmark interpretation with PD, and AC-based product evaluation | Code changes, weakening AC, independent QA/design/code-review substitution |
+| `staff-engineer` | Scoped technical decisions, feasibility with PM/PD, simplification and code review, requested RFCs/ADRs/diagrams | Implementation, fixes, or independent approval of its own technical proposal |
 | `product-designer` before implementation | Binding design-source analysis and design spec when required | Implementation, code review, QA |
 | `tasker` | Ordered execution tasks and light audit notes | Independent audit verdict |
 | `auditor` | Independent pre-implementation audit | Tasks, code changes, code review |
@@ -15,5 +17,7 @@ The caller entry policy controls advancement and authority throughout.
 | docs skills | Durable docs update or no-impact record | Review/QA substitution |
 
 Hand back a failed artifact to its owner. Return failed post-build design conformance to the implementer, then rerun the affected review on the new implementation identity. Do not silently let one specialist absorb another's independence contract.
+
+PM and Staff Engineer join where their expertise resolves a question; they are not required on every issue. Apply the canonical clarification policy and return one decision record to the caller, with clear product, design, and engineering responsibilities. Required independent gates retain their named owners.
 
 Specialists never mutate Linear or perform state-changing Git/provider operations independently; they return results to the active entry. Semi/manual authority remains limited by the explicit caller boundary/stage.

@@ -37,7 +37,7 @@ Tasking, audit, and implementation must stop when a required design specificatio
 
 The implementer reads the recorded design-gate decision, binding design sources, and approved design specification before editing UI code. Implement the specified components and tokens. Do not add one-off styling, a new primitive, or a visual/interaction deviation that the approved artifacts do not authorize.
 
-When implementation exposes an uncovered UI decision or makes the approved direction impractical, return it to product-designer or planner clarification. Do not redesign in code.
+When implementation exposes an uncovered UI decision or makes the approved direction impractical, return it through the caller to product-designer, with product-manager for product outcomes and staff-engineer for feasibility under [clarification-policy.md](./clarification-policy.md). Planner records the resulting direction. Do not redesign in code.
 
 Exercise the affected UI in a real browser during implementation when the environment permits it. Return the exact routes, states, themes, and representative viewports needed for conformance review. Keep optional screenshots in disposable evidence storage unless the user or registered workflow explicitly requires another destination.
 

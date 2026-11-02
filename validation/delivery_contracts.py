@@ -21,7 +21,9 @@ CANONICAL_REFERENCES = (
 ENTRY_SKILLS = ("goal-to-delivery", "spec-driven-delivery", "linear-delivery-loop")
 SPECIALIST_AGENTS = (
     "planner",
+    "product-manager",
     "product-designer",
+    "staff-engineer",
     "tasker",
     "auditor",
     "dotnet",
@@ -420,7 +422,9 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
             stages,
             (
                 "planner",
+                "product-manager",
                 "product-designer",
+                "staff-engineer",
                 "tasker",
                 "auditor",
                 "matching implementer",

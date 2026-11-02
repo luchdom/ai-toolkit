@@ -14,6 +14,17 @@ For non-trivial work without an explicit entry, use manual `$spec-driven-deliver
 
 The workflows reuse the same specialist skills, but they do not require every specialist for every issue. Routine work plans inline; risky work can add tasking, audit, runtime QA, or documentation stages as needed. Frontend/UI work follows the canonical [design gates](src/skills/goal-to-delivery/references/design-gates.md): unresolved UI decisions require a pre-build product-designer spec, and every changed rendered UI or interaction requires a post-build real-browser design conformance review.
 
+## Product and engineering specialists
+
+| Agent | Use it for |
+|---|---|
+| [`product-manager`](src/agents/product-manager.md) | Product and acceptance-criteria clarifications, evaluating implementation against customer outcomes and AC, benchmark work with PD, and PRDs on request. |
+| [`staff-engineer`](src/agents/staff-engineer.md) | Technical clarification for the team, feasibility with PM/PD, code review, simplification and duplication analysis, and requested RFCs, ADRs, diagrams, and implementation guidance. Writes documents; implementers write code. |
+
+The active workflow routes questions to these specialists under the shared [clarification policy](src/skills/goal-to-delivery/references/clarification-policy.md). They can make supported decisions within approved scope, while unresolved material choices go to the human owner. Consult them when their expertise is useful; PD, the independent reviewer, and QA retain their existing gates.
+
+Examples: ask PM to evaluate a named implementation against its approved AC or draft a PRD; ask Staff Engineer to compare simpler implementation options, review a named diff, or document an architectural decision. Both use the repository's canonical agent metadata; regenerate and sync after changing their configuration.
+
 ## MVP autonomous loop
 
 The MVP deliberately uses existing systems instead of a separate orchestration service:

@@ -1,6 +1,6 @@
 ---
 name: multi-agent-delivery
-description: Route one already-selected delivery workflow through the shared planner, designer, tasker, auditor, implementer, code-reviewer, QA, and documentation specialists. Use for explicit specialist handoffs; never use it to choose a workflow mode, select Linear work, or expand caller authority.
+description: Route one already-selected delivery workflow through planner, PM, PD, Staff Engineer, tasker, auditor, implementer, code-reviewer, QA, and documentation specialists. Use for explicit specialist handoffs; never use it to choose a workflow mode, select Linear work, or expand caller authority.
 ---
 
 # Multi-Agent Delivery
@@ -15,7 +15,7 @@ Do not choose or change the workflow policy. Do not select queue work, infer aut
 
 ## Shared handoff order
 
-1. `planner` discovers context, writes the plan, and owns clarification content.
+1. `planner` discovers context, writes the plan, and coordinates the clarification record.
 2. `product-designer` writes the design spec when `design-gates.md` requires one and records binding design-system sources.
 3. `tasker` creates execution-ready tasks.
 4. Independent `auditor` judges plan/task readiness before implementation.
@@ -25,7 +25,9 @@ Do not choose or change the workflow policy. Do not select queue work, infer aut
 8. `qa` verifies real behavior and local repository gates without substituting for design review.
 9. `$docs-as-code`, with `$luchdom-docs` where applicable, updates durable documentation or records no impact.
 
-Loop a failed audit to its named artifact owner. During implementation, loop an uncovered UI decision to product-designer or planner clarification before coding that decision. Loop scoped design-review, code-review, or QA defects to an implementer only when the caller still grants implementation authority and its retry policy permits it. Never let product-designer, code-reviewer, or QA fix code in place.
+At the point a question arises, consult `product-manager` for product/AC decisions or `staff-engineer` for technical decisions under the canonical [clarification policy](../goal-to-delivery/references/clarification-policy.md). Include PD for experience and benchmark work and PM/PD/Staff Engineer together when feasibility affects the product direction. Request PRDs, engineering documents, staff code reviews, or PM acceptance evaluations only when the user or work needs that output; these consultations are not extra mandatory gates. PM evaluation uses the exact implementation/requirements and current QA/design evidence, and any unresolved required AC remains a completion blocker.
+
+Loop a failed audit to its named artifact owner. During implementation, return an uncovered decision through this consultation route before coding that decision; PD owns any resulting design revision. Loop scoped design-review, code-review, or QA defects to an implementer only when the caller still grants implementation authority and its retry policy permits it. PM and Staff Engineer return decisions, docs, or findings; they do not implement fixes. Never let product-designer, code-reviewer, or QA fix code in place.
 
 Use the exact `artifactFolder` recorded by the active work descriptor/registry for every handoff. Do not reconstruct it from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, migrate, or rewrite them.
 

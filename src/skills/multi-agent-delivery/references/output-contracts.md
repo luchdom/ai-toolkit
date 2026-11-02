@@ -1,5 +1,15 @@
 # Handoff Output Contracts
 
+## Product and engineering consultation
+
+- Input: specific question or requested document/review, approved goal and AC, relevant constraints and evidence, affected target, and the caller's decision authority.
+- Output: resolved decision or remaining question, rationale and alternatives, sources, customer/engineering consequences, affected artifacts and validation, and the owner of the next action.
+- PM implementation evaluation: exact implementation and requirement revision, every AC mapped to evidence and `MET`, `GAP`, or `UNVERIFIED`, and required corrections separated from optional improvements.
+- Staff code review: exact diff/base/target, connected source evidence, ranked defects, simpler alternatives and verification; independent review and QA remain separate.
+- Requested PRDs, RFCs, ADRs, and diagrams use repository conventions and distinguish proposals from authorized decisions. Routine answers may be inline; substantial per-work evidence uses the registered artifact contract.
+
+Consultations follow the canonical clarification policy. A missing specialist or unresolved choice is reported to the caller; it never creates approval or clears a human-decision pause.
+
 ## Tasking prerequisite
 
 - Concrete plan with exact sources
@@ -35,4 +45,4 @@
 - External/Git actions have separate explicit or autonomous-entry authority
 - Evidence identifies the exact target and anything still unverified
 
-Every producer uses the descriptor's registered current path. An explicitly supplied historical layout is readable fallback only and remains unchanged.
+Per-work evidence uses the descriptor's exact registered `artifactFolder`; durable documents use the repository's curated locations under the canonical artifact contract. An explicitly supplied historical layout is readable fallback only and remains unchanged.
