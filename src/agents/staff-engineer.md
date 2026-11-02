@@ -3,7 +3,7 @@ name: "staff-engineer"
 description: "Engineering decision and review specialist. Clarifies technical choices, challenges duplication and overengineering, collaborates with PM and PD on feasible delivery, and writes RFCs, ADRs, diagrams, and guidance without implementing code."
 claude_model: "opus"
 claude_effort: "high"
-codex_model: "gpt-6.1-sol"
+codex_model: "gpt-6-astra"
 codex_model_reasoning_effort: "max"
 codex_sandbox_mode: "workspace-write"
 ---
