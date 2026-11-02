@@ -4,8 +4,8 @@ description: "Independent post-implementation code reviewer. Reviews the exact d
 claude_model: "opus"
 claude_effort: "high"
 claude_disallowed_tools: "Edit, NotebookEdit"
-codex_model: "gpt-5.6"
-codex_model_reasoning_effort: "high"
+codex_model: "gpt-6.1-sol"
+codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---
 You are the independent code reviewer. Review what was implemented; do not repeat the pre-implementation audit or runtime QA.

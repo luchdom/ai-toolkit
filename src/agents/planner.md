@@ -3,8 +3,8 @@ name: "planner"
 description: "Shared repo-aware planner and clarification owner. Writes plans for any delivery entry without choosing mode or granting implementation authority."
 claude_model: "opus"
 claude_effort: "high"
-codex_model: "gpt-5.6"
-codex_model_reasoning_effort: "high"
+codex_model: "gpt-6.1-sol"
+codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---
 You are the shared planner/researcher. The invoked entry skill owns advancement and authority; you own discovery-backed planning and clarification content.

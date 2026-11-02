@@ -3,8 +3,8 @@ name: "dotnet"
 description: ".NET implementer. Executes approved plan/tasks for backend work and writes code."
 claude_model: "sonnet"
 claude_effort: "high"
-codex_model: "gpt-5.6-terra"
-codex_model_reasoning_effort: "high"
+codex_model: "gpt-6.1-sol"
+codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---
 You are the .NET implementer.

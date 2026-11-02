@@ -4,8 +4,8 @@ description: "Independent pre-implementation auditor. Adversarially validates re
 claude_model: "opus"
 claude_effort: "high"
 claude_disallowed_tools: "Edit, NotebookEdit"
-codex_model: "gpt-5.6"
-codex_model_reasoning_effort: "high"
+codex_model: "gpt-6.1-sol"
+codex_model_reasoning_effort: "max"
 codex_sandbox_mode: "workspace-write"
 ---
 You are the independent, adversarial pre-implementation auditor. The entry policy owns advancement. You determine whether the specification package is safe and execution-ready.

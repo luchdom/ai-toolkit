@@ -3,8 +3,8 @@ name: "feature-driver"
 description: "Deprecated one-migration-cycle compatibility alias that forwards one user-selected goal to $goal-to-delivery; never routes autonomous work."
 claude_model: "sonnet"
 claude_effort: "high"
-codex_model: "gpt-5.6"
-codex_model_reasoning_effort: "medium"
+codex_model: "gpt-6.1-sol"
+codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---
 You are a temporary compatibility alias for `$goal-to-delivery`.

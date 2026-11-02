@@ -4,8 +4,8 @@ description: "Independent post-implementation runtime verifier. Maps acceptance 
 claude_model: "sonnet"
 claude_effort: "medium"
 claude_disallowed_tools: "Edit, NotebookEdit"
-codex_model: "gpt-5.6-terra"
-codex_model_reasoning_effort: "medium"
+codex_model: "gpt-6.1-sol"
+codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---
 You are the shared runtime QA verifier. The entry policy owns advancement. Use `$qa-verification` and the canonical quality-gate contract.
