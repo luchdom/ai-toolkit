@@ -19,6 +19,20 @@ revision = "f6831c5df8ad546c2567535442f1691a823868e3"
 tools = ["codex"]
 
 [[skills]]
+name = "frontend-design"
+repo = "https://github.com/anthropics/skills.git"
+path = "skills/frontend-design"
+revision = "ca45fc496a3436251f191354091d557da31c15b5"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "unslop"
+repo = "https://github.com/heydamir/unslop.git"
+path = "skills/unslop"
+revision = "a6f121eee5f29c2f74976b75456feae8b66afb3a"
+tools = ["codex", "claude"]
+
+[[skills]]
 name = "stripe-best-practices"
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-best-practices"
@@ -52,3 +66,286 @@ repo = "https://github.com/openai/skills.git"
 path = "skills/.curated/linear"
 revision = "49f948faa9258a0c61caceaf225e179651397431"
 tools = ["codex"]
+
+[[skills]]
+name = "show-me"
+repo = "https://github.com/humanlayer/skills.git"
+path = "plugins/show-me/skills/show-me"
+revision = "69d5fc61d6ca6f7056d283a2ee2a045be741a1d6"
+tools = ["codex", "claude"]
+
+# Matt Pocock: every skill outside skills/deprecated at this revision,
+# including engineering, productivity, in-progress, and misc.
+
+[[skills]]
+name = "ask-matt"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/ask-matt"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "code-review"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/code-review"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "codebase-design"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/codebase-design"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "diagnosing-bugs"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/diagnosing-bugs"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "domain-modeling"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/domain-modeling"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "grill-with-docs"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/grill-with-docs"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "implement"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/implement"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "implement-spec"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/implement-spec"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "improve-codebase-architecture"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/improve-codebase-architecture"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "pr"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/pr"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "prototype"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/prototype"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "research"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/research"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "retro"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/retro"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "setup-matt-pocock-skills"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/setup-matt-pocock-skills"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "tdd"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/tdd"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "to-spec"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/to-spec"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "to-tickets"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/to-tickets"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "triage"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/triage"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "wayfinder"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/wayfinder"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "wizard"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/engineering/wizard"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "chief-of-staff"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/chief-of-staff"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "claude-handoff"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/claude-handoff"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "loop-me"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/loop-me"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "setup-ts-deep-modules"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/setup-ts-deep-modules"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "software-factory"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/software-factory"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "writing-beats"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/writing-beats"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "writing-fragments"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/writing-fragments"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "writing-shape"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/in-progress/writing-shape"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "git-guardrails-claude-code"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/misc/git-guardrails-claude-code"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "migrate-to-shoehorn"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/misc/migrate-to-shoehorn"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "scaffold-exercises"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/misc/scaffold-exercises"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "setup-pre-commit"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/misc/setup-pre-commit"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "grill-me"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/grill-me"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "grilling"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/grilling"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "handoff"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/handoff"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "teach"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/teach"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "to-questionnaire"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/to-questionnaire"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "wait-what"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/wait-what"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "writing-for-agents"
+repo = "https://github.com/mattpocock/skills.git"
+path = "skills/productivity/writing-for-agents"
+revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
+tools = ["codex", "claude", "copilot", "cursor"]
