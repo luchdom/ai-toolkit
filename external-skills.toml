@@ -27,10 +27,17 @@ tools = ["codex", "claude", "copilot", "cursor"]
 
 [[skills]]
 name = "unslop"
-repo = "https://github.com/heydamir/unslop.git"
-path = "skills/unslop"
-revision = "a6f121eee5f29c2f74976b75456feae8b66afb3a"
-tools = ["codex", "claude"]
+repo = "https://github.com/cursor/plugins.git"
+path = "pstack/skills/unslop"
+revision = "6ea74587e384e1a8035c09ae33a46fe3f881eb9b"
+tools = ["codex", "claude", "copilot", "cursor"]
+
+[[skills]]
+name = "technical-writing"
+repo = "https://github.com/cursor/plugins.git"
+path = "pstack/skills/technical-writing"
+revision = "6ea74587e384e1a8035c09ae33a46fe3f881eb9b"
+tools = ["codex", "claude", "copilot", "cursor"]
 
 [[skills]]
 name = "stripe-best-practices"
@@ -71,7 +78,7 @@ tools = ["codex"]
 name = "show-me"
 repo = "https://github.com/humanlayer/skills.git"
 path = "plugins/show-me/skills/show-me"
-revision = "69d5fc61d6ca6f7056d283a2ee2a045be741a1d6"
+revision = "4d69d20f6e9b57b4fcf0d501ccfb1be961f0f329"
 tools = ["codex", "claude"]
 
 # Matt Pocock: every skill outside skills/deprecated at this revision,
