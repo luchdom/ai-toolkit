@@ -191,7 +191,7 @@ Codex parallel extraction expects this existing feature setting:
 multi_agent = true
 ```
 
-Use `$graphify` to invoke the skill explicitly. The global install does not modify a repository. By contrast, `graphify codex install` writes an always-on `AGENTS.md` section and registers `.codex/hooks.json`; do not run that project command automatically in Luchdom repositories, whose primary Codebase Memory policy is repository-owned. Keep extraction local with the CLI guidance in [External Tools](EXTERNAL-TOOLS.md#graphify).
+Use `$graphify` to invoke the skill explicitly. The global install does not modify a repository. By contrast, `graphify codex install` writes an always-on `AGENTS.md` section and registers `.codex/hooks.json`; run that project command only when project-local activation and hooks are explicitly requested. Keep extraction local with the CLI guidance in [External Tools](EXTERNAL-TOOLS.md#graphify).
 
 ### UI/UX Pro Max
 

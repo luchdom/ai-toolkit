@@ -253,8 +253,8 @@ Notes:
 - Full semantic extraction can process docs and media through an LLM backend.
   Do not omit `--code-only` for private repositories unless the user has
   explicitly approved the selected provider and data boundary.
-- Graphify and Codebase Memory are separate indexes. Neither index is proof of
-  exhaustive source coverage; use direct source reads for reported gaps.
+- A generated graph does not establish exhaustive source coverage; use direct
+  source reads for reported gaps.
 
 ### AWS CLI
 
@@ -417,4 +417,4 @@ This provisions an anonymous, claimable sandbox with API keys. Run it only as pa
 
 ### MCP Server Binaries
 
-Some server installers also provide a local executable. Keep their complete setup together in [MCP Servers](MCP-SERVERS.md), including [Codebase Memory](MCP-SERVERS.md#codebase-memory-mcp). A binary on `PATH` does not establish agent registration or authenticated service access.
+Some server installers also provide a local executable. Keep their complete setup together in [MCP Servers](MCP-SERVERS.md). A binary on `PATH` does not establish agent registration or authenticated service access.
