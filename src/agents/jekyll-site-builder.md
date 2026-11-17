@@ -3,7 +3,7 @@ name: "jekyll-site-builder"
 description: "Jekyll + GitHub Pages implementer for personal, portfolio, vCard, docs, and static sites."
 claude_model: "sonnet"
 claude_effort: "medium"
-codex_model: "gpt-6.1-sol"
+codex_model: "gpt-6.2-sol"
 codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---

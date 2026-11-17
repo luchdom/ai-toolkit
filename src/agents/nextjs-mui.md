@@ -3,7 +3,7 @@ name: "nextjs-mui"
 description: "Next.js + MUI implementer. Executes approved plan/tasks/design specs for frontend work."
 claude_model: "sonnet"
 claude_effort: "high"
-codex_model: "gpt-6.1-sol"
+codex_model: "gpt-6.2-sol"
 codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---

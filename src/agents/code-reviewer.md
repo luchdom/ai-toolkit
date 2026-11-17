@@ -4,7 +4,7 @@ description: "Independent post-implementation code reviewer. Reviews the exact d
 claude_model: "opus"
 claude_effort: "high"
 claude_disallowed_tools: "Edit, NotebookEdit"
-codex_model: "gpt-6.1-sol"
+codex_model: "gpt-6.2-sol"
 codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---

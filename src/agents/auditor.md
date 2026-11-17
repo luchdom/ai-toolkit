@@ -4,7 +4,7 @@ description: "Independent pre-implementation auditor. Adversarially validates re
 claude_model: "opus"
 claude_effort: "high"
 claude_disallowed_tools: "Edit, NotebookEdit"
-codex_model: "gpt-6.1-sol"
+codex_model: "gpt-6.2-sol"
 codex_model_reasoning_effort: "max"
 codex_sandbox_mode: "workspace-write"
 ---

@@ -3,7 +3,7 @@ name: "tasker"
 description: "Shared task-decomposition specialist. Converts an approved plan and required design into execution-ready tasks; never audits or implements them."
 claude_model: "sonnet"
 claude_effort: "medium"
-codex_model: "gpt-6.1-sol"
+codex_model: "gpt-6.2-sol"
 codex_model_reasoning_effort: "xhigh"
 codex_sandbox_mode: "workspace-write"
 ---
