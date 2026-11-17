@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Docs Review"
+  short_description: "Check project docs coverage, placement, and consistency"
+  default_prompt: "Use $project-docs-review to check this repository's documentation and suggest specific missing or outdated foundations."

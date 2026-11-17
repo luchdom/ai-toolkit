@@ -7,6 +7,10 @@ description: Maintain durable, searchable repository documentation as a distinct
 
 Own the documentation stage without replacing planning, code review, or runtime QA.
 
+For changes to product scope, UI rules, or technical structure, locate their owners using [the project documentation standard](../project-docs/references/documentation-standard.md). Update the existing PRD, design system, or architecture equivalent when affected, and refresh root `AGENTS.md` links/commands when needed. Use `$project-docs-review` for uncertain coverage and suggest `$project-docs` for missing foundations; keep that suggestion proportional to the change and within the caller's active scope.
+
+Verify project tool instructions still route to the actual docs map. For a working UI catalogue, update its documented source/access instructions when affected and identify any component/token/demo changes belonging to an implementation stage. Keep written UI rules and working examples consistent without claiming out-of-scope code work was completed.
+
 ## Contract
 
 1. Read repository instructions and the smallest relevant curated documentation set.

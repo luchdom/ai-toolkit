@@ -152,7 +152,7 @@ def test_bootstrap_writes_tool_instruction_source_tree() -> None:
             bootstrap_existing.write_tool_instructions()
         expected = (
             source_root / "codex" / "AGENTS.md",
-            source_root / "claude" / "CLAUDE.md",
+            source_root / "claude" / "AGENTS.md",
             source_root / "copilot" / ".github" / "copilot-instructions.md",
             source_root / "cursor" / "AGENTS.md",
         )

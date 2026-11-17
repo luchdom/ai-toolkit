@@ -14,6 +14,16 @@ DIST = ROOT / "dist"
 SKILL_REF_PATTERN = re.compile(r"\$([a-z0-9][a-z0-9-]*)")
 MANIFEST_VERSION = 1
 CURSOR_RULE_PATH_REPLACEMENTS = (
+    ("`$project-docs-review`", "the `.cursor/rules/project-docs-review.mdc` rule"),
+    ("`$project-docs`", "the `.cursor/rules/project-docs.mdc` rule"),
+    ("../project-docs/references/documentation-standard.md", "./project-documentation-standard.mdc"),
+    ("references/documentation-standard.md", "./project-documentation-standard.mdc"),
+    ("references/working-design-system.md", "./project-working-design-system.mdc"),
+    ("working-design-system.md", "./project-working-design-system.mdc"),
+    ("assets/PRD.md", "./project-prd-template.mdc"),
+    ("assets/DESIGN_SYSTEM.md", "./project-design-system-template.mdc"),
+    ("assets/ARCHITECTURE.md", "./project-architecture-template.mdc"),
+    ("assets/AGENTS.md", "./project-agents-template.mdc"),
     ("`$ui-review-spec`", "the `.cursor/rules/ui-review-spec.mdc` rule"),
     ("../goal-to-delivery/references/design-gates.md", "./ui-design-gates.mdc"),
     ("./references/design-review-template.md", "./ui-design-review-template.mdc"),
@@ -192,6 +202,12 @@ def rebuild_dist() -> None:
     markdown_output.write_text(markdown_guidance, encoding="utf-8")
     projections[markdown_source] = [markdown_output]
 
+    project_docs_source = markdown_source.with_name("project-docs.md")
+    project_docs_guidance = project_docs_source.read_text(encoding="utf-8")
+    project_docs_output = markdown_output.with_name(project_docs_source.name)
+    shutil.copy2(project_docs_source, project_docs_output)
+    projections[project_docs_source] = [project_docs_output]
+
     config_source = SRC / "tool-instructions" / "shared" / "markdownlint.json"
     config_output = markdown_output.parent / "markdownlint-cli2.jsonc"
     config_output.write_text(
@@ -202,7 +218,7 @@ def rebuild_dist() -> None:
 
     for agent_path in sorted((SRC / "agents").glob("*.md")):
         meta, body = parse_frontmatter(agent_path.read_text(encoding="utf-8"))
-        body = body.rstrip() + "\n\n" + markdown_guidance
+        body = body.rstrip() + "\n\n" + markdown_guidance + "\n" + project_docs_guidance
         codex_text = render_codex_toml(meta, body)
         claude_text = render_claude_agent(meta, body)
         copilot_text = render_copilot_agent(meta, body)
@@ -235,6 +251,54 @@ def rebuild_dist() -> None:
                 projections[source] = [destination / relative for destination in destinations]
 
     cursor_support_rules = (
+        (
+            SRC / "skills" / "project-docs" / "SKILL.md",
+            "project-docs.mdc",
+            "Create or refine the repository's project documentation.",
+            True,
+        ),
+        (
+            SRC / "skills" / "project-docs-review" / "SKILL.md",
+            "project-docs-review.mdc",
+            "Assess project documentation coverage, placement, and consistency.",
+            True,
+        ),
+        (
+            SRC / "skills" / "project-docs" / "references" / "documentation-standard.md",
+            "project-documentation-standard.mdc",
+            "Placement, ownership, applicability, and maintenance of project documentation.",
+            False,
+        ),
+        (
+            SRC / "skills" / "project-docs" / "references" / "working-design-system.md",
+            "project-working-design-system.mdc",
+            "Runnable component catalogues using the project's real tokens, components, and interactions.",
+            False,
+        ),
+        (
+            SRC / "skills" / "project-docs" / "assets" / "PRD.md",
+            "project-prd-template.mdc",
+            "Starter template for product requirements.",
+            False,
+        ),
+        (
+            SRC / "skills" / "project-docs" / "assets" / "DESIGN_SYSTEM.md",
+            "project-design-system-template.mdc",
+            "Starter template for a project's UI design system.",
+            False,
+        ),
+        (
+            SRC / "skills" / "project-docs" / "assets" / "ARCHITECTURE.md",
+            "project-architecture-template.mdc",
+            "Starter template for project architecture.",
+            False,
+        ),
+        (
+            SRC / "skills" / "project-docs" / "assets" / "AGENTS.md",
+            "project-agents-template.mdc",
+            "Starter template for root project instructions.",
+            False,
+        ),
         (
             SRC / "skills" / "goal-to-delivery" / "references" / "design-gates.md",
             "ui-design-gates.mdc",
@@ -283,26 +347,22 @@ def rebuild_dist() -> None:
         output.write_text(render_cursor_rule({"description": description}, body), encoding="utf-8")
         projections.setdefault(source, []).append(output)
 
-    codex_instruction = SRC / "tool-instructions" / "codex" / "AGENTS.md"
-    claude_instruction = SRC / "tool-instructions" / "claude" / "CLAUDE.md"
-    copilot_instruction = SRC / "tool-instructions" / "copilot" / ".github" / "copilot-instructions.md"
-    cursor_instruction = SRC / "tool-instructions" / "cursor" / "AGENTS.md"
-    if codex_instruction.exists():
-        output = DIST / "tool-instructions" / "codex" / "AGENTS.md"
-        shutil.copy2(codex_instruction, output)
-        projections[codex_instruction] = [output]
-    if claude_instruction.exists():
-        output = DIST / "tool-instructions" / "claude" / "CLAUDE.md"
-        shutil.copy2(claude_instruction, output)
-        projections[claude_instruction] = [output]
-    if copilot_instruction.exists():
-        output = DIST / "tool-instructions" / "copilot" / ".github" / "copilot-instructions.md"
-        shutil.copy2(copilot_instruction, output)
-        projections[copilot_instruction] = [output]
-    if cursor_instruction.exists():
-        output = DIST / "tool-instructions" / "cursor" / "AGENTS.md"
-        shutil.copy2(cursor_instruction, output)
-        projections[cursor_instruction] = [output]
+    for relative in (
+        Path("codex/AGENTS.md"),
+        Path("claude/AGENTS.md"),
+        Path("copilot/.github/copilot-instructions.md"),
+        Path("cursor/AGENTS.md"),
+    ):
+        source = SRC / "tool-instructions" / relative
+        if source.exists():
+            output = DIST / "tool-instructions" / relative
+            output.write_text(
+                source.read_text(encoding="utf-8").replace(
+                    "{{PROJECT_DOCUMENTATION_GUIDANCE}}", project_docs_guidance.rstrip()
+                ),
+                encoding="utf-8",
+            )
+            projections[source] = [output]
 
     write_projection_manifest(projections)
 

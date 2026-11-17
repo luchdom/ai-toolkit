@@ -236,7 +236,7 @@ class DeliveryContractTests(unittest.TestCase):
     def test_tool_instruction_paths_and_identifiers_are_canonical(self) -> None:
         expected = (
             "src/tool-instructions/codex/AGENTS.md",
-            "src/tool-instructions/claude/CLAUDE.md",
+            "src/tool-instructions/claude/AGENTS.md",
             "src/tool-instructions/copilot/.github/copilot-instructions.md",
             "src/tool-instructions/cursor/AGENTS.md",
         )
@@ -296,7 +296,7 @@ class DeliveryContractTests(unittest.TestCase):
             relative_paths = (
                 "src/skills/goal-to-delivery/references/worktree-policy.md",
                 "src/tool-instructions/codex/AGENTS.md",
-                "src/tool-instructions/claude/CLAUDE.md",
+                "src/tool-instructions/claude/AGENTS.md",
                 "src/tool-instructions/copilot/.github/copilot-instructions.md",
                 "src/tool-instructions/cursor/AGENTS.md",
             )

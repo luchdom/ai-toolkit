@@ -37,7 +37,7 @@ GUIDANCE_FILES = (
     "AGENTS.md",
     "README.md",
     "src/tool-instructions/codex/AGENTS.md",
-    "src/tool-instructions/claude/CLAUDE.md",
+    "src/tool-instructions/claude/AGENTS.md",
     "src/tool-instructions/copilot/.github/copilot-instructions.md",
     "src/tool-instructions/cursor/AGENTS.md",
 )
@@ -104,7 +104,7 @@ DOCS_AI_ALLOWLIST: dict[str, dict[str, frozenset[str]]] = {
             {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
         )
     },
-    "src/tool-instructions/claude/CLAUDE.md": {
+    "src/tool-instructions/claude/AGENTS.md": {
         "legacy runtime compatibility": frozenset(
             {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
         )
