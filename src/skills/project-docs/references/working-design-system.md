@@ -1,6 +1,12 @@
 # Working Design System
 
-For a project with a UI, pair the written design rules with a runnable catalogue when practical. The catalogue demonstrates the project's real typography, tokens, components, states, and interactions. Reuse an existing workshop, component library, or internal examples page first.
+For a project with a UI, pair the written design system with a runnable catalogue that demonstrates the project's real typography, tokens, components, states, and interactions.
+
+## Build shared components before pages
+
+1. Locate the project's written design system and runnable component catalogue. Use `$project-docs` to establish either one if missing. Reuse an existing workshop, component library, or internal examples page when available.
+2. Within authorized frontend implementation, add missing components and variants to the shared UI source. Show the core shared components the page needs in the runnable catalogue with their relevant variants and states.
+3. Compose the page with the same component implementations and tokens shown in the catalogue.
 
 ## Choose the natural home
 
@@ -15,12 +21,15 @@ These locations are examples, not mandatory paths. Keep the repository's stack a
 
 ## Minimum runnable coverage
 
+Choose examples and states that apply to the product.
+
 | Area | Demonstrate | Observable check |
 |---|---|---|
 | Foundations | Shared colour/token swatches, headings/body/captions, spacing/radius examples, actual icons | Values and rendered styles match the authoritative token/theme sources |
-| Actions | Actual primary and secondary actions, disabled/loading variants | Pointer and keyboard activation produce visible local feedback; repeated submission behaves as specified |
-| Forms | Actual text input, helper/error feedback, and selection controls used by the product | Typing, validation, correction, focus, and selection work with accessible labels/state |
-| Product components | Existing cards, badges, navigation, or other components relevant to the UI | Variants and interaction states use the same implementation as the app |
+| Actions | Primary and secondary buttons, including disabled and loading variants | Pointer and keyboard activation produce visible local feedback. Repeated submission behaves as specified |
+| Forms | Form labels, text fields, selects, checkboxes, and helper or error messages | Labels identify their controls. Typing, validation, correction, and selection work with visible focus |
+| Data and status | Data tables, cards, status badges, and applicable loading, empty, and error states | Table headers identify the data. Badges communicate status in text |
+| Navigation and overlays | Tabs, menus, and dialogs | Keyboard navigation works. Dialogs manage and restore focus |
 | Layout and themes | Small and large viewports, long labels/content, supported themes | Content remains usable, controls reachable, and focus visible |
 
 Use synthetic fixtures and local state for demos. For example, an Add task form can reject an empty title, add a local preview item, and toggle its completion. It demonstrates behavior without contacting a live API. Static screenshots, decorative button shapes, or copied CSS that diverges from production do not establish a working catalogue.

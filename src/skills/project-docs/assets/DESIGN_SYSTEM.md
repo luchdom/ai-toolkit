@@ -78,11 +78,13 @@
 |---|---|---|---|
 | Primary button | Accent background, on-accent label, control radius, `12px 16px` padding | Click/keyboard activation; visible focus; disabled; loading keeps its label and width | `src/components/Button.tsx`, primary variant |
 | Secondary button | Surface background, text label, border token | Same activation/focus rules; lower emphasis | The same `Button` implementation, secondary variant |
+| Form label | Body size, medium weight, above the field | Names the associated control and indicates required fields in text | `src/components/FormLabel.tsx` |
 | Text field | Persistent label, surface background, control-border token, control radius | Typing, focus, required/invalid feedback, disabled state; errors linked to the field | `src/components/TextField.tsx` |
+| Task table | Text column headers, row dividers, space-3 cell padding | Column headers identify the data. Sorting works with a keyboard when supported. Loading, empty, and error states are visible | `src/components/TaskTable.tsx` |
 | Status badge | Small radius, compact padding, text plus optional icon | Communicates status without relying on colour alone | `src/components/Badge.tsx` |
 | Card | Surface background, border, card radius, space-4 padding | Groups related content; actions remain real controls | `src/components/Card.tsx` |
 
-**Minimum:** name the actual library/source paths and specify variants, spacing, typography, relevant states, and behavior for the product's primary action, secondary action, and form controls. Include other components only when used. Reuse the implementation instead of creating a second visual copy for the catalogue.
+**Minimum** coverage links the shared implementation and runnable example for each core component the product uses. Record planned locations for proposed components. Describe the relevant variants, spacing, typography, states, and behavior. Use the same implementations and tokens in the catalogue and on frontend pages.
 
 ## 07 Icons
 
@@ -133,7 +135,7 @@
 | Foundations | Colour/token swatches, heading/body/caption samples, spacing, radii, and icons from the shared sources |
 | Actions | Actual primary/secondary buttons with click and keyboard feedback, disabled and loading examples |
 | Forms | Actual fields with typing, validation/error correction, and applicable selection controls |
-| Product components | The real badges/cards/navigation used by the app, with relevant variants and states |
+| Product components | Shared components used by the app, such as tables, badges, cards, tabs, and dialogs, with relevant variants and states |
 | Layout | Small and large viewports, long content, and supported themes |
 
 Record the actual source path, local URL, startup command, access boundary, and browser checks. Use synthetic data and local state. A working catalogue shares production components/tokens; static pictures do not establish interaction behavior. Use the skill's working-design-system guidance to choose the implementation and verification scope. If implementation is outside the current docs request, record a concrete proposal and offer that follow-up; do not mark the catalogue implemented.

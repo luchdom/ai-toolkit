@@ -56,7 +56,7 @@ For a new UI, an example palette/type scale can be a clearly labeled proposal ra
 
 ## Working design system
 
-For UI projects, assess a runnable component workshop, internal page, or HTML catalogue alongside the Markdown guide. Reuse an existing one where available; follow [the working design-system guide](working-design-system.md) for stack-aware placement, minimum functional demonstrations, access, and browser verification. Shared tokens/components must drive both the catalogue and the application. A docs-only scope can finish with a concrete implementation proposal; catalogue implementation follows the authorized UI scope and its design/verification gates.
+Before building frontend pages, follow [the working design-system guide](working-design-system.md) to establish the design system if needed and demonstrate the shared components and tokens the pages will use. A docs-only scope can finish with a concrete implementation proposal. Build the catalogue and components within authorized UI work and follow its design and verification requirements.
 
 ## Tool instruction routing
 
