@@ -1,5 +1,7 @@
 # Luchdom Documentation Ownership
 
+Use the existing product, UI design, and architecture owners identified by [the project documentation standard](../../project-docs/references/documentation-standard.md) alongside this Luchdom-specific map. Existing equivalent paths take precedence over new duplicate files.
+
 - `README.md`: orientation, supported entry points, bootstrap, and links
 - `AGENTS.md`: repository-specific workflow routing, commands, safety, and authority
 - `docs/HARNESS.md`: one-iteration behavior, stop conditions, outputs, recovery

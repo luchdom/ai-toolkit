@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Docs"
+  short_description: "Create and refine a repository's core project docs"
+  default_prompt: "Use $project-docs to inspect this repository and create or refine its PRD, design system, architecture, and AGENTS.md with me."

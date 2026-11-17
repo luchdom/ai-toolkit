@@ -14,6 +14,14 @@ For non-trivial work without an explicit entry, use manual `$spec-driven-deliver
 
 The workflows reuse the same specialist skills, but they do not require every specialist for every issue. Routine work plans inline; risky work can add tasking, audit, runtime QA, or documentation stages as needed. Frontend/UI work follows the canonical [design gates](src/skills/goal-to-delivery/references/design-gates.md): unresolved UI decisions require a pre-build product-designer spec, and every changed rendered UI or interaction requires a post-build real-browser design conformance review.
 
+## Project documentation
+
+Use [`$project-docs`](src/skills/project-docs/SKILL.md) to create or refine a repository's product brief, design system, architecture, and root `AGENTS.md`. It includes templates, checks the actual repository, and works through open decisions with you. Use [`$project-docs-review`](src/skills/project-docs-review/SKILL.md) for coverage, placement, and consistency findings without edits. Existing equivalent documents are reused; projects without a UI can mark the design system not applicable.
+
+Templates provide populated examples and minimum coverage requirements. For UI projects, the skill also defines a working component catalogue using the real tokens/components, with its source and startup/access instructions linked from the project docs map. Implement the catalogue within authorized UI work, or record a concrete proposal during docs-only work.
+
+Sync adds a shared docs-discovery rule to user instructions and generated project/specialist instructions. Agents suggest the specific missing documentation when relevant, honor earlier declines, and keep applicable docs current within the active task. Codex, Claude Code, and Cursor project setup share `AGENTS.md`. See [Project documentation](docs/project-documentation.md) for examples, placement, and installation.
+
 ## Product and engineering specialists
 
 | Agent | Use it for |

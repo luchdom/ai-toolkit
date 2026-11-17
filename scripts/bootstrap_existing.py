@@ -76,7 +76,7 @@ def write_tool_instructions() -> None:
     cursor_dir.mkdir(parents=True, exist_ok=True)
 
     codex_instruction = codex_dir / "AGENTS.md"
-    claude_instruction = claude_dir / "CLAUDE.md"
+    claude_instruction = claude_dir / "AGENTS.md"
     copilot_instruction = copilot_dir / "copilot-instructions.md"
     cursor_instruction = cursor_dir / "AGENTS.md"
 

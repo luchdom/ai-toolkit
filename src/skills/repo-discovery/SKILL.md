@@ -11,7 +11,7 @@ Build only the context needed for the current task. Find the governing docs, the
 
 1. Read `AGENTS.md` first.
 2. Identify the task area: frontend, backend, service, shared, infrastructure, or mixed.
-3. Read the smallest relevant subset of `/docs`, `README`, and nearby feature docs.
+3. Read the smallest relevant subset of `/docs`, `README`, and nearby feature docs. Locate the product, design (for UI), and architecture owners through root `AGENTS.md` or the docs index; existing equivalents count. For shared UI work, locate any working design-system page/library and its real component/token sources. Use `$project-docs-review` for material gaps and suggest `$project-docs` for specific creation/refinement without blocking unrelated work.
 4. Find the closest existing implementation pattern in code.
 5. Find the tests nearest to that pattern, especially the suites that match the affected boundary.
 6. Return a concise summary with exact source paths and open questions.

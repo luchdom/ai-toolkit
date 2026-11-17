@@ -123,29 +123,43 @@ def sync_skill_dirs(src_root: Path, dest_root: Path) -> None:
         print(f"Synced skill {skill_dir.name} -> {target}")
 
 
-def sync_markdown_guidance(dest: Path) -> None:
-    """Refresh only the Markdown block, including in unmarked user instructions."""
-    shared = DIST / "tool-instructions" / "shared"
-    block = (shared / "markdown-lint.md").read_text(encoding="utf-8")
-    start = "<!-- AI-TOOLKIT-MARKDOWN:START -->"
-    end = "<!-- AI-TOOLKIT-MARKDOWN:END -->"
+def sync_user_instruction_block(dest: Path, source: Path, marker: str, label: str) -> None:
+    """Update one toolkit-owned block without replacing personal instructions."""
+    block = source.read_text(encoding="utf-8")
+    start = f"<!-- AI-TOOLKIT-{marker}:START -->"
+    end = f"<!-- AI-TOOLKIT-{marker}:END -->"
     existing = ""
     if dest.exists():
         with dest.open(encoding="utf-8", newline="") as file:
             existing = file.read()
     if start in existing or end in existing:
         if existing.count(start) != 1 or existing.count(end) != 1 or existing.index(start) >= existing.index(end):
-            raise ValueError(f"Malformed Markdown lint markers in {dest}; preserved existing content.")
+            raise ValueError(f"Malformed {label} markers in {dest}; preserved existing content.")
         end_position = consume_newline(existing, existing.index(end) + len(end))
         updated = existing[:existing.index(start)] + block + existing[end_position:]
     else:
         separator = "" if not existing or existing.endswith("\n\n") else "\n" if existing.endswith("\n") else "\n\n"
         updated = existing + separator + block
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    with dest.open("w", encoding="utf-8", newline="") as file:
-        file.write(updated)
+    if updated != existing:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with dest.open("w", encoding="utf-8", newline="") as file:
+            file.write(updated)
+        print(f"Updated {label} guidance in {dest}")
+
+
+def sync_markdown_guidance(dest: Path) -> None:
+    shared = DIST / "tool-instructions" / "shared"
+    sync_user_instruction_block(dest, shared / "markdown-lint.md", "MARKDOWN", "Markdown lint")
     sync_file(shared / "markdownlint-cli2.jsonc", Path.home() / ".config" / "ai-toolkit" / "markdownlint-cli2.jsonc")
-    print(f"Updated Markdown lint guidance in {dest}")
+
+
+def sync_project_docs_guidance(dest: Path) -> None:
+    sync_user_instruction_block(
+        dest,
+        DIST / "tool-instructions" / "shared" / "project-docs.md",
+        "PROJECT-DOCS",
+        "Project documentation",
+    )
 
 
 def sync_codex() -> None:
@@ -154,6 +168,7 @@ def sync_codex() -> None:
         sync_file(agent_file, codex_home / "agents" / agent_file.name)
     sync_skill_dirs(DIST / "codex" / "skills", codex_home / "skills")
     sync_markdown_guidance(codex_home / "AGENTS.md")
+    sync_project_docs_guidance(codex_home / "AGENTS.md")
 
 
 def sync_claude() -> None:
@@ -162,6 +177,7 @@ def sync_claude() -> None:
         sync_file(agent_file, claude_home / "agents" / agent_file.name)
     sync_skill_dirs(DIST / "claude" / "skills", claude_home / "skills")
     sync_markdown_guidance(claude_home / "CLAUDE.md")
+    sync_project_docs_guidance(claude_home / "CLAUDE.md")
 
 
 def sync_copilot() -> None:
@@ -170,18 +186,16 @@ def sync_copilot() -> None:
         sync_file(agent_file, copilot_home / "agents" / agent_file.name)
     sync_skill_dirs(DIST / "copilot" / "skills", copilot_home / "skills")
     sync_markdown_guidance(copilot_home / "copilot-instructions.md")
+    sync_project_docs_guidance(copilot_home / "copilot-instructions.md")
 
 
 def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
     project.mkdir(parents=True, exist_ok=True)
 
-    if "codex" in tools:
+    agent_tool = next((tool for tool in ("codex", "claude", "cursor") if tool in tools), None)
+    if agent_tool:
         target = project / "AGENTS.md"
-        write_or_splice_template(DIST / "tool-instructions" / "codex" / "AGENTS.md", target, force)
-
-    if "claude" in tools:
-        target = project / "CLAUDE.md"
-        write_or_splice_template(DIST / "tool-instructions" / "claude" / "CLAUDE.md", target, force)
+        write_or_splice_template(DIST / "tool-instructions" / agent_tool / "AGENTS.md", target, force)
 
     if "copilot" in tools:
         target = project / ".github" / "copilot-instructions.md"
@@ -210,9 +224,6 @@ def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
             print(f"Synced skill {skill_dir.name} -> {target}")
 
     if "cursor" in tools:
-        target = project / "AGENTS.md"
-        write_or_splice_template(DIST / "tool-instructions" / "cursor" / "AGENTS.md", target, force)
-
         rules_root = project / ".cursor" / "rules"
         for rule_file in sorted((DIST / "cursor" / "rules").glob("*.mdc")):
             target = rules_root / rule_file.name
