@@ -33,11 +33,11 @@ These requests authorize documentation work. They do not authorize redesigning t
 
 ## Working design system
 
-For UI projects, the skill also assesses a runnable catalogue alongside the Markdown guide. Reuse an existing workshop/component library, or choose an internal app route for a framework project and a served HTML page for a vanilla site. Use the actual shared components and tokens.
+Before building frontend pages, establish a written design system and a runnable component catalogue. Use `$project-docs` if either is missing. Reuse an existing workshop or choose a suitable app route or served HTML page. Demonstrate the required shared components in the catalogue first, then compose pages from those same implementations and tokens.
 
-Minimum demonstrations cover typography/token samples, real primary/secondary actions, form input and validation, relevant product components/states, and responsive behavior. Controls must work with pointer and keyboard input; fixtures can use synthetic data and local state. Static pictures of controls do not establish working behavior.
+Show the components the project uses, such as data tables, form labels, buttons, badges, text fields, selects, cards, tabs, and dialogs. Demonstrate relevant variants and states, typography, tokens, and responsive behavior. Exercise interactive controls with pointer and keyboard input. Fixtures can use synthetic data and local state.
 
-The design-system document records the real source path, local URL, startup command, access boundary, and observed browser checks. When UI implementation is already in scope, build or refine that catalogue under the applicable UI workflow. During docs-only work, record a concrete proposal and remaining implementation instead of claiming it exists. See [the working design-system guide](../src/skills/project-docs/references/working-design-system.md).
+The design-system document records the actual source path, local URL, startup command, access boundary, and observed browser checks. Build or refine the catalogue within authorized UI implementation. During docs-only work, record the proposal and remaining implementation. See [the working design-system guide](../src/skills/project-docs/references/working-design-system.md).
 
 ## Placement
 
