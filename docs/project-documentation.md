@@ -67,7 +67,7 @@ Global/project tool guidance
 
 The creation skill maintains that map and existing project-specific router pointers while editing docs. For example, `.github/copilot-instructions.md` can link `../AGENTS.md`; the root map then links `docs/PRD.md` or the repository's actual equivalent. Scoped instructions use paths relative to their own locations. The review follows these links and reports a missing route even if the documents themselves exist. The global default filenames help discovery; they do not replace project-specific links.
 
-Read [the canonical standard](../src/skills/project-docs/references/documentation-standard.md) for ownership, evidence states, and conditional extensions such as code style, testing, security, operations, ADRs, and a glossary. Templates live under [the skill's assets](../src/skills/project-docs/assets/). Keep feature-specific plans and QA evidence in the active workflow's registered artifact folder; they have a different purpose from these durable foundations.
+Read [the canonical standard](../src/skills/project-docs/references/documentation-standard.md) for ownership, evidence states, and conditional extensions such as code style, testing, security, operations, ADRs, and a glossary. Templates live under [the skill's assets](../src/skills/project-docs/assets/). Use the [artifact contract](../src/skills/goal-to-delivery/references/artifact-contract.md) for feature-specific plans and QA evidence.
 
 ## Review and ordinary project work
 
@@ -99,7 +99,7 @@ python3 scripts/sync.py --tool codex
 
 On Windows use `py -3` or the verified executable. Choose `claude`, `copilot`, or `all` for the other supported user-level destinations. Normal sync includes selected external imports; `--skip-external` limits it to repository-generated content. Add `--project "<actual-repository-path>"` when project-local routing is wanted. Cursor uses project-local rules, including both docs skills, the standard, and all four templates.
 
-User-level sync adds an `AI-TOOLKIT-PROJECT-DOCS` block to the tool's existing user-instruction location and installs both skills with their resources. It preserves content outside the block. The project setup uses root `AGENTS.md`; the existing Claude user-level instruction destination is independent of that project layout. Existing unmarked project instructions remain protected by the normal sync rules.
+User-level sync adds an `AI-TOOLKIT-PROJECT-DOCS` block to the tool's existing user-instruction location and installs both skills with their resources. The block also points substantive planning requests to the manual Plan stage and its artifact contract. Sync preserves content outside the block. The project setup uses root `AGENTS.md`; the existing Claude user-level instruction destination is independent of that project layout. Existing unmarked project instructions remain protected by the normal sync rules.
 
 Verify the two installed `SKILL.md` files, the creation skill's four assets and two references, and the docs rule in the selected user/project instructions. For Cursor, verify the `project-docs.mdc`, `project-docs-review.mdc`, `project-documentation-standard.mdc`, `project-working-design-system.mdc`, and `project-*-template.mdc` rules. Start a new agent session to discover newly installed skills/instructions. Build and validation alone do not install into live user homes.
 
