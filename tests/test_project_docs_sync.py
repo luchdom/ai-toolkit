@@ -127,7 +127,8 @@ class ProjectDocsSyncTests(unittest.TestCase):
             for name in names:
                 path = project / ".cursor" / "rules" / name
                 self.assertTrue(path.is_file())
-                assert_resource_links_resolve(self, path, ".mdc")
+                suffix = None if name in ("project-docs.mdc", "project-docs-review.mdc") else ".mdc"
+                assert_resource_links_resolve(self, path, suffix)
 
 
 if __name__ == "__main__":
