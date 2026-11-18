@@ -15,17 +15,19 @@ The normal state mapping is Backlog for eligible intake, In Progress for the sin
 
 ## Acquire the run lease
 
-After validating that `.ai/loop.json` exists and is enabled, acquire the deterministic cross-run lease before reading or mutating Linear, Git, notifications, or repository work. Run `python <this-skill-directory>/scripts/loop_lock.py acquire --repo-root <repository-root>` and retain the returned token only for release.
+Check the current OS and shell. Use Python 3.11 or newer. Verify `python3 --version` on macOS, or `py -3 --version` or `python --version` on Windows. Replace `<python>` with the verified command or executable path. Resolve `<this-skill-directory>` from this file and quote paths with spaces. In PowerShell, use `&` before a quoted executable path.
+
+After validating `.ai/loop.json`, acquire the lease before reading Linear or starting delivery. Run `<python> "<this-skill-directory>/scripts/loop_lock.py" acquire --repo-root "<repository-root>"`. Keep the returned token for release.
 
 - Exit `0` with `status: acquired`: continue this invocation.
 - Exit `3` with `status: busy`: another invocation owns this Linear queue; stop immediately without comments, notifications, or repository mutation.
 - Any other result: fail closed and report the local lock error without attempting delivery.
 
-The helper scopes the lock by repository key plus Linear team/project, so worktrees and separate local checkouts of the same queue contend. Its lease is `maxRunMinutes + 15` minutes. An expired valid lease is recovered atomically; malformed state is never overwritten.
+Local checkouts and worktrees for the same repository key and Linear team/project share one lease. It lasts `maxRunMinutes + 15` minutes. The helper recovers an expired valid lease and stops on an invalid lease file.
 
-On Windows, the default lease root is `%LOCALAPPDATA%\Luchdom\ai-toolkit`. Set `LUCHDOM_AI_STATE_HOME` to an absolute user-state path only when an installation requires an explicit override; never point it at this repository or its `docs` directory.
+On Windows, the default lease root is `%LOCALAPPDATA%\Luchdom\ai-toolkit`. On macOS and other POSIX hosts, it is `$XDG_STATE_HOME/luchdom-ai` when set, otherwise `~/.local/state/luchdom-ai`. These lease paths are separate from the delivery workflow registry. Set `LUCHDOM_AI_STATE_HOME` to an absolute user-state path only when an installation requires an explicit override; never point it at this repository or its `docs` directory.
 
-Before every return after acquisition—including completion, checkpoint, decision request, validation failure, or unexpected error—run `python <this-skill-directory>/scripts/loop_lock.py release --repo-root <repository-root> --token <token>`. Never store the token in Linear, Git, docs, or notifications. If the process is killed before release, a later invocation recovers the lease after expiry.
+Release the lease before every return after acquisition. Run `<python> "<this-skill-directory>/scripts/loop_lock.py" release --repo-root "<repository-root>" --token <token>`. Keep the token local to the run. If the process ends before release, a later invocation recovers the lease after expiry.
 
 ## Select or resume one issue
 

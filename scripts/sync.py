@@ -182,6 +182,13 @@ def sync_codex() -> None:
     sync_markdown_guidance(codex_home / "AGENTS.md")
     sync_project_docs_guidance(codex_home / "AGENTS.md")
     sync_delivery_guidance("codex", codex_home, codex_home / "AGENTS.md")
+    dotnet_routing = DIST / "tool-instructions" / "shared" / "dotnet-routing.md"
+    sync_user_instruction_block(
+        codex_home / "AGENTS.md",
+        dotnet_routing.read_text(encoding="utf-8"),
+        "DOTNET",
+        ".NET routing",
+    )
 
 
 def sync_claude() -> None:

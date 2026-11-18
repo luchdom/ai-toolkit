@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -124,6 +125,9 @@ def main() -> int:
 
     environment = os.environ.copy()
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
+    # macOS exposes /var via a symlink; test fixtures need the physical path.
+    temporary_root = str(Path(tempfile.gettempdir()).resolve())
+    environment.update({name: temporary_root for name in ("TMPDIR", "TEMP", "TMP")})
     for step in manifest["steps"]:
         command = command_for(step)
         print(f"\n==> {step['name']}: {' '.join(command)}", flush=True)

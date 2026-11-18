@@ -548,6 +548,18 @@ class DeliveryContractTests(unittest.TestCase):
         self.assertIn('"startdirectory": "tests"', rendered)
         self.assertNotIn("sync.py --tool", rendered)
 
+    def test_aggregate_gate_passes_physical_temp_root_to_children(self) -> None:
+        step = {"name": "build", "type": "command", "argv": ["{python}", "scripts/build.py"]}
+        temporary_alias = str(ROOT / ".." / ROOT.name)
+        with mock.patch.object(aggregate_validation, "load_manifest", return_value={"steps": [step]}), mock.patch.object(
+            aggregate_validation.tempfile, "gettempdir", return_value=temporary_alias
+        ), mock.patch.object(aggregate_validation.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as run:
+            self.assertEqual(0, aggregate_validation.main())
+        environment = run.call_args.kwargs["env"]
+        for name in ("TMPDIR", "TEMP", "TMP"):
+            self.assertEqual(str(ROOT.resolve()), environment[name])
+        self.assertEqual("1", environment["PYTHONDONTWRITEBYTECODE"])
+
     def test_aggregate_manifest_accepts_only_fixed_local_shapes(self) -> None:
         safe = {
             "schemaVersion": 1,

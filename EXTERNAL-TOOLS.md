@@ -1,6 +1,6 @@
 # External Tools
 
-Use this document for CLI tools and local runtimes. Use [External Skills](EXTERNAL-SKILLS.md) for imported skills and native plugins, and [MCP Servers](MCP-SERVERS.md) for server registration, configuration, and authentication.
+Use this document for CLI tools and local runtimes. Follow the [external skill guide](EXTERNAL-SKILLS.md) to manage pinned skill imports and [MCP Servers](MCP-SERVERS.md) to register, configure, or authenticate servers.
 
 ## Select the Host Path
 
@@ -14,10 +14,7 @@ One-line CLI commands without shell-specific syntax work in both PowerShell and 
 
 1. Follow the [README](README.md#build-validate-and-install) to build and sync this repository. Normal sync includes the selected imports in [external-skills.toml](external-skills.toml).
 2. Install the companion CLI tools required by the skills you use. Skill files and working CLI access are separate checks.
-3. Follow [External Skills](EXTERNAL-SKILLS.md#native-installers-and-plugins) for packages that use a native installer or plugin manager.
-4. Configure only the MCP servers you choose through [MCP Servers](MCP-SERVERS.md).
-
-Use `scripts/sync.py --tool all --skip-external` for repository-generated content only. That option skips external skill downloads; it does not install CLI tools or configure MCP servers.
+3. Configure the MCP servers you need through [MCP Servers](MCP-SERVERS.md).
 
 ## CLI Tools and Runtimes
 
@@ -234,8 +231,6 @@ uv tool install graphifyy
 graphify --version
 ```
 
-Install its agent skill through [External Skills](EXTERNAL-SKILLS.md#graphify). This CLI install does not register a project hook or MCP server.
-
 For each selected repository, keep generated graphs outside the Git
 worktrees and use local AST-only extraction. `--code-only` skips docs, PDFs, and
 images and does not call an LLM. Replace `<repository-path>` and `<name>` with the current host's checkout and a stable index name; the quoted `$HOME` paths work in both PowerShell and zsh/bash:
@@ -295,7 +290,7 @@ npm install -g @playwright/cli@latest
 playwright-cli --help
 ```
 
-Install the companion skill through [External Skills](EXTERNAL-SKILLS.md#playwright-cli). Prefer CLI plus skills for coding-agent workflows; [Playwright MCP](MCP-SERVERS.md#playwright) is available for persistent browser sessions.
+Use [Playwright MCP](MCP-SERVERS.md#playwright) for persistent browser sessions.
 
 ### UI/UX Pro Max CLI
 
@@ -305,64 +300,6 @@ Use [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/u
 npm install -g ui-ux-pro-max-cli
 uipro --version
 ```
-
-Generate the agent skill bundle separately through [External Skills](EXTERNAL-SKILLS.md#uiux-pro-max). Its bundled Python search scripts use the standard library and run locally.
-
-### MemPalace
-
-Links:
-
-- [MemPalace repository](https://github.com/MemPalace/mempalace)
-- [MemPalace official documentation](https://mempalaceofficial.com/guide/getting-started.html)
-- [MemPalace MCP integration](https://mempalaceofficial.com/guide/mcp-integration.html)
-
-Recommended for:
-
-- local persistent semantic memory across projects and conversations
-- a writable MCP memory palace with project wings, rooms, entity relationships,
-  and agent diaries
-
-Install the official PyPI package in an isolated environment:
-
-```powershell
-uv tool install mempalace
-```
-
-Verify the CLI:
-
-```powershell
-mempalace --version
-mempalace status
-```
-
-Initialize and mine only an approved source directory. Use `--no-llm` when the
-initial entity scan must remain local. Use the actual host path:
-
-```text
-mempalace init "<approved-source-path>" --no-llm --yes --auto-mine --lang en,pt-br
-```
-
-For dirty repositories or repositories with private untracked files, create a
-clean tracked-only local clone under `~/.mempalace/sources/` and mine that copy.
-This preserves the working tree and prevents unrelated untracked artifacts from
-entering the palace. Replace `<repository-path>`, `<branch>`, and `<name>` with the selected repository's values; these commands work in PowerShell and zsh/bash:
-
-```text
-git clone --no-hardlinks --single-branch --branch "<branch>" "<repository-path>" "$HOME/.mempalace/sources/<name>"
-mempalace init "$HOME/.mempalace/sources/<name>" --no-llm --yes --auto-mine --lang en,pt-br
-```
-
-Notes:
-
-- MemPalace stores and returns mined text verbatim. Never mine secrets, raw
-  financial documents, provider payloads, private transcripts, or other content
-  that is outside the approved memory boundary.
-- Project mining respects `.gitignore` by default. A clean tracked-only clone is
-  still the safer boundary when the live checkout contains unrelated changes.
-- The default Chroma/ONNX embedding path is local and needs no API key. The first
-  mine downloads the embedding model and may take several minutes.
-- Install the native plugin through [External Skills](EXTERNAL-SKILLS.md#mempalace), then verify its server through [MCP Servers](MCP-SERVERS.md#mempalace).
-- The plugin and PyPI package can publish at different versions. The executable on `PATH` controls the runtime; check `mempalace --version` and `mempalace status`, then restart Codex after an upgrade.
 
 ### Firecrawl CLI
 
@@ -380,8 +317,6 @@ If the command is not immediately available in a Windows shell:
 npx -y firecrawl-cli@latest login --browser
 npx -y firecrawl-cli@latest view-config
 ```
-
-The skill installation flow is in [External Skills](EXTERNAL-SKILLS.md#firecrawl). Authentication is separate from installing skill files.
 
 ### PostHog CLI
 
@@ -403,7 +338,7 @@ posthog-cli login
 posthog-cli --help
 ```
 
-Use [External Skills](EXTERNAL-SKILLS.md#posthog) for the optional plugin and [MCP Servers](MCP-SERVERS.md#posthog) for its remote skills store.
+Follow [MCP Servers](MCP-SERVERS.md#posthog) for the remote skills store.
 
 ### Stripe CLI Sandbox
 
@@ -413,7 +348,7 @@ Use [External Skills](EXTERNAL-SKILLS.md#posthog) for the optional plugin and [M
 stripe sandbox create
 ```
 
-This provisions an anonymous, claimable sandbox with API keys. Run it only as part of an authorized sandbox setup; importing [Stripe skills](EXTERNAL-SKILLS.md#stripe) does not run it or provision resources.
+This command provisions an anonymous, claimable sandbox with API keys. The [import manifest](external-skills.toml) pins the Stripe skill files separately.
 
 ### MCP Server Binaries
 

@@ -5,6 +5,7 @@ Linear Delivery Loop selects or resumes one issue per invocation and runs [Goal 
 ## Prerequisites
 
 - Codex can open the target repository and use its local tools.
+- Python 3.11 or newer is available. Follow [platform support](platform-support.md) to select the interpreter and shell commands for the current host.
 - Linear access is available through the installed connector/skill.
 - GitHub CLI is authenticated when the repository uses pull requests.
 - Required credentials are environment variables, never committed files.
@@ -48,7 +49,7 @@ Do not archive attended pilots, schedules attached to an existing long-lived cha
 
 Every invocation acquires a local lease before reading or mutating Linear, Git, notifications, or repository work. The lease is shared by worktrees and local checkouts configured for the same repository key plus Linear team/project. A concurrent invocation exits without mutation; the active owner may continue or checkpoint. The lease expires 15 minutes after the configured `maxRunMinutes`, allowing recovery after a killed process without permitting a normal in-budget run to overlap.
 
-Lock files live under the user state directory: `LUCHDOM_AI_STATE_HOME` when set, otherwise `%LOCALAPPDATA%\Luchdom\ai-toolkit` on Windows or the platform-local Luchdom state folder on other systems. State must remain outside the repository and its `docs` directory. Valid expired locks recover automatically. Malformed lock state fails closed; verify that no invocation is active before moving that file aside for troubleshooting.
+Lock files live under `LUCHDOM_AI_STATE_HOME` when set, otherwise `%LOCALAPPDATA%\Luchdom\ai-toolkit` on Windows, or `$XDG_STATE_HOME/luchdom-ai` on macOS and other POSIX hosts when `XDG_STATE_HOME` is set, falling back to `~/.local/state/luchdom-ai`. These lease files are separate from the delivery workflow registry; see [platform support](platform-support.md) for both defaults. State must remain outside the repository and its `docs` directory. Valid expired locks recover automatically. Malformed lock state fails closed; verify that no invocation is active before moving that file aside for troubleshooting.
 
 ## Decisions and notifications
 

@@ -118,5 +118,31 @@ class DeliveryRoutingSyncTests(unittest.TestCase):
                     self.assertIn(f"(<{guide.as_posix()}>)", (project / "AGENTS.md").read_text(encoding="utf-8"))
 
 
+class CodexRoutingSyncTests(unittest.TestCase):
+    def test_sync_installs_dotnet_route_and_reference_with_personal_rules_intact(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            codex = home / ".codex"
+            codex.mkdir()
+            instructions = codex / "AGENTS.md"
+            original = b"# Personal rules\r\n\r\n@RTK.md\r\n"
+            instructions.write_bytes(original)
+            with mock.patch.object(Path, "home", return_value=home), redirect_stdout(io.StringIO()):
+                sync.sync_codex()
+                first = instructions.read_bytes()
+                suffix = b"\r\n# More personal rules\r\n"
+                instructions.write_bytes(first + suffix)
+                sync.sync_codex()
+
+            self.assertTrue(first.startswith(original))
+            self.assertEqual(first + suffix, instructions.read_bytes())
+            self.assertEqual(1, first.count(b"<!-- AI-TOOLKIT-DOTNET:START -->"))
+            self.assertIn(b"$dotnet-implementation", first)
+            self.assertTrue((codex / "agents/dotnet.toml").is_file())
+            skill = codex / "skills/dotnet-implementation"
+            self.assertTrue((skill / "SKILL.md").is_file())
+            self.assertTrue((skill / "references/modular-monolith.md").is_file())
+
+
 if __name__ == "__main__":
     unittest.main()

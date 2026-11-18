@@ -8,7 +8,7 @@ Use the OS of the host executing the command, then choose syntax for its active 
 2. Run the read-only probe from the toolkit checkout with an available Python: `python3 scripts/platform_info.py` on macOS, or `py -3 scripts/platform_info.py` on Windows. A verified `python` executable is also usable. The JSON identifies the execution OS, architecture, Python executable/version, home, checkout, shell environment hints, and available command paths.
 3. Require Python **3.11 or newer** for toolkit maintenance, including the TOML bootstrap helper. The probe itself runs on Python 3.9+ and exits 1 when the interpreter is too old or the host is outside the Windows/macOS support matrix. Select an installed supported interpreter and rerun it. Keep that same executable for build, validation, and sync.
 4. Confirm the active shell from the execution tool before choosing syntax. `shellHints` are only environment hints. Verify needed CLIs with their version/status commands; a path in the probe means discoverable, not authenticated or working.
-5. Follow the matching commands below, [External Skills](../EXTERNAL-SKILLS.md) for upstream imports and native plugins, [External Tools](../EXTERNAL-TOOLS.md) for companion CLIs, and [MCP Servers](../MCP-SERVERS.md) for explicit server setup. Unsupported hosts need their own verified commands; do not silently use the Windows branch.
+5. Follow the matching commands below. Use the [external skill guide](../EXTERNAL-SKILLS.md) for pinned imports, [External Tools](../EXTERNAL-TOOLS.md) for companion CLIs, and [MCP Servers](../MCP-SERVERS.md) for server setup. Unsupported hosts need their own verified commands.
 
 The probe does not install tools, authenticate services, edit configuration, or select a delivery workflow.
 
@@ -42,7 +42,7 @@ On macOS, `python3` may still select an older system interpreter even when a new
 
 Normal sync includes compatible selected imports from [external-skills.toml](../external-skills.toml). It requires Git and network access to the pinned public repositories. Preview the local import plan with `python3 scripts/external_skills.py --tool all --dry-run` on macOS or `py -3 scripts/external_skills.py --tool all --dry-run` on Windows. Use `--skip-external` with `scripts/sync.py` for offline installation of repository-generated content only. CLI installation, plugin setup, MCP configuration, and login remain separate operations.
 
-`scripts/validate.py` rebuilds generated adapters and runs the repository gate without syncing to a user home. Runtime path guards remain enabled.
+`scripts/validate.py` rebuilds generated adapters and runs the repository gate without syncing to a user home. It resolves the temporary-directory base for subprocesses so macOS `/var` aliases do not trigger workflow symlink protection. Runtime path guards remain enabled.
 
 ## Paths and persistent state
 
@@ -50,6 +50,12 @@ Normal sync includes compatible selected imports from [external-skills.toml](../
 |---|---|---|
 | Toolkit location | Actual checkout path | Actual checkout path |
 | User-level adapters | `Path.home()/.codex` and `Path.home()/.claude` | `Path.home()/.codex` and `Path.home()/.claude` |
+| Workflow registry default | `%LOCALAPPDATA%/Luchdom/ai-delivery` | `~/Library/Application Support/Luchdom/ai-delivery` |
+| Linear loop lease default | `%LOCALAPPDATA%/Luchdom/ai-toolkit` | `$XDG_STATE_HOME/luchdom-ai`, otherwise `~/.local/state/luchdom-ai` |
+
+Workflow helpers use an explicit `--state-home` first, then `LUCHDOM_DELIVERY_STATE_HOME`, then the OS default. Workflow state roots must be absolute, outside the checkout and Git directory, and free of symlink/reparse components. Other OSes require an explicit workflow state root. Windows requires an absolute `LOCALAPPDATA` for its workflow default. Inherited Windows variables do not change macOS defaults.
+
+The loop helper uses a separate override, `LUCHDOM_AI_STATE_HOME`, for its lease directory. It does not set the workflow registry root. Existing roots are not migrated automatically. Keep each helper's existing explicit override when resuming work, and do not run concurrent copies against different roots for the same queue.
 
 The sync script uses `Path.home()` for user-level destinations. Shared docs links are rendered from `LUCHDOM_AI_TOOLKIT_DOCS`, then legacy `LUCHDOM_AI_CONFIG_DOCS`, then this checkout's `docs` directory. These overrides must name a real location on the execution host. After moving the toolkit checkout, refresh marker-managed project instructions so their docs links point to the new location.
 

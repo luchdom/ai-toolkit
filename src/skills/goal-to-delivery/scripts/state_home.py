@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -58,15 +59,22 @@ def derive_state_home(
         configured_path = Path(configured)
         if not configured_path.is_absolute():
             raise StateHomeError(f"{STATE_HOME_ENVIRONMENT} must be an absolute machine-stable base")
-        _reject_reparse_components(configured_path)
-        base = _resolved(configured_path)
-    else:
+    elif sys.platform == "win32":
         local_app_data = environment.get("LOCALAPPDATA")
         if not local_app_data:
             raise StateHomeError("LOCALAPPDATA is required when no state-home override is configured")
+        if not Path(local_app_data).is_absolute():
+            raise StateHomeError("LOCALAPPDATA must be an absolute machine-stable base")
         configured_path = Path(local_app_data) / "Luchdom" / "ai-delivery"
-        _reject_reparse_components(configured_path)
-        base = _resolved(configured_path)
+    elif sys.platform == "darwin":
+        configured_path = Path.home() / "Library" / "Application Support" / "Luchdom" / "ai-delivery"
+    else:
+        raise StateHomeError(
+            f"No default state-home location is supported on {sys.platform}; "
+            f"configure {STATE_HOME_ENVIRONMENT} with an absolute machine-stable base"
+        )
+    _reject_reparse_components(configured_path)
+    base = _resolved(configured_path)
 
     repository_root = _resolved(identity.repository_root)
     common_dir = _resolved(identity.common_dir)

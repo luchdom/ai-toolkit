@@ -26,8 +26,11 @@ Sync adds a shared docs-discovery rule to user instructions and generated projec
 
 | Agent | Use it for |
 |---|---|
+| [`dotnet`](src/agents/dotnet.md) | Authorized C#/.NET backend implementation, including ASP.NET Core APIs, persistence, authorization, workers, and tests. |
 | [`product-manager`](src/agents/product-manager.md) | Product and acceptance-criteria clarifications, evaluating implementation against customer outcomes and AC, benchmark work with PD, and PRDs on request. |
 | [`staff-engineer`](src/agents/staff-engineer.md) | Technical clarification for the team, feasibility with PM/PD, code review, simplification and duplication analysis, and requested RFCs, ADRs, diagrams, and implementation guidance. Writes documents; implementers write code. |
+
+For .NET implementation, use [`$dotnet-implementation`](src/skills/dotnet-implementation/SKILL.md) to route the work and apply the same guidance when working inline. The skill bundles a [modular monolith guide](src/skills/dotnet-implementation/references/modular-monolith.md) for projects that use or explicitly adopt module-first vertical slices. Codex sync adds the route to the user instructions so it also applies in projects without toolkit instructions.
 
 Goal to Delivery can consult the product manager for goals and product behavior, the product designer for UI and user experience, and the staff engineer for technical choices. A staff engineer can also perform the independent code review when they meet the review requirements. See the [clarification policy](src/skills/spec-driven-delivery/references/clarification-policy.md) and [quality gates](src/skills/spec-driven-delivery/references/quality-gates.md).
 
@@ -124,11 +127,11 @@ Use `--tool codex` or `--tool claude` to install for one tool. Use `--tool all` 
 
 User sync installs the shared delivery references next to the skills in each tool's home. Project instructions link to the toolkit checkout. Sync the project instructions again if that checkout moves.
 
-Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). Preview them with `python3 scripts/external_skills.py --tool all --dry-run` on macOS or `py -3 scripts/external_skills.py --tool all --dry-run` on Windows. Use `--skip-external` on `scripts/sync.py` for repository-generated content only. Imports preserve unmanaged or locally modified skill directories; `--force` does not bypass their ownership checks. See [External Skills](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
+Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). The manifest header contains the preview and sync commands. See the [external skill guide](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
 
 Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Use `--force` to adopt an unmarked project instruction file. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
 
-For a fresh Codex environment, start with [External Skills](EXTERNAL-SKILLS.md) for selected imports and native plugins. The [additional skill restore checklist](docs/codex-skill-restore.md) is a historical Windows inventory for system and plugin skills beyond the active manifest; follow current platform paths and package instructions when restoring it.
+For a fresh Codex environment, start with the [import manifest](external-skills.toml) and the [external skill guide](EXTERNAL-SKILLS.md). For older system and plugin skills, consult the historical [additional skill restore checklist](docs/codex-skill-restore.md) and follow current upstream instructions.
 
 ## Maintenance
 
@@ -138,5 +141,5 @@ Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.m
 - Keep tool instructions as concise routers rather than copies of the canonical protocol.
 - Keep legacy artifact-root literals limited to the validator's reviewed path-and-purpose allowlist.
 - Keep credentials in environment variables, never repository files.
-- Use [External Tools](EXTERNAL-TOOLS.md) for companion CLIs, [External Skills](EXTERNAL-SKILLS.md) for imports and plugins, and [MCP Servers](MCP-SERVERS.md) for explicit server setup.
+- Use [External Tools](EXTERNAL-TOOLS.md) for companion CLIs, the [external skill guide](EXTERNAL-SKILLS.md) to maintain imports, and [MCP Servers](MCP-SERVERS.md) for server setup.
 - Preserve unrelated user changes and historical artifact evidence.

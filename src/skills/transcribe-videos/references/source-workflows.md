@@ -2,6 +2,8 @@
 
 ## Public video and YouTube
 
+The one-line `yt-dlp` commands below work in PowerShell and zsh/bash. Use paths that exist on the current host, regardless of paths recorded in earlier sessions.
+
 Inspect metadata without downloading media:
 
 ```powershell
@@ -58,12 +60,26 @@ Store the manifest only in the task’s temporary directory:
 }
 ```
 
-Run one batch so the Whisper model is loaded only once:
+Run one batch so the Whisper model is loaded only once. Run from the installed skill directory, or replace `scripts/transcribe_media.py` with its absolute path. Use the isolated environment prepared below.
+
+macOS with zsh/bash (backslash continues a line):
+
+```sh
+"<venv>/bin/python" scripts/transcribe_media.py \
+  --manifest "<temporary-dir>/manifest.json" \
+  --output-dir "<temporary-dir>/transcripts" \
+  --model small \
+  --device cpu \
+  --compute-type int8 \
+  --language <language-code>
+```
+
+Windows with PowerShell (backtick continues a line):
 
 ```powershell
-python .\scripts\transcribe_media.py `
-  --manifest ".\manifest.json" `
-  --output-dir ".\transcripts" `
+& "<venv>\Scripts\python.exe" scripts/transcribe_media.py `
+  --manifest "<temporary-dir>/manifest.json" `
+  --output-dir "<temporary-dir>/transcripts" `
   --model small `
   --device cpu `
   --compute-type int8 `
@@ -74,13 +90,22 @@ The raw JSON intentionally omits input URLs. It is an intermediate artifact and 
 
 ## Dependency setup
 
-Use `yt-dlp` from the official project. The `ai-toolkit` repository records its supported Windows installation in `EXTERNAL-TOOLS.md`.
+Use `yt-dlp` from the official project. The `ai-toolkit` repository records Windows and macOS installation options in `EXTERNAL-TOOLS.md`.
 
-Install `faster-whisper` in an isolated environment when it is unavailable:
+Choose Python 3.11 or newer from the current host: verify `python3 --version` on macOS, or `py -3 --version` on Windows, is at least 3.11. A verified absolute interpreter or Windows `python` at version 3.11 or newer is also suitable. The runtime OS determines the venv layout; PowerShell on macOS still uses `bin/python`.
 
-```powershell
-python -m venv "<temporary-or-user-local-venv>"
-& "<temporary-or-user-local-venv>\Scripts\python.exe" -m pip install --upgrade pip faster-whisper
+Install `faster-whisper` in an isolated environment when it is unavailable. macOS with zsh/bash:
+
+```sh
+python3 -m venv "<venv>"
+"<venv>/bin/python" -m pip install --upgrade pip faster-whisper
 ```
 
-Use a user-local runtime directory outside Git repositories if the environment should be reused. A task-local environment may be deleted with the other temporary state.
+Windows with PowerShell:
+
+```powershell
+py -3 -m venv "<venv>"
+& "<venv>\Scripts\python.exe" -m pip install --upgrade pip faster-whisper
+```
+
+For PowerShell on macOS, use `& "<venv>/bin/python"` to invoke the quoted executable; use PowerShell backticks or a single line for continuations. Use a user-local runtime directory outside Git repositories if the environment should be reused. A task-local environment may be deleted with the other temporary state.

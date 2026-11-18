@@ -25,4 +25,5 @@ Run the applicable stages in the order shown. Revisit the plan when clarificatio
 - Before task breakdown, resolve open material decisions and finish any required design spec. Use the [clarification policy](clarification-policy.md) to record decisions. If a later stage reveals a gap, return to the stage that owns it and update any affected evidence.
 - For UI work, use the [design gates](design-gates.md) to decide whether a spec is required. Every change to rendered UI or interaction requires a current design conformance verdict before QA or code review can pass.
 - Use the [quality gates](quality-gates.md) to decide when an independent pre-build audit or behavior QA applies, and to verify the evidence needed for code review and publication.
+- For authorized C#/.NET backend changes, use [`$dotnet-implementation`](../../dotnet-implementation/SKILL.md) to select the `dotnet` specialist or apply the same guidance inline. In mixed work, route only the .NET portion this way.
 - Follow the [completion boundaries](../../../tool-instructions/shared/completion-boundaries.md) for Git, pull requests, merge, and issue closure.

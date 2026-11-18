@@ -1,32 +1,106 @@
-# Selected direct skill imports. See EXTERNAL-SKILLS.md for native installers,
-# supported targets, ownership protection, and how to update these pins.
+# Pinned external skill imports. See EXTERNAL-SKILLS.md to add, update, or exclude an entry.
+# Run from the toolkit checkout with Git and the verified Python 3.11+ interpreter.
+# For each platform, the first command previews. The second syncs external skills only.
+#
+# macOS (zsh)
+#   python3 scripts/external_skills.py --tool codex --dry-run
+#   python3 scripts/external_skills.py --tool codex
+#
+# Windows (PowerShell)
+#   py -3 scripts/external_skills.py --tool codex --dry-run
+#   py -3 scripts/external_skills.py --tool codex
+#
+# Use --tool all to select all supported agents.
+# Normal toolkit sync includes the matching entries. Add --skip-external to scripts/sync.py to skip them for one run.
 version = 1
+
+# --- blader/napkin ---
 
 [[skills]]
 name = "napkin"
+# Maintain a concise repository runbook of recurring guidance.
 repo = "https://github.com/blader/napkin.git"
 path = "."
 revision = "27fa60a895de4383b26a539136bc983155cb979c"
 tools = ["codex", "claude"]
 
-# Keep the existing gpt-taste identity. New upstream releases use taste-skill;
-# migrating to that skill is a separate selection change.
+# --- DietrichGebert/ponytail (v5.3.3) ---
+# Invoke these standalone Codex skills by name, for example `$ponytail-review`.
+
+[[skills]]
+name = "ponytail"
+# Find the smallest change that fully solves a coding task.
+repo = "https://github.com/DietrichGebert/ponytail.git"
+path = "skills/ponytail"
+revision = "7801d061243d7b753bad0e0b3c057cd250b11755"
+tools = ["codex"]
+
+[[skills]]
+name = "ponytail-audit"
+# Rank bugs, security risks, test gaps, and complexity across a repository.
+repo = "https://github.com/DietrichGebert/ponytail.git"
+path = "skills/ponytail-audit"
+revision = "7801d061243d7b753bad0e0b3c057cd250b11755"
+tools = ["codex"]
+
+[[skills]]
+name = "ponytail-debt"
+# Collect deferred shortcuts from code comments into a report.
+repo = "https://github.com/DietrichGebert/ponytail.git"
+path = "skills/ponytail-debt"
+revision = "7801d061243d7b753bad0e0b3c057cd250b11755"
+tools = ["codex"]
+
+[[skills]]
+name = "ponytail-gain"
+# Show benchmark results for code size, time, tokens, and cost.
+repo = "https://github.com/DietrichGebert/ponytail.git"
+path = "skills/ponytail-gain"
+revision = "7801d061243d7b753bad0e0b3c057cd250b11755"
+tools = ["codex"]
+
+[[skills]]
+name = "ponytail-help"
+# Explain Ponytail modes, skills, and commands.
+repo = "https://github.com/DietrichGebert/ponytail.git"
+path = "skills/ponytail-help"
+revision = "7801d061243d7b753bad0e0b3c057cd250b11755"
+tools = ["codex"]
+
+[[skills]]
+name = "ponytail-review"
+# Review a change and related code for defects, risks, and unnecessary complexity.
+repo = "https://github.com/DietrichGebert/ponytail.git"
+path = "skills/ponytail-review"
+revision = "7801d061243d7b753bad0e0b3c057cd250b11755"
+tools = ["codex"]
+
+# --- Leonxlnx/taste-skill ---
+# The pinned revision supplies the gpt-taste variant.
+
 [[skills]]
 name = "gpt-taste"
+# Design pages with varied layouts, an AIDA structure, and GSAP scroll motion.
 repo = "https://github.com/Leonxlnx/taste-skill.git"
 path = "skills/gpt-tasteskill"
 revision = "f6831c5df8ad546c2567535442f1691a823868e3"
 tools = ["codex"]
 
+# --- anthropics/skills ---
+
 [[skills]]
 name = "frontend-design"
+# Design distinctive interfaces with deliberate typography and layout.
 repo = "https://github.com/anthropics/skills.git"
 path = "skills/frontend-design"
 revision = "ca45fc496a3436251f191354091d557da31c15b5"
 tools = ["codex", "claude"]
 
+# --- cursor/plugins ---
+
 [[skills]]
 name = "unslop"
+# Remove formulaic AI phrasing from writing.
 repo = "https://github.com/cursor/plugins.git"
 path = "pstack/skills/unslop"
 revision = "6ea74587e384e1a8035c09ae33a46fe3f881eb9b"
@@ -34,13 +108,17 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "technical-writing"
+# Structure and edit technical documentation for clarity and consistency.
 repo = "https://github.com/cursor/plugins.git"
 path = "pstack/skills/technical-writing"
 revision = "6ea74587e384e1a8035c09ae33a46fe3f881eb9b"
 tools = ["codex", "claude"]
 
+# --- stripe/ai ---
+
 [[skills]]
 name = "stripe-best-practices"
+# Choose and implement Stripe APIs for payments, billing, and Connect.
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-best-practices"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
@@ -48,6 +126,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "stripe-directory"
+# Find providers and verify how to pay, book, donate, or integrate with them.
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-directory"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
@@ -55,6 +134,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "stripe-projects"
+# Provision infrastructure and third-party services through Stripe Projects.
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-projects"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
@@ -62,30 +142,40 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "upgrade-stripe"
+# Upgrade Stripe API versions, webhooks, and SDKs.
 repo = "https://github.com/stripe/ai.git"
 path = "skills/upgrade-stripe"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
 tools = ["codex", "claude"]
 
+# --- openai/skills ---
+
 [[skills]]
 name = "linear"
+# Manage issues, projects, and team workflows in Linear.
 repo = "https://github.com/openai/skills.git"
 path = "skills/.curated/linear"
 revision = "49f948faa9258a0c61caceaf225e179651397431"
 tools = ["codex"]
 
+# --- humanlayer/skills ---
+
 [[skills]]
 name = "show-me"
+# Explain a topic with diagrams, code sketches, or focused HTML artifacts.
 repo = "https://github.com/humanlayer/skills.git"
 path = "plugins/show-me/skills/show-me"
 revision = "4d69d20f6e9b57b4fcf0d501ccfb1be961f0f329"
 tools = ["codex", "claude"]
 
-# Matt Pocock: every skill outside skills/deprecated at this revision,
-# including engineering, productivity, in-progress, and misc.
+# --- mattpocock/skills ---
+# Includes every skill outside skills/deprecated at the pinned revision.
+
+# Engineering
 
 [[skills]]
 name = "ask-matt"
+# Find the Matt Pocock skill or workflow that fits the task.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/ask-matt"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -93,6 +183,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "code-review"
+# Review changes against repository standards and the originating requirements.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/code-review"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -100,6 +191,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "codebase-design"
+# Design modules with clear interfaces, useful seams, and testable behavior.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/codebase-design"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -107,6 +199,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "diagnosing-bugs"
+# Reproduce and diagnose difficult bugs and performance regressions.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/diagnosing-bugs"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -114,6 +207,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "domain-modeling"
+# Clarify domain concepts and record them in glossaries or decision records.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/domain-modeling"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -121,6 +215,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "grill-with-docs"
+# Stress-test a design while documenting domain terms and architecture decisions.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/grill-with-docs"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -128,6 +223,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "implement"
+# Implement a specified change from a spec or selected tickets.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/implement"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -135,6 +231,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "implement-spec"
+# Implement a full spec by delivering dependent tickets on an integration branch.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/implement-spec"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -142,6 +239,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "improve-codebase-architecture"
+# Find opportunities to deepen modules and present them in an HTML report.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/improve-codebase-architecture"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -149,6 +247,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "pr"
+# Draft a pull request description.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/pr"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -156,6 +255,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "prototype"
+# Build a disposable prototype to test a design or behavior.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/prototype"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -163,6 +263,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "research"
+# Investigate a question using primary sources and record the findings.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/research"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -170,6 +271,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "retro"
+# Review a coding session and identify improvements to the agent's environment.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/retro"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -177,6 +279,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "setup-matt-pocock-skills"
+# Configure the issue tracker, triage labels, and domain docs for the engineering skills.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/setup-matt-pocock-skills"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -184,6 +287,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "tdd"
+# Build or fix behavior through test-driven development.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/tdd"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -191,6 +295,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "to-spec"
+# Turn the current discussion into a specification for the issue tracker.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/to-spec"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -198,6 +303,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "to-tickets"
+# Break a plan or spec into end-to-end tickets with explicit dependencies.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/to-tickets"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -205,6 +311,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "triage"
+# Verify and classify issues or pull requests and prepare them for implementation.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/triage"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -212,6 +319,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "wayfinder"
+# Map a large project into linked decisions and resolve them in order.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/wayfinder"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -219,13 +327,17 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "wizard"
+# Generate an interactive Bash guide for steps a human must perform.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/wizard"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
 tools = ["codex", "claude"]
 
+# In progress
+
 [[skills]]
 name = "chief-of-staff"
+# Coordinate subagents to pursue a long-running goal in one session.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/chief-of-staff"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -233,6 +345,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "claude-handoff"
+# Pass the current conversation to a fresh background agent.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/claude-handoff"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -240,6 +353,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "loop-me"
+# Interview the user about specifications for workflows in the current workspace.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/loop-me"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -247,6 +361,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "setup-ts-deep-modules"
+# Use dependency-cruiser to enforce TypeScript package entry points.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/setup-ts-deep-modules"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -254,6 +369,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "software-factory"
+# Describe the tasks and services that make up a software factory.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/software-factory"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -261,6 +377,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-beats"
+# Build an article from source material one narrative beat at a time.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/writing-beats"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -268,6 +385,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-fragments"
+# Collect raw ideas and excerpts for a piece of writing.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/writing-fragments"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -275,13 +393,17 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-shape"
+# Shape source material into an article paragraph by paragraph.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/writing-shape"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
 tools = ["codex", "claude"]
 
+# Miscellaneous
+
 [[skills]]
 name = "git-guardrails-claude-code"
+# Set up Claude Code hooks that block destructive Git commands.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/git-guardrails-claude-code"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -289,6 +411,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "migrate-to-shoehorn"
+# Replace TypeScript test assertions with @total-typescript/shoehorn.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/migrate-to-shoehorn"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -296,6 +419,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "scaffold-exercises"
+# Create exercise directories with problems, solutions, and explainers.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/scaffold-exercises"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -303,13 +427,17 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "setup-pre-commit"
+# Set up Husky and lint-staged for formatting, type checks, and tests.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/setup-pre-commit"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
 tools = ["codex", "claude"]
 
+# Productivity
+
 [[skills]]
 name = "grill-me"
+# Start the grilling interview for a plan or design on request.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/grill-me"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -317,6 +445,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "grilling"
+# Stress-test a plan or idea through structured rounds of questions.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/grilling"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -324,6 +453,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "handoff"
+# Summarize the current conversation for another agent to continue.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/handoff"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -331,6 +461,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "teach"
+# Teach a skill or concept using the current workspace.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/teach"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -338,6 +469,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "to-questionnaire"
+# Turn unresolved decisions into a questionnaire for someone else to answer.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/to-questionnaire"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -345,6 +477,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "wait-what"
+# Re-explain the previous message in clearer terms.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/wait-what"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
@@ -352,6 +485,7 @@ tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-for-agents"
+# Write concise agent instructions, skills, and navigation pointers.
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/writing-for-agents"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
