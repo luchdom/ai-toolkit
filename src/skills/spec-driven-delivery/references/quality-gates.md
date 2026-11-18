@@ -2,6 +2,18 @@
 
 Use the repository's local commands and collect enough evidence to check each acceptance criterion. Run the required local validation even when hosted checks pass.
 
+## Critical workflows
+
+Apply these checks when work adds or materially changes a workflow whose failure can block an essential user task, compromise access or data, affect billing, or require operator recovery. Reuse existing telemetry and admin tools where they meet the need.
+
+In `plan`, name each affected workflow and include the applicable checks in its acceptance criteria. Give a reason when a check does not apply.
+
+- **Telemetry.** Name the product events, logs, metrics, or traces that show success and help diagnose failure. Specify how to identify the environment and deployed version. Use a request or job ID to link related events, logs, and traces where needed. Document how agents query redacted data with scoped read-only access.
+- **Admin operations.** When the workflow needs operator inspection or recovery, specify a documented API or command-line interface (CLI) for the supported operations. Define permissions, machine-readable results, and how to check the status of background work. Reuse the same application operation behind any admin screen. Define audit records for writes and safe retry behavior where relevant.
+- **End-to-end verification.** Plan a success case and a representative failure through a real entry point with isolated test data. Include recovery when the workflow supports it. Specify the expected application state and telemetry for each case.
+
+Carry the acceptance checks into `task` and `qa`. In QA, run the planned cases using the agent's tools and test identities that match the permission scopes in the plan. Query the emitted telemetry to diagnose the failure. Exercise the applicable admin API or CLI. Verify the expected application state and signals for each case. For writes, check that unauthorized calls fail and verify the audit record. Check retry behavior where relevant.
+
 ## Audit before implementation
 
 Use an independent auditor when work is high risk, ambiguous, unusually large, or touches security, tenancy, billing, or migrations. Small routine work can use an inline plan and task breakdown.

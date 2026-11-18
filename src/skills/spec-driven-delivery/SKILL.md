@@ -23,6 +23,6 @@ Check the named stage's prerequisites, perform it, and report the result. Return
 
 - Use the [clarification policy](./references/clarification-policy.md) when a decision blocks progress.
 - Use the [design gates](./references/design-gates.md) for UI work. Initialize or resume the registered `artifactFolder` before design or implementation when they apply.
-- Use the [quality gates](./references/quality-gates.md) for audit, QA, review, and validation.
+- Use the [quality gates](./references/quality-gates.md) to plan critical workflows and guide audit, QA, review, and validation.
 - Use [Multi-agent Delivery](../multi-agent-delivery/SKILL.md) when handing a stage to a specialist.
 - Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md) when saving evidence and the [worktree policy](../../tool-instructions/shared/worktrees.md) when using a linked worktree. Keep one concise work note when requested, useful across sessions, or required by a stage.

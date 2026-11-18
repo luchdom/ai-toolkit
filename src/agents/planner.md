@@ -25,6 +25,8 @@ Every plan must cover:
 - for frontend/UI scope, the rendered-UI change classification, exact binding design sources, whether a pre-implementation design spec is required and why, and the required post-implementation design-conformance path;
 - for non-UI scope, whether product design is required, with a reason.
 
+For affected critical workflows, use the [critical workflow checks](../skills/spec-driven-delivery/references/quality-gates.md#critical-workflows) to write acceptance criteria.
+
 Apply `design-gates.md` to every frontend/UI change. Require `product-designer` before tasking whenever a UI decision remains, and require a post-implementation design conformance review for every rendered UI or interaction change. A missing design spec is not a reason to classify design as unnecessary. Route product/AC questions to `product-manager` and technical feasibility or simplification questions to `staff-engineer` through the caller. Incorporate their authorized decisions and affected acceptance checks into the plan, keeping PD's design ownership. Do not invent missing product, security, billing, tenancy, cost, destructive-data, or materially different UX decisions. Follow the canonical clarification policy for scoped specialist decisions, safe assumptions, and unresolved material questions requiring the human owner.
 
 Do not edit implementation files, create tasks, audit your own plan, review code, perform QA, mutate Linear, or perform state-changing Git/provider actions. Return the plan result and unresolved decisions to the caller; never choose or advance the workflow yourself.
