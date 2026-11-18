@@ -301,23 +301,6 @@ npm install -g ui-ux-pro-max-cli
 uipro --version
 ```
 
-### Firecrawl CLI
-
-Use the [Firecrawl CLI](https://docs.firecrawl.dev/sdks/cli) for web extraction, crawl, search, and browser workflows.
-
-```text
-npm install -g firecrawl-cli
-firecrawl login --browser
-firecrawl view-config
-```
-
-If the command is not immediately available in a Windows shell:
-
-```text
-npx -y firecrawl-cli@latest login --browser
-npx -y firecrawl-cli@latest view-config
-```
-
 ### PostHog CLI
 
 Use [@posthog/cli](https://www.npmjs.com/package/@posthog/cli) for analytics setup, source maps, and product instrumentation. See the [official source map CLI documentation](https://posthog.com/docs/error-tracking/upload-source-maps/cli).
