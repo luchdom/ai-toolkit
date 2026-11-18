@@ -1,6 +1,6 @@
 # Codex skill restore checklist
 
-Source snapshot: 2026-10-20. This restore checklist covers skills available in that Codex session **in addition to** the skills maintained in this repository and `C:\dev\social-media\social-media-toolkit`, excluding retired integrations and superseded plugin copies. The two repositories contained 15 and 8 distinct source skills, respectively. The current restore target contains 67 additional skill IDs, counting duplicate installations once.
+Source snapshot: 2026-10-20. This restore checklist covers skills available in that Codex session **in addition to** the skills maintained in this repository and `C:\dev\social-media\social-media-toolkit`, excluding retired integrations and superseded plugin copies. The two repositories contained 15 and 8 distinct source skills, respectively. The current restore target contains 59 additional skill IDs, counting duplicate installations once.
 
 This inventory describes a historical Windows installation. The [import manifest](../external-skills.toml) records the active pinned imports. Use the [external skill guide](../EXTERNAL-SKILLS.md) for sync and recovery, and use the new environment's home directory when restoring.
 
@@ -15,7 +15,7 @@ The [ai-toolkit README](../README.md) documents build, validation, and sync comm
 1. Sync this repository and its selected external imports, then install the social-media toolkit through its own instructions. Compare the manifest with this historical inventory before restoring additional copies. This file covers only the additional skills below.
 2. Restore user-level skills to the appropriate user-level location. On the original machine these were under `C:\Users\lucas\.codex\skills` and `C:\Users\lucas\.agents\skills`. Do not assume the same home path in a new environment.
 3. Check that the Codex system skills are supplied by the installed Codex version. Install or enable the listed plugin packages through the supported plugin manager.
-4. Start a new Codex session and compare its **available skills** with all 67 qualified IDs below. Check the `SKILL.md` files for user-level skills as a secondary file check. A plugin cache directory or an old session's skill list alone is insufficient.
+4. Start a new Codex session and compare its **available skills** with all 59 qualified IDs below. Check the `SKILL.md` files for user-level skills as a secondary file check. A plugin cache directory or an old session's skill list alone is insufficient.
 5. Record missing skills and any renamed equivalents explicitly. Confirm external CLI or service access only when a skill actually requires it; skill availability and service authentication are separate checks.
 
 In the tables, a name in package `P` means the qualified skill ID `P:name`. Preserve capitalization in names such as `Presentations` and `Spreadsheets`.
@@ -26,14 +26,14 @@ In the tables, a name in package `P` means the qualified skill ID `P:name`. Pres
 | --- | --- |
 | `interface-design` | `imagegen`, `openai-docs`, `skill-creator`, `skill-installer` |
 
-## User-level skills (29 unique)
+## User-level skills (21 unique)
 
 | Original location | Package | Skills |
 | --- | --- | --- |
 | `C:\Users\lucas\.codex\skills` | `interface-design` | `gpt-taste`, `graphify`, `linear`, `pdf`, `playwright`, `pluggy-doctor`, `pluggy-integration`, `pluggy-open-finance`, `pluggy-payments`, `remotion-captions`, `remotion-docs`, `remotion-markup`, `remotion-render` |
-| `C:\Users\lucas\.agents\skills` | `interface-design` | `banner-design`, `brand`, `design`, `design-system`, `firecrawl`, `firecrawl-agent`, `firecrawl-browser`, `firecrawl-crawl`, `firecrawl-download`, `firecrawl-map`, `firecrawl-scrape`, `firecrawl-search`, `reverse-engineer-anything`, `slides`, `ui-styling`, `ui-ux-pro-max` |
+| `C:\Users\lucas\.agents\skills` | `interface-design` | `banner-design`, `brand`, `design`, `design-system`, `reverse-engineer-anything`, `slides`, `ui-styling`, `ui-ux-pro-max` |
 
-Two other local `SKILL.md` files, `napkin` and `review-agent`, were present on disk but were not exposed in that Codex session's available-skills list, so they are not restore targets in the 67.
+Two other local `SKILL.md` files, `napkin` and `review-agent`, were present on disk but were not exposed in that Codex session's available-skills list, so they are not restore targets in the 59.
 
 ## Plugin skills (34)
 
