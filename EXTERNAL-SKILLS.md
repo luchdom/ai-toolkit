@@ -48,6 +48,6 @@ Exclusions take effect on future syncs. Use the removal steps below to remove an
 Sync records each import's source and file hashes in `.ai-toolkit-external-skills.json` beside the installed directories. It replaces an existing directory only if it recognizes the import and the installed files match the recorded hashes. These checks also apply when toolkit sync uses `--force`.
 
 - **Resolve a conflict.** Inspect and back up the exact unmanaged or modified skill before moving it out of the agent's skill directories.
-- **Roll back an update.** Verify the installed import matches its receipt, then restore the previous manifest pin.
+- **Roll back an update.** Verify the installed import matches its receipt, restore the previous pin, then apply it using the sync command in the manifest header.
 - **Remove an installed import.** Exclude the skill from that destination first. Back up and remove its exact directory, then remove only its entry from the receipt.
 - **Recover an interrupted replacement.** If sync reports a retained recovery directory, preserve it and the existing receipt. Use the retained `previous` directory to restore the affected skill before retrying.

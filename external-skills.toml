@@ -25,6 +25,7 @@ revision = "27fa60a895de4383b26a539136bc983155cb979c"
 tools = ["codex", "claude"]
 
 # --- DietrichGebert/ponytail (v5.3.3) ---
+# Invoke these standalone Codex skills by name, for example `$ponytail-review`.
 
 [[skills]]
 name = "ponytail"
