@@ -124,11 +124,11 @@ python3 scripts/sync.py --tool all --project "$HOME/path/to/repo"
 
 Use `--tool codex`, `claude`, `copilot`, or `cursor` to limit installation. Cursor project sync writes `AGENTS.md` plus `.cursor/rules/*.mdc`, including the projected UI design-gate, review procedure, and templates. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
 
-Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). Preview them with `python3 scripts/external_skills.py --tool all --dry-run` on macOS or `py -3 scripts/external_skills.py --tool all --dry-run` on Windows. Use `--skip-external` on `scripts/sync.py` for repository-generated content only. Imports preserve unmanaged or locally modified skill directories; `--force` does not bypass their ownership checks. See [External Skills](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
+Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). The manifest header contains the preview and sync commands. See the [external skill guide](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
 
 Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Existing unmarked instruction files, project Copilot agents/skills, and Cursor rules remain untouched unless `--force` explicitly adopts or refreshes them. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
 
-For a fresh Codex environment, start with [External Skills](EXTERNAL-SKILLS.md) for selected imports and native plugins. The [additional skill restore checklist](docs/codex-skill-restore.md) is a historical Windows inventory for system and plugin skills beyond the active manifest; follow current platform paths and package instructions when restoring it.
+For a fresh Codex environment, start with the [import manifest](external-skills.toml) and the [external skill guide](EXTERNAL-SKILLS.md). For older system and plugin skills, consult the historical [additional skill restore checklist](docs/codex-skill-restore.md) and follow current upstream instructions.
 
 ## Maintenance
 
@@ -138,5 +138,5 @@ Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.m
 - Keep tool instructions as concise routers rather than copies of the canonical protocol.
 - Keep legacy artifact-root literals limited to the validator's reviewed path-and-purpose allowlist.
 - Keep credentials in environment variables, never repository files.
-- Use [External Tools](EXTERNAL-TOOLS.md) for companion CLIs, [External Skills](EXTERNAL-SKILLS.md) for imports and plugins, and [MCP Servers](MCP-SERVERS.md) for explicit server setup.
+- Use [External Tools](EXTERNAL-TOOLS.md) for companion CLIs, the [external skill guide](EXTERNAL-SKILLS.md) to maintain imports, and [MCP Servers](MCP-SERVERS.md) for server setup.
 - Preserve unrelated user changes and historical artifact evidence.

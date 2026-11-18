@@ -1,6 +1,6 @@
 # MCP Servers
 
-Use this document to configure Model Context Protocol (MCP) servers for a selected agent environment. [External Tools](EXTERNAL-TOOLS.md) covers companion executables; [External Skills](EXTERNAL-SKILLS.md) covers imported instructions and native plugins.
+Use this document to configure Model Context Protocol (MCP) servers for a selected agent environment. [External Tools](EXTERNAL-TOOLS.md) covers companion executables. The [external skill guide](EXTERNAL-SKILLS.md) covers pinned skill imports.
 
 Toolkit and external skill sync do not register MCP servers, change agent configuration, run login flows, or initialize a memory store. Configure only the servers needed for the current environment. Keep credentials in the environment or the agent's supported credential store, never in this repository.
 
@@ -50,21 +50,6 @@ command = "npx"
 args = ["@playwright/mcp@latest"]
 ```
 
-### MemPalace
-
-The [native MemPalace plugin](EXTERNAL-SKILLS.md#mempalace) provides its MCP server and writable memory skills. Verify the CLI and registration after installing the plugin:
-
-```text
-mempalace --version
-codex plugin list
-codex mcp get mempalace
-mempalace status
-```
-
-The server runtime is supplied by the executable on `PATH`. Restart Codex after runtime upgrades. Plugin registration and initialization are separate: follow [the approved-source mining procedure](EXTERNAL-TOOLS.md#mempalace) before creating or mining a palace. MemPalace returns mined text verbatim; only approved source content belongs in it.
-
-See the [official MCP integration guide](https://mempalaceofficial.com/guide/mcp-integration.html) for agent-specific setup and the [getting-started guide](https://mempalaceofficial.com/guide/getting-started.html) for initialization.
-
 ### PostHog
 
 Use the [PostHog MCP server or AI plugin](https://github.com/PostHog/ai-plugin) when remote product tools or the [hosted skills store](https://posthog.com/docs/prompt-management/skills-store) are needed. Prefer the [CLI](EXTERNAL-TOOLS.md#posthog-cli) for local command workflows.
@@ -110,7 +95,7 @@ Verify the registration after login:
 codex mcp get linear
 ```
 
-The [Linear skill](EXTERNAL-SKILLS.md#openai-curated-linear-skill) supplies workflow instructions; the server supplies issue access. Older installed skill instructions may mention `rmcp_client` or `codex --enable rmcp_client`. Treat those as version-specific guidance and check the current agent documentation before changing feature settings.
+The Linear entry in the [import manifest](external-skills.toml) provides workflow instructions. The server supplies issue access. Older installed skill instructions may mention `rmcp_client` or `codex --enable rmcp_client`. Treat those as version-specific guidance and check the current agent documentation before changing feature settings.
 
 ## Recovery
 
