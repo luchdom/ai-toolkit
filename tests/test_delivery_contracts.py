@@ -244,8 +244,6 @@ class DeliveryContractTests(unittest.TestCase):
         expected = (
             "src/tool-instructions/codex/AGENTS.md",
             "src/tool-instructions/claude/AGENTS.md",
-            "src/tool-instructions/copilot/.github/copilot-instructions.md",
-            "src/tool-instructions/cursor/AGENTS.md",
         )
         self.assertTrue(all((ROOT / relative).is_file() for relative in expected))
         self.assertFalse((ROOT / "src" / ("project" + "-templates")).exists())
@@ -253,43 +251,6 @@ class DeliveryContractTests(unittest.TestCase):
             instruction = (ROOT / relative).read_text(encoding="utf-8")
             self.assertIn("src/tool-instructions/shared/delivery-workflow.md", instruction)
             self.assertNotIn("goal-to-delivery/references/", instruction)
-
-        self.assertEqual(
-            (ROOT / "src/tool-instructions/codex/AGENTS.md").read_text(encoding="utf-8"),
-            (ROOT / "src/tool-instructions/cursor/AGENTS.md").read_text(encoding="utf-8"),
-        )
-
-        cursor_rules = ROOT / "dist" / "cursor" / "rules"
-        expected_cursor_support = (
-            "ui-design-gates.mdc",
-            "clarification-policy.mdc",
-            "ui-review-spec.mdc",
-            "ui-design-spec-template.mdc",
-            "ui-design-review-template.mdc",
-            "ui-audit-checklist.mdc",
-            "ui-component-selection.mdc",
-        )
-        self.assertTrue(all((cursor_rules / name).is_file() for name in expected_cursor_support))
-        self.assertIn(
-            ".cursor/rules/ui-design-gates.mdc",
-            (cursor_rules / "product-designer.mdc").read_text(encoding="utf-8"),
-        )
-        for specialist in ("planner.mdc", "auditor.mdc"):
-            rule = (cursor_rules / specialist).read_text(encoding="utf-8")
-            self.assertIn(".cursor/rules/ui-design-gates.mdc", rule)
-            self.assertNotIn("`design-gates.md`", rule)
-        self.assertIn(
-            "./ui-design-review-template.mdc",
-            (cursor_rules / "ui-review-spec.mdc").read_text(encoding="utf-8"),
-        )
-        self.assertNotIn(
-            "./references/",
-            (cursor_rules / "ui-review-spec.mdc").read_text(encoding="utf-8"),
-        )
-        self.assertIn(
-            "./clarification-policy.mdc",
-            (cursor_rules / "ui-design-gates.mdc").read_text(encoding="utf-8"),
-        )
 
         build = (ROOT / "scripts/build.py").read_text(encoding="utf-8")
         sync = (ROOT / "scripts/sync.py").read_text(encoding="utf-8")

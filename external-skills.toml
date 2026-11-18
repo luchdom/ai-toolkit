@@ -23,49 +23,49 @@ name = "frontend-design"
 repo = "https://github.com/anthropics/skills.git"
 path = "skills/frontend-design"
 revision = "ca45fc496a3436251f191354091d557da31c15b5"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "unslop"
 repo = "https://github.com/cursor/plugins.git"
 path = "pstack/skills/unslop"
 revision = "6ea74587e384e1a8035c09ae33a46fe3f881eb9b"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "technical-writing"
 repo = "https://github.com/cursor/plugins.git"
 path = "pstack/skills/technical-writing"
 revision = "6ea74587e384e1a8035c09ae33a46fe3f881eb9b"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "stripe-best-practices"
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-best-practices"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
-tools = ["codex", "claude", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "stripe-directory"
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-directory"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
-tools = ["codex", "claude", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "stripe-projects"
 repo = "https://github.com/stripe/ai.git"
 path = "skills/stripe-projects"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
-tools = ["codex", "claude", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "upgrade-stripe"
 repo = "https://github.com/stripe/ai.git"
 path = "skills/upgrade-stripe"
 revision = "1e24cf59cb0dd78df298afc3b7d372e5a5055ece"
-tools = ["codex", "claude", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "linear"
@@ -89,270 +89,270 @@ name = "ask-matt"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/ask-matt"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "code-review"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/code-review"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "codebase-design"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/codebase-design"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "diagnosing-bugs"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/diagnosing-bugs"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "domain-modeling"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/domain-modeling"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "grill-with-docs"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/grill-with-docs"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "implement"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/implement"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "implement-spec"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/implement-spec"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "improve-codebase-architecture"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/improve-codebase-architecture"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "pr"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/pr"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "prototype"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/prototype"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "research"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/research"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "retro"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/retro"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "setup-matt-pocock-skills"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/setup-matt-pocock-skills"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "tdd"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/tdd"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "to-spec"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/to-spec"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "to-tickets"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/to-tickets"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "triage"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/triage"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "wayfinder"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/wayfinder"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "wizard"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/engineering/wizard"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "chief-of-staff"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/chief-of-staff"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "claude-handoff"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/claude-handoff"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "loop-me"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/loop-me"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "setup-ts-deep-modules"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/setup-ts-deep-modules"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "software-factory"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/software-factory"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-beats"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/writing-beats"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-fragments"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/writing-fragments"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-shape"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/in-progress/writing-shape"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "git-guardrails-claude-code"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/git-guardrails-claude-code"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "migrate-to-shoehorn"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/migrate-to-shoehorn"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "scaffold-exercises"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/scaffold-exercises"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "setup-pre-commit"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/misc/setup-pre-commit"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "grill-me"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/grill-me"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "grilling"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/grilling"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "handoff"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/handoff"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "teach"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/teach"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "to-questionnaire"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/to-questionnaire"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "wait-what"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/wait-what"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]
 
 [[skills]]
 name = "writing-for-agents"
 repo = "https://github.com/mattpocock/skills.git"
 path = "skills/productivity/writing-for-agents"
 revision = "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d"
-tools = ["codex", "claude", "copilot", "cursor"]
+tools = ["codex", "claude"]

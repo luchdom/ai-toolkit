@@ -14,11 +14,11 @@ import tempfile
 import tomllib
 import unicodedata
 from pathlib import Path
-from typing import Callable, Iterable
+from typing import Callable
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "external-skills.toml"
-TOOLS = {"codex", "claude", "copilot", "cursor"}
+TOOLS = {"codex", "claude"}
 RECEIPT = ".ai-toolkit-external-skills.json"
 RESERVED = re.compile(r"^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)", re.I)
 
@@ -179,14 +179,8 @@ def load_receipt(root: Path, boundary: Path) -> dict:
     return data
 
 
-def targets(entry: dict, tools: set[str], home: Path, projects: Iterable[Path]) -> list[tuple[Path, Path]]:
-    result = []
-    for tool in sorted(set(entry["tools"]) & tools):
-        if tool == "cursor":
-            result.extend((project / ".cursor" / "skills", project) for project in projects)
-        else:
-            result.append((home / f".{tool}" / "skills", home))
-    return list(dict.fromkeys(result))
+def targets(entry: dict, tools: set[str], home: Path) -> list[Path]:
+    return [home / f".{tool}" / "skills" for tool in sorted(set(entry["tools"]) & tools & TOOLS)]
 
 
 def install_skill(entry: dict, source: Path, root: Path, boundary: Path) -> str:
@@ -251,15 +245,14 @@ def install_skill(entry: dict, source: Path, root: Path, boundary: Path) -> str:
     return "updated" if current is not None else "installed"
 
 
-def preflight(entries: list[dict], tools: set[str], projects: Iterable[Path] = (), *, home: Path | None = None) -> None:
+def preflight(entries: list[dict], tools: set[str], *, home: Path | None = None) -> None:
     """Check local ownership/conflicts before any legacy or external sync writes."""
     home = (home if home is not None else Path.home()).absolute()
-    projects = [path.expanduser().absolute() for path in projects]
     for entry in entries:
-        for root, boundary in targets(entry, tools, home, projects):
+        for root in targets(entry, tools, home):
             destination = root / entry["name"]
-            check_path(destination, boundary)
-            receipt = load_receipt(root, boundary)
+            check_path(destination, home)
+            receipt = load_receipt(root, home)
             if destination.exists():
                 previous = receipt["skills"].get(entry["name"])
                 if previous is None:
@@ -268,21 +261,19 @@ def preflight(entries: list[dict], tools: set[str], projects: Iterable[Path] = (
                     raise ImportError(f"Locally modified skill {entry['name']}; back up or reconcile it before importing. Existing content preserved.")
 
 
-def sync_external_skills(entries: list[dict], tools: set[str], projects: Iterable[Path] = (), *, home: Path | None = None, dry_run: bool = False, fetcher: Callable[[dict, Path], Path] = fetch_skill) -> None:
-    home = home if home is not None else Path.home()
-    home = home.absolute()
-    projects = [path.expanduser().absolute() for path in projects]
-    preflight(entries, tools, projects, home=home)
+def sync_external_skills(entries: list[dict], tools: set[str], *, home: Path | None = None, dry_run: bool = False, fetcher: Callable[[dict, Path], Path] = fetch_skill) -> None:
+    home = (home if home is not None else Path.home()).absolute()
+    preflight(entries, tools, home=home)
     failures = 0
     for entry in entries:
-        destinations = targets(entry, tools, home, projects)
+        destinations = targets(entry, tools, home)
         if not destinations:
             print(f"Skipped external skill {entry['name']} (no selected compatible destination)")
             continue
         if dry_run:
-            for root, boundary in destinations:
-                check_path(root / entry["name"], boundary)
-                load_receipt(root, boundary)
+            for root in destinations:
+                check_path(root / entry["name"], home)
+                load_receipt(root, home)
                 print(f"Would sync external skill {entry['name']} at {entry['revision']} -> {root / entry['name']}")
             continue
         try:
@@ -291,9 +282,9 @@ def sync_external_skills(entries: list[dict], tools: set[str], projects: Iterabl
                 if not (source / "SKILL.md").is_file():
                     raise ImportError(f"Pinned source for {entry['name']} has no SKILL.md.")
                 tree_hashes(source)
-                for root, boundary in destinations:
+                for root in destinations:
                     try:
-                        outcome = install_skill(entry, source, root, boundary)
+                        outcome = install_skill(entry, source, root, home)
                         print(f"External skill {entry['name']}: {outcome} -> {root / entry['name']}")
                     except (ImportError, OSError) as exc:
                         failures += 1
@@ -310,12 +301,11 @@ def sync_external_skills(entries: list[dict], tools: set[str], projects: Iterabl
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tool", choices=[*sorted(TOOLS), "all"], default="all")
-    parser.add_argument("--project", action="append", default=[], type=Path)
     parser.add_argument("--dry-run", action="store_true", help="Show the local import plan without network access or writes.")
     args = parser.parse_args()
     try:
         entries = load_manifest()
-        sync_external_skills(entries, TOOLS if args.tool == "all" else {args.tool}, args.project, dry_run=args.dry_run)
+        sync_external_skills(entries, TOOLS if args.tool == "all" else {args.tool}, dry_run=args.dry_run)
     except (ImportError, OSError) as exc:
         print(f"EXTERNAL SKILLS ERROR: {exc}", file=sys.stderr)
         return 1

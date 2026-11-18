@@ -23,10 +23,10 @@ Read the [shared workflow](src/tool-instructions/shared/delivery-workflow.md) to
 ## When asked to install or sync the AI toolkit
 
 1. Run the platform probe, then `python3 scripts/build.py` on macOS or `py -3 scripts/build.py` on Windows from the repo root. Substitute the verified Python 3.11+ executable when needed.
-2. Run the same interpreter with `scripts/sync.py --tool <codex|claude|copilot|cursor|all>`. Normal sync includes the compatible selected imports in `external-skills.toml`; preview them with `scripts/external_skills.py --tool all --dry-run`. Use `--skip-external` for repository-generated content only. External imports preserve unmanaged or modified skills; `--force` does not bypass their protection.
+2. Run the same interpreter with `scripts/sync.py --tool <codex|claude|all>`. Normal sync includes the compatible selected imports in `external-skills.toml`; preview them with `scripts/external_skills.py --tool all --dry-run`. Use `--skip-external` for repository-generated content only. External imports preserve unmanaged or modified skills; `--force` does not bypass their protection.
 3. If the user wants project-local tool instructions, add `--project <path>`.
 4. `scripts/sync.py` resolves `{{LUCHDOM_AI_TOOLKIT_DOCS}}` in tool instructions from `LUCHDOM_AI_TOOLKIT_DOCS` when it is set, otherwise from the legacy `LUCHDOM_AI_CONFIG_DOCS` name or this repo's local `docs` folder.
-5. Root `AGENTS.md` (shared by Codex, Claude Code, and Cursor) and `.github/copilot-instructions.md` are marker-managed: normal sync emits `<!-- AI-TOOLKIT-LUCHDOM:START -->` and `:END`, accepts and migrates the legacy `AI-CONFIG-LUCHDOM` markers, and preserves content outside them. Existing unmarked files remain untouched unless `--force` explicitly adopts them. Project Copilot agents/skills and Cursor rules remain skip-unless-`--force`. Repository-generated user-level agents and skills are refreshed on every sync; compare and back up intentional local preferences first.
+5. Codex and Claude Code share the root `AGENTS.md`. Sync updates the block between `<!-- AI-TOOLKIT-LUCHDOM:START -->` and `<!-- AI-TOOLKIT-LUCHDOM:END -->` and preserves text outside it. Sync also migrates the legacy `AI-CONFIG-LUCHDOM` markers. Use `--force` to adopt an unmarked file. Back up local changes to toolkit-managed user agents and skills before syncing.
 6. Verify the installed files exist after sync.
 
 ## Preferred behavior
@@ -40,5 +40,3 @@ Read the [shared workflow](src/tool-instructions/shared/delivery-workflow.md) to
 - If changing shared project-local guidance, update the relevant files under `src/tool-instructions/`.
 - Project-local tool instructions link to the shared workflow in `src/tool-instructions/shared/`.
 - Follow `EXTERNAL-SKILLS.md` for selected imports and native plugins, `EXTERNAL-TOOLS.md` for companion CLIs, and `MCP-SERVERS.md` for explicit server setup. Prefer the linked official installation procedures. Normal skill sync does not install CLIs, run plugins, or configure MCP servers.
-- Copilot support in this repo uses user-level `~/.copilot/agents` and `~/.copilot/skills`, plus project-level `.github/agents`, `.github/skills`, and `.github/copilot-instructions.md`.
-- Cursor support in this repo is project-level only. Generate `AGENTS.md` plus `.cursor/rules/*.mdc` into the target repo when the user asks for Cursor support. Compatible selected external skills use `.cursor/skills/` and require `--project`.

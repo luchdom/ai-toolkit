@@ -78,7 +78,6 @@ class DeliveryRoutingSyncTests(unittest.TestCase):
         installations = (
             ("codex", "AGENTS.md", sync.sync_codex),
             ("claude", "CLAUDE.md", sync.sync_claude),
-            ("copilot", "copilot-instructions.md", sync.sync_copilot),
         )
         for tool, instruction_name, install in installations:
             with self.subTest(tool=tool), tempfile.TemporaryDirectory() as directory:
@@ -111,15 +110,12 @@ class DeliveryRoutingSyncTests(unittest.TestCase):
 
     def test_project_routers_use_the_shared_workflow(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            for tool in ("codex", "claude", "copilot", "cursor"):
+            for tool in ("codex", "claude"):
                 with self.subTest(tool=tool), redirect_stdout(io.StringIO()):
                     project = Path(directory) / tool
                     sync.sync_tool_instructions(project, {tool}, False)
-                    instructions = ".github/copilot-instructions.md" if tool == "copilot" else "AGENTS.md"
                     guide = ROOT / "src/tool-instructions/shared/delivery-workflow.md"
-                    self.assertIn(f"(<{guide.as_posix()}>)", (project / instructions).read_text(encoding="utf-8"))
-                    if tool == "copilot":
-                        self.assert_delivery_links_resolve(project / ".github")
+                    self.assertIn(f"(<{guide.as_posix()}>)", (project / "AGENTS.md").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

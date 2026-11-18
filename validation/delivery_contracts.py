@@ -69,8 +69,6 @@ GUIDANCE_FILES = (
     "README.md",
     "src/tool-instructions/codex/AGENTS.md",
     "src/tool-instructions/claude/AGENTS.md",
-    "src/tool-instructions/copilot/.github/copilot-instructions.md",
-    "src/tool-instructions/cursor/AGENTS.md",
 )
 FORBIDDEN_OPERATIONAL_PATTERNS = (
     ("retired state name", re.compile(r"\bReady for Codex\b", re.IGNORECASE)),
@@ -87,7 +85,7 @@ OLD_LAYOUT_PATTERN = re.compile(
 )
 MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 DOCTRINE_BLOCK_MIN_LENGTH = 120
-TEXT_SUFFIXES = {".json", ".md", ".mdc", ".py", ".toml", ".txt", ".yaml", ".yml"}
+TEXT_SUFFIXES = {".json", ".md", ".py", ".toml", ".txt", ".yaml", ".yml"}
 
 # Each digest identifies one exact stripped source line and its reviewed purpose.
 # Generated projections are mapped back to their canonical source before lookup.
@@ -681,23 +679,9 @@ def _canonical_projection_source(relative: str) -> str:
             stem = name.removesuffix(".toml")
         elif parts[1] == "claude" and name.endswith(".md"):
             stem = name.removesuffix(".md")
-        elif parts[1] == "copilot" and name.endswith(".agent.md"):
-            stem = name.removesuffix(".agent.md")
         else:
             return relative
         return f"src/agents/{stem}.md"
-
-    if len(parts) == 4 and parts[:3] == ["dist", "cursor", "rules"] and parts[3].endswith(".mdc"):
-        support_sources = {
-            "ui-design-gates.mdc": (STAGE_REFERENCES / "design-gates.md").as_posix(),
-            "clarification-policy.mdc": (STAGE_REFERENCES / "clarification-policy.md").as_posix(),
-            "ui-review-spec.mdc": "src/skills/ui-review-spec/SKILL.md",
-            "ui-design-spec-template.mdc": "src/skills/ui-review-spec/references/spec-template.md",
-            "ui-design-review-template.mdc": "src/skills/ui-review-spec/references/design-review-template.md",
-            "ui-audit-checklist.mdc": "src/skills/ui-review-spec/references/ui-audit-checklist.md",
-            "ui-component-selection.mdc": "src/skills/ui-review-spec/references/component-selection.md",
-        }
-        return support_sources.get(parts[3], f"src/agents/{parts[3].removesuffix('.mdc')}.md")
 
     return relative
 

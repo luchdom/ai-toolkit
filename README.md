@@ -1,6 +1,6 @@
 # ai-toolkit
 
-Reusable AI agents, skills, and project-local tool instructions for Codex, Claude Code, GitHub Copilot CLI, and Cursor.
+Reusable AI agents, skills, and project instructions for Codex and Claude Code.
 
 ## Delivery workflows
 
@@ -20,7 +20,7 @@ Use [`$project-docs`](src/skills/project-docs/SKILL.md) to create or refine a re
 
 Templates provide populated examples and minimum coverage requirements. For UI projects, the skill also defines a working component catalogue using the real tokens/components, with its source and startup/access instructions linked from the project docs map. Implement the catalogue within authorized UI work, or record a concrete proposal during docs-only work.
 
-Sync adds a shared docs-discovery rule to user instructions and generated project/specialist instructions. Agents suggest the specific missing documentation when relevant, honor earlier declines, and keep applicable docs current within the active task. Codex, Claude Code, and Cursor project setup share `AGENTS.md`. See [Project documentation](docs/project-documentation.md) for examples, placement, and installation.
+Sync adds a shared docs-discovery rule to user instructions and generated project/specialist instructions. Agents suggest the specific missing documentation when relevant, honor earlier declines, and keep applicable docs current within the active task. Codex and Claude Code share `AGENTS.md`. See [Project documentation](docs/project-documentation.md) for examples, placement, and installation.
 
 ## Product and engineering specialists
 
@@ -120,19 +120,19 @@ py -3 scripts/sync.py --tool all --project "C:/path/to/repo"
 python3 scripts/sync.py --tool all --project "$HOME/path/to/repo"
 ```
 
-Use `--tool codex`, `claude`, `copilot`, or `cursor` to limit installation. Cursor project sync writes `AGENTS.md` plus `.cursor/rules/*.mdc`, including the projected UI design-gate, review procedure, and templates. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
+Use `--tool codex` or `--tool claude` to install for one tool. Use `--tool all` for both. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
 
 User sync installs the shared delivery references next to the skills in each tool's home. Project instructions link to the toolkit checkout. Sync the project instructions again if that checkout moves.
 
 Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). Preview them with `python3 scripts/external_skills.py --tool all --dry-run` on macOS or `py -3 scripts/external_skills.py --tool all --dry-run` on Windows. Use `--skip-external` on `scripts/sync.py` for repository-generated content only. Imports preserve unmanaged or locally modified skill directories; `--force` does not bypass their ownership checks. See [External Skills](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
 
-Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Existing unmarked instruction files, project Copilot agents/skills, and Cursor rules remain untouched unless `--force` explicitly adopts or refreshes them. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
+Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Use `--force` to adopt an unmarked project instruction file. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
 
 For a fresh Codex environment, start with [External Skills](EXTERNAL-SKILLS.md) for selected imports and native plugins. The [additional skill restore checklist](docs/codex-skill-restore.md) is a historical Windows inventory for system and plugin skills beyond the active manifest; follow current platform paths and package instructions when restoring it.
 
 ## Maintenance
 
-Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.md). Install with `npm ci`, then run `npm run lint:md:files -- ":path/to/changed.md"`; use `npm run lint:md` for an all-file audit. The Python gate remains dependency-free. Toolkit sync installs a dedicated Markdown rule in user-level Codex, Claude Code, and Copilot instructions and includes it in generated specialist agents and project routers. Install the global CLI separately for use outside this repository.
+Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.md). Install with `npm ci`, then run `npm run lint:md:files -- ":path/to/changed.md"`; use `npm run lint:md` for an all-file audit. The Python gate remains dependency-free. Toolkit sync installs a dedicated Markdown rule in user-level Codex and Claude Code instructions and includes it in generated specialist agents and project routers. Install the global CLI separately for use outside this repository.
 
 - Change `src/`, regenerate `dist/`, and validate; do not edit generated output.
 - Keep tool instructions as concise routers rather than copies of the canonical protocol.

@@ -159,17 +159,11 @@ def sync_project_docs_guidance(dest: Path) -> None:
     sync_user_instruction_block(dest, source.read_text(encoding="utf-8"), "PROJECT-DOCS", "Project documentation")
 
 
-def sync_delivery_references(tool: str, destination: Path, *, overwrite: bool) -> None:
+def sync_delivery_guidance(tool: str, tool_home: Path, instructions: Path) -> None:
     shared = Path("tool-instructions/shared")
     for source in sorted((DIST / tool / shared).glob("*.md")):
-        target = destination / shared / source.name
-        if overwrite or not target.exists():
-            sync_file(source, target)
-
-
-def sync_delivery_guidance(tool: str, tool_home: Path, instructions: Path) -> None:
-    sync_delivery_references(tool, tool_home, overwrite=True)
-    worktree_policy = (tool_home / "tool-instructions/shared/worktrees.md").as_posix()
+        sync_file(source, tool_home / shared / source.name)
+    worktree_policy = (tool_home / shared / "worktrees.md").as_posix()
     block = (
         "<!-- AI-TOOLKIT-WORKTREES:START -->\n"
         "## Git worktrees\n\n"
@@ -200,64 +194,18 @@ def sync_claude() -> None:
     sync_delivery_guidance("claude", claude_home, claude_home / "CLAUDE.md")
 
 
-def sync_copilot() -> None:
-    copilot_home = Path.home() / ".copilot"
-    for agent_file in sorted((DIST / "copilot" / "agents").glob("*.agent.md")):
-        sync_file(agent_file, copilot_home / "agents" / agent_file.name)
-    sync_skill_dirs(DIST / "copilot" / "skills", copilot_home / "skills")
-    sync_markdown_guidance(copilot_home / "copilot-instructions.md")
-    sync_project_docs_guidance(copilot_home / "copilot-instructions.md")
-    sync_delivery_guidance("copilot", copilot_home, copilot_home / "copilot-instructions.md")
-
-
 def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
     project.mkdir(parents=True, exist_ok=True)
 
-    agent_tool = next((tool for tool in ("codex", "claude", "cursor") if tool in tools), None)
+    agent_tool = next((tool for tool in ("codex", "claude") if tool in tools), None)
     if agent_tool:
         target = project / "AGENTS.md"
         write_or_splice_template(DIST / "tool-instructions" / agent_tool / "AGENTS.md", target, force)
 
-    if "copilot" in tools:
-        target = project / ".github" / "copilot-instructions.md"
-        write_or_splice_template(DIST / "tool-instructions" / "copilot" / ".github" / "copilot-instructions.md", target, force)
-        sync_delivery_references("copilot", project / ".github", overwrite=force)
-
-        agents_root = project / ".github" / "agents"
-        for agent_file in sorted((DIST / "copilot" / "agents").glob("*.agent.md")):
-            target = agents_root / agent_file.name
-            if force or not target.exists():
-                sync_file(agent_file, target)
-            else:
-                print(f"Skipped existing {target}")
-
-        skills_root = project / ".github" / "skills"
-        for skill_dir in sorted((DIST / "copilot" / "skills").iterdir()):
-            if not skill_dir.is_dir():
-                continue
-            target = skills_root / skill_dir.name
-            if target.exists():
-                if force:
-                    shutil.rmtree(target)
-                else:
-                    print(f"Skipped existing {target}")
-                    continue
-            shutil.copytree(skill_dir, target)
-            print(f"Synced skill {skill_dir.name} -> {target}")
-
-    if "cursor" in tools:
-        rules_root = project / ".cursor" / "rules"
-        for rule_file in sorted((DIST / "cursor" / "rules").glob("*.mdc")):
-            target = rules_root / rule_file.name
-            if force or not target.exists():
-                sync_file(rule_file, target)
-            else:
-                print(f"Skipped existing {target}")
-
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Install generated Codex, Claude, Copilot, and Cursor adapters, skills, and tool instructions.")
-    parser.add_argument("--tool", choices=["codex", "claude", "copilot", "cursor", "all"], default="all")
+    parser = argparse.ArgumentParser(description="Install generated Codex and Claude Code adapters, skills, and tool instructions.")
+    parser.add_argument("--tool", choices=["codex", "claude", "all"], default="all")
     parser.add_argument(
         "--project",
         action="append",
@@ -275,12 +223,12 @@ def main() -> int:
         help="Sync repository-generated content only, without external skill imports or network access.",
     )
     args = parser.parse_args()
-    tools = {"codex", "claude", "copilot", "cursor"} if args.tool == "all" else {args.tool}
+    tools = external_skills.TOOLS if args.tool == "all" else {args.tool}
     entries = []
     if not args.skip_external:
         try:
             entries = external_skills.load_manifest()
-            external_skills.preflight(entries, tools, [Path(path) for path in args.project])
+            external_skills.preflight(entries, tools)
         except (external_skills.ImportError, OSError) as exc:
             print(f"EXTERNAL SKILLS ERROR: {exc}", file=sys.stderr)
             return 1
@@ -292,15 +240,13 @@ def main() -> int:
         sync_codex()
     if "claude" in tools:
         sync_claude()
-    if "copilot" in tools:
-        sync_copilot()
 
     for project in args.project:
         sync_tool_instructions(Path(project), tools, args.force)
 
     if not args.skip_external:
         try:
-            external_skills.sync_external_skills(entries, tools, [Path(path) for path in args.project])
+            external_skills.sync_external_skills(entries, tools)
         except (external_skills.ImportError, OSError) as exc:
             print(f"EXTERNAL SKILLS ERROR: {exc}", file=sys.stderr)
             return 1

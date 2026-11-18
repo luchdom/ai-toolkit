@@ -19,9 +19,9 @@ python3 scripts/build.py
 python3 scripts/sync.py --tool all
 ```
 
-On Windows, use the verified `py -3` interpreter instead of `python3`. Sync installs the fallback configuration at `~/.config/ai-toolkit/markdownlint-cli2.jsonc` on either platform and maintains a dedicated Markdown guidance block in `~/.codex/AGENTS.md`, `~/.claude/CLAUDE.md`, and `~/.copilot/copilot-instructions.md` for the selected tools. It preserves content outside that block, even in existing unmarked user instruction files. Malformed or duplicate Markdown markers stop that update. The existing rules for project instruction markers are unchanged.
+On Windows, use the verified `py -3` interpreter instead of `python3`. Sync installs the fallback configuration at `~/.config/ai-toolkit/markdownlint-cli2.jsonc` on either platform and maintains a dedicated Markdown guidance block in `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md` for the selected tools. It preserves content outside that block, even in existing unmarked user instruction files. Malformed or duplicate Markdown markers stop that update. The existing rules for project instruction markers are unchanged.
 
-The generated specialist agents also include the shared rule. Cursor receives the rule through its generated project instructions and specialist rules; it has no user-level sync in this toolkit. Start a new agent session after syncing to load updated instructions. Sync does not install npm packages or change editor settings. Normal sync also fetches the selected pinned [external skill imports](../EXTERNAL-SKILLS.md); use `--skip-external` for repository-generated content only. Those imports do not install the companion Markdown CLI.
+The generated specialist agents also include the shared rule. Start a new agent session after syncing to load updated instructions. Sync does not install npm packages or change editor settings. Normal sync also fetches the selected pinned [external skill imports](../EXTERNAL-SKILLS.md); use `--skip-external` for repository-generated content only. Those imports do not install the companion Markdown CLI.
 
 ## Check changed files
 

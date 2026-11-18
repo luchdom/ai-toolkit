@@ -13,34 +13,12 @@ SRC = ROOT / "src"
 DIST = ROOT / "dist"
 SKILL_REF_PATTERN = re.compile(r"\$([a-z0-9][a-z0-9-]*)")
 MANIFEST_VERSION = 1
-SKILL_ADAPTERS = ("codex", "claude", "copilot")
+SKILL_ADAPTERS = ("codex", "claude")
 SHARED_DELIVERY_FILES = (
     "artifact-contract.md",
     "completion-boundaries.md",
     "delivery-workflow.md",
     "worktrees.md",
-)
-CURSOR_RULE_PATH_REPLACEMENTS = (
-    ("`$project-docs-review`", "the `.cursor/rules/project-docs-review.mdc` rule"),
-    ("`$project-docs`", "the `.cursor/rules/project-docs.mdc` rule"),
-    ("../project-docs/references/documentation-standard.md", "./project-documentation-standard.mdc"),
-    ("references/documentation-standard.md", "./project-documentation-standard.mdc"),
-    ("(references/working-design-system.md)", "(./project-working-design-system.mdc)"),
-    ("(working-design-system.md)", "(./project-working-design-system.mdc)"),
-    ("assets/PRD.md", "./project-prd-template.mdc"),
-    ("assets/DESIGN_SYSTEM.md", "./project-design-system-template.mdc"),
-    ("assets/ARCHITECTURE.md", "./project-architecture-template.mdc"),
-    ("assets/AGENTS.md", "./project-agents-template.mdc"),
-    ("`$ui-review-spec`", "the `.cursor/rules/ui-review-spec.mdc` rule"),
-    ("../spec-driven-delivery/references/design-gates.md", "./ui-design-gates.mdc"),
-    ("spec-driven-delivery/references/clarification-policy.md", ".cursor/rules/clarification-policy.mdc"),
-    ("(./clarification-policy.md)", "(./clarification-policy.mdc)"),
-    ("./references/design-review-template.md", "./ui-design-review-template.mdc"),
-    ("./references/spec-template.md", "./ui-design-spec-template.mdc"),
-    ("./references/ui-audit-checklist.md", "./ui-audit-checklist.mdc"),
-    ("./references/component-selection.md", "./ui-component-selection.mdc"),
-    ("spec-driven-delivery/references/design-gates.md", ".cursor/rules/ui-design-gates.mdc"),
-    ("`design-gates.md`", "`.cursor/rules/ui-design-gates.mdc`"),
 )
 
 
@@ -92,29 +70,6 @@ def render_claude_agent(meta: dict[str, str], body: str) -> str:
         lines.append(f'disallowedTools: {json.dumps(meta["claude_disallowed_tools"])}')
     lines.append("---")
     return "\n".join(lines) + "\n\n" + body.rstrip() + "\n"
-
-
-def render_copilot_agent(meta: dict[str, str], body: str) -> str:
-    return (
-        "---\n"
-        f'name: {json.dumps(meta["name"])}\n'
-        f'description: {json.dumps(meta["description"])}\n'
-        "infer: true\n"
-        "---\n\n"
-        f"{body.rstrip()}\n"
-    )
-
-
-def render_cursor_rule(meta: dict[str, str], body: str) -> str:
-    for source, destination in CURSOR_RULE_PATH_REPLACEMENTS:
-        body = body.replace(source, destination)
-    return (
-        "---\n"
-        f'description: {json.dumps(meta["description"])}\n'
-        "alwaysApply: false\n"
-        "---\n\n"
-        f"{body.rstrip()}\n"
-    )
 
 
 def validate_tool_instruction_skills() -> None:
@@ -190,17 +145,10 @@ def rebuild_dist() -> None:
     if DIST.exists():
         shutil.rmtree(DIST)
 
-    (DIST / "codex" / "agents").mkdir(parents=True, exist_ok=True)
-    (DIST / "codex" / "skills").mkdir(parents=True, exist_ok=True)
-    (DIST / "claude" / "agents").mkdir(parents=True, exist_ok=True)
-    (DIST / "claude" / "skills").mkdir(parents=True, exist_ok=True)
-    (DIST / "copilot" / "agents").mkdir(parents=True, exist_ok=True)
-    (DIST / "copilot" / "skills").mkdir(parents=True, exist_ok=True)
-    (DIST / "cursor" / "rules").mkdir(parents=True, exist_ok=True)
-    (DIST / "tool-instructions" / "codex").mkdir(parents=True, exist_ok=True)
-    (DIST / "tool-instructions" / "claude").mkdir(parents=True, exist_ok=True)
-    (DIST / "tool-instructions" / "copilot" / ".github").mkdir(parents=True, exist_ok=True)
-    (DIST / "tool-instructions" / "cursor").mkdir(parents=True, exist_ok=True)
+    for tool in SKILL_ADAPTERS:
+        (DIST / tool / "agents").mkdir(parents=True, exist_ok=True)
+        (DIST / tool / "skills").mkdir(parents=True, exist_ok=True)
+        (DIST / "tool-instructions" / tool).mkdir(parents=True, exist_ok=True)
 
     projections: dict[Path, list[Path]] = {}
 
@@ -231,15 +179,11 @@ def rebuild_dist() -> None:
         body = body.rstrip() + "\n\n" + markdown_guidance + "\n" + project_docs_guidance
         codex_text = render_codex_toml(meta, body)
         claude_text = render_claude_agent(meta, body)
-        copilot_text = render_copilot_agent(meta, body)
-        cursor_text = render_cursor_rule(meta, body)
         outputs = [
             DIST / "codex" / "agents" / f"{agent_path.stem}.toml",
             DIST / "claude" / "agents" / f"{agent_path.stem}.md",
-            DIST / "copilot" / "agents" / f"{agent_path.stem}.agent.md",
-            DIST / "cursor" / "rules" / f"{agent_path.stem}.mdc",
         ]
-        for output, content in zip(outputs, (codex_text, claude_text, copilot_text, cursor_text), strict=True):
+        for output, content in zip(outputs, (codex_text, claude_text), strict=True):
             output.write_text(content, encoding="utf-8")
         projections[agent_path] = outputs
 
@@ -263,115 +207,8 @@ def rebuild_dist() -> None:
                 relative = source.relative_to(skill_dir)
                 projections[source] = [destination / relative for destination in destinations]
 
-    cursor_support_rules = (
-        (
-            SRC / "skills" / "project-docs" / "SKILL.md",
-            "project-docs.mdc",
-            "Create or refine the repository's project documentation.",
-            True,
-        ),
-        (
-            SRC / "skills" / "project-docs-review" / "SKILL.md",
-            "project-docs-review.mdc",
-            "Assess project documentation coverage, placement, and consistency.",
-            True,
-        ),
-        (
-            SRC / "skills" / "project-docs" / "references" / "documentation-standard.md",
-            "project-documentation-standard.mdc",
-            "Placement, ownership, applicability, and maintenance of project documentation.",
-            False,
-        ),
-        (
-            SRC / "skills" / "project-docs" / "references" / "working-design-system.md",
-            "project-working-design-system.mdc",
-            "Runnable component catalogues using the project's real tokens, components, and interactions.",
-            False,
-        ),
-        (
-            SRC / "skills" / "project-docs" / "assets" / "PRD.md",
-            "project-prd-template.mdc",
-            "Starter template for product requirements.",
-            False,
-        ),
-        (
-            SRC / "skills" / "project-docs" / "assets" / "DESIGN_SYSTEM.md",
-            "project-design-system-template.mdc",
-            "Starter template for a project's UI design system.",
-            False,
-        ),
-        (
-            SRC / "skills" / "project-docs" / "assets" / "ARCHITECTURE.md",
-            "project-architecture-template.mdc",
-            "Starter template for project architecture.",
-            False,
-        ),
-        (
-            SRC / "skills" / "project-docs" / "assets" / "AGENTS.md",
-            "project-agents-template.mdc",
-            "Starter template for root project instructions.",
-            False,
-        ),
-        (
-            SRC / "skills" / "spec-driven-delivery" / "references" / "design-gates.md",
-            "ui-design-gates.mdc",
-            "Binding frontend/UI design gates for planning, implementation, and rendered conformance review.",
-            False,
-        ),
-        (
-            SRC / "skills" / "spec-driven-delivery" / "references" / "clarification-policy.md",
-            "clarification-policy.mdc",
-            "Decision authority and specialist guidance for delivery.",
-            False,
-        ),
-        (
-            SRC / "skills" / "ui-review-spec" / "SKILL.md",
-            "ui-review-spec.mdc",
-            "Produce a pre-build UI design specification or post-build rendered design-conformance review.",
-            True,
-        ),
-        (
-            SRC / "skills" / "ui-review-spec" / "references" / "spec-template.md",
-            "ui-design-spec-template.mdc",
-            "Output template for an implementer-ready UI design specification.",
-            False,
-        ),
-        (
-            SRC / "skills" / "ui-review-spec" / "references" / "design-review-template.md",
-            "ui-design-review-template.mdc",
-            "Output template for a rendered UI design-conformance verdict.",
-            False,
-        ),
-        (
-            SRC / "skills" / "ui-review-spec" / "references" / "ui-audit-checklist.md",
-            "ui-audit-checklist.mdc",
-            "Checklist for UI hierarchy, states, accessibility, responsiveness, and conformance evidence.",
-            False,
-        ),
-        (
-            SRC / "skills" / "ui-review-spec" / "references" / "component-selection.md",
-            "ui-component-selection.mdc",
-            "Repository-first component and design-system selection rules.",
-            False,
-        ),
-    )
-    for source, output_name, description, has_frontmatter in cursor_support_rules:
-        source_text = source.read_text(encoding="utf-8")
-        if has_frontmatter:
-            source_meta, body = parse_frontmatter(source_text)
-            description = source_meta["description"]
-        else:
-            body = source_text
-        output = DIST / "cursor" / "rules" / output_name
-        output.write_text(render_cursor_rule({"description": description}, body), encoding="utf-8")
-        projections.setdefault(source, []).append(output)
-
-    for relative in (
-        Path("codex/AGENTS.md"),
-        Path("claude/AGENTS.md"),
-        Path("copilot/.github/copilot-instructions.md"),
-        Path("cursor/AGENTS.md"),
-    ):
+    for tool in SKILL_ADAPTERS:
+        relative = Path(tool) / "AGENTS.md"
         source = SRC / "tool-instructions" / relative
         if source.exists():
             output = DIST / "tool-instructions" / relative
@@ -387,7 +224,7 @@ def rebuild_dist() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate Codex, Claude, Copilot, and Cursor adapters from canonical AI config sources.")
+    parser = argparse.ArgumentParser(description="Generate Codex and Claude Code adapters from canonical AI config sources.")
     parser.parse_args()
     rebuild_dist()
     print("Built adapters into dist/.")

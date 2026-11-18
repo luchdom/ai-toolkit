@@ -49,7 +49,7 @@ Normal sync includes compatible selected imports from [external-skills.toml](../
 | Purpose | Windows | macOS |
 |---|---|---|
 | Toolkit location | Actual checkout path | Actual checkout path |
-| User-level adapters | `Path.home()/.codex`, `.claude`, `.copilot` | `Path.home()/.codex`, `.claude`, `.copilot` |
+| User-level adapters | `Path.home()/.codex` and `Path.home()/.claude` | `Path.home()/.codex` and `Path.home()/.claude` |
 
 The sync script uses `Path.home()` for user-level destinations. Shared docs links are rendered from `LUCHDOM_AI_TOOLKIT_DOCS`, then legacy `LUCHDOM_AI_CONFIG_DOCS`, then this checkout's `docs` directory. These overrides must name a real location on the execution host. After moving the toolkit checkout, refresh marker-managed project instructions so their docs links point to the new location.
 
@@ -59,7 +59,7 @@ Before a requested sync, compare and back up any intentional local changes to to
 
 Normal sync preflights the selected external imports before writing repository-generated output. External imports use ownership receipts and preserve unmanaged directories or locally modified imports; `--force` does not bypass these checks. Resolve a reported conflict using [external skill recovery](../EXTERNAL-SKILLS.md#ownership-conflicts-and-recovery), or explicitly select `--skip-external` to sync only repository-generated content.
 
-Project instruction files preserve text outside toolkit markers. Existing unmarked instruction files, project Copilot agents/skills, and Cursor rules are skipped unless `--force` is supplied. `--force` replaces project instruction files in full; use it only when that replacement is intended.
+Project instruction files preserve text outside toolkit markers. Use `--force` to adopt an unmarked project instruction file. `--force` replaces project instruction files in full; use it only when that replacement is intended.
 
 After sync, verify the intended destination files exist and inspect the rendered docs path. To undo a sync, restore the backed-up managed files and instruction blocks. Do not delete unrelated skills or tool configuration. Repo development needs build/validation only; syncing live user homes is a separate installation action.
 

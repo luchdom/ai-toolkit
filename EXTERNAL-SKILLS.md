@@ -44,7 +44,7 @@ python3 scripts/external_skills.py --tool codex
 py -3 scripts/external_skills.py --tool codex
 ```
 
-Use `--project "/actual/project/path"` with either command when project destinations are required. The option is repeatable. A dry run validates the local manifest and destination plan; it cannot prove that a remote revision, skill directory, or service is available.
+Use `--project "/actual/project/path"` with `scripts/sync.py` to also install project instructions. A dry run validates the local manifest and destination plan; it cannot prove that a remote revision, skill directory, or service is available.
 
 ### Destinations and Compatibility
 
@@ -52,12 +52,8 @@ Use `--project "/actual/project/path"` with either command when project destinat
 | --- | --- |
 | Codex | `~/.codex/skills/<name>` |
 | Claude Code | `~/.claude/skills/<name>` |
-| GitHub Copilot CLI | `~/.copilot/skills/<name>` |
-| Cursor | `<project>/.cursor/skills/<name>`; requires `--project` |
 
-See [Cursor's skill documentation](https://cursor.com/docs/skills) for its project skill directory and discovery behavior.
-
-An import is installed only for the tools declared in its manifest entry and selected by `--tool`. A skill written for one agent is not converted automatically for another. Cursor entries without a project are reported as skipped.
+An import is installed only for the tools declared in its manifest entry and selected by `--tool`. A skill written for one agent is not converted automatically for another.
 
 The importer fetches the pinned Git revision and copies the complete skill directory, including supporting scripts, references, and assets. It does not execute those scripts, upstream installers, lifecycle hooks, plugin commands, or MCP setup. Review upstream instructions before selecting a skill. Restart the agent after installation and verify its available skill list; files on disk alone do not prove that the current session loaded them.
 
@@ -71,7 +67,7 @@ All `[[skills]]` entries in [external-skills.toml](external-skills.toml) are sel
 | `repo` | Public GitHub HTTPS repository URL ending in `.git` |
 | `path` | Skill directory inside the repository; `.` means its root |
 | `revision` | Full 40-character Git commit SHA |
-| `tools` | Explicit compatible targets: `codex`, `claude`, `copilot`, or `cursor` |
+| `tools` | Distinct compatible targets from `codex` and `claude` |
 
 The top-level `version` is `1`. Names cannot collide with repository-owned `src/skills` names. The importer rejects malformed or unknown fields, duplicate names, unsafe paths, symlink content, and invalid revisions before importing.
 

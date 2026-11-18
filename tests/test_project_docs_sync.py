@@ -17,13 +17,12 @@ sync = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sync)
 
 
-def assert_resource_links_resolve(test: unittest.TestCase, path: Path, suffix: str | None = None) -> None:
+def assert_resource_links_resolve(test: unittest.TestCase, path: Path) -> None:
     for target in re.findall(r"\]\(([^)]+)\)", path.read_text(encoding="utf-8")):
         if "://" in target or target.startswith("#"):
             continue
         relative = target.split("#", 1)[0]
-        if suffix is None or relative.endswith(suffix):
-            test.assertTrue((path.parent / relative).is_file(), f"Broken resource link in {path}: {target}")
+        test.assertTrue((path.parent / relative).is_file(), f"Broken resource link in {path}: {target}")
 
 
 class ProjectDocsSyncTests(unittest.TestCase):
@@ -31,7 +30,6 @@ class ProjectDocsSyncTests(unittest.TestCase):
         tools = (
             (sync.sync_codex, ".codex", "AGENTS.md"),
             (sync.sync_claude, ".claude", "CLAUDE.md"),
-            (sync.sync_copilot, ".copilot", "copilot-instructions.md"),
         )
         for install, folder, instruction_name in tools:
             with self.subTest(tool=folder), tempfile.TemporaryDirectory() as directory:
@@ -71,7 +69,7 @@ class ProjectDocsSyncTests(unittest.TestCase):
                 self.assertEqual(original, instructions.read_text(encoding="utf-8"))
 
     def test_project_sync_shares_agents_and_preserves_existing_tool_file(self) -> None:
-        for tools in ({"claude"}, {"codex", "claude", "copilot", "cursor"}):
+        for tools in ({"claude"}, {"codex", "claude"}):
             with self.subTest(tools=tools), tempfile.TemporaryDirectory() as directory:
                 project = Path(directory)
                 with redirect_stdout(io.StringIO()):
@@ -108,28 +106,6 @@ class ProjectDocsSyncTests(unittest.TestCase):
             for relative, content in originals.items():
                 self.assertEqual(content, (project / relative).read_bytes())
             self.assertEqual(set(originals), {path.relative_to(project).as_posix() for path in project.rglob("*") if path.is_file()})
-
-    def test_cursor_sync_includes_resolvable_docs_rules_and_templates(self) -> None:
-        names = (
-            "project-docs.mdc",
-            "project-docs-review.mdc",
-            "project-documentation-standard.mdc",
-            "project-working-design-system.mdc",
-            "project-prd-template.mdc",
-            "project-design-system-template.mdc",
-            "project-architecture-template.mdc",
-            "project-agents-template.mdc",
-        )
-        with tempfile.TemporaryDirectory() as directory:
-            project = Path(directory)
-            with redirect_stdout(io.StringIO()):
-                sync.sync_tool_instructions(project, {"cursor"}, False)
-            for name in names:
-                path = project / ".cursor" / "rules" / name
-                self.assertTrue(path.is_file())
-                suffix = None if name in ("project-docs.mdc", "project-docs-review.mdc") else ".mdc"
-                assert_resource_links_resolve(self, path, suffix)
-
 
 if __name__ == "__main__":
     unittest.main()
