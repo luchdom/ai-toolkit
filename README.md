@@ -24,6 +24,8 @@ Sync adds a shared docs-discovery rule to user instructions and generated projec
 
 ## Product and engineering specialists
 
+Use [`$refine`](src/skills/refine/SKILL.md) to pressure-test a goal before delivery. For example, `$refine choose a migration approach --with staff --output rfc` starts an interview with Staff Engineer and produces a proposal for review.
+
 | Agent | Use it for |
 |---|---|
 | [`dotnet`](src/agents/dotnet.md) | Authorized C#/.NET backend implementation, including ASP.NET Core APIs, persistence, authorization, workers, and tests. |
