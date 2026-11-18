@@ -848,6 +848,9 @@ def check_projection_manifest(root: Path) -> list[str]:
         and "__pycache__" not in path.parts
         and path.suffix != ".pyc"
     }
+    twelve_factor_guide = root / "docs" / "twelve-factor-for-agentic-development.md"
+    if twelve_factor_guide.is_file():
+        expected_sources.add(twelve_factor_guide.relative_to(root).as_posix())
     observed_sources: set[str] = set()
     observed_outputs: set[str] = set()
     for entry in entries:

@@ -14,10 +14,12 @@ DIST = ROOT / "dist"
 SKILL_REF_PATTERN = re.compile(r"\$([a-z0-9][a-z0-9-]*)")
 MANIFEST_VERSION = 1
 SKILL_ADAPTERS = ("codex", "claude")
+TWELVE_FACTOR_GUIDE = Path("docs/twelve-factor-for-agentic-development.md")
 SHARED_DELIVERY_FILES = (
     "artifact-contract.md",
     "completion-boundaries.md",
     "delivery-workflow.md",
+    TWELVE_FACTOR_GUIDE.name,
     "worktrees.md",
 )
 
@@ -153,7 +155,7 @@ def rebuild_dist() -> None:
     projections: dict[Path, list[Path]] = {}
 
     shared = Path("tool-instructions/shared")
-    for source in sorted((SRC / shared).glob("*.md")):
+    for source in (*sorted((SRC / shared).glob("*.md")), ROOT / TWELVE_FACTOR_GUIDE):
         destinations = [DIST]
         if source.name in SHARED_DELIVERY_FILES:
             # Match the source layout so links from skills work after sync.
@@ -174,8 +176,10 @@ def rebuild_dist() -> None:
     )
     projections[config_source] = [config_output]
 
+    installed_guide = shared / TWELVE_FACTOR_GUIDE.name
     for agent_path in sorted((SRC / "agents").glob("*.md")):
         meta, body = parse_frontmatter(agent_path.read_text(encoding="utf-8"))
+        body = body.replace(f"../../{TWELVE_FACTOR_GUIDE.as_posix()}", f"../{installed_guide.as_posix()}")
         body = body.rstrip() + "\n\n" + markdown_guidance + "\n" + project_docs_guidance
         codex_text = render_codex_toml(meta, body)
         claude_text = render_claude_agent(meta, body)

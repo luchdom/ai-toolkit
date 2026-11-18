@@ -38,6 +38,10 @@ def write_agent_sources() -> None:
     for toml_path in sorted((CODEX_HOME / "agents").glob("*.toml")):
         data = tomllib.loads(toml_path.read_text(encoding="utf-8"))
         body = data["developer_instructions"].rstrip() + "\n"
+        body = body.replace(
+            "](../tool-instructions/shared/twelve-factor-for-agentic-development.md)",
+            "](../../docs/twelve-factor-for-agentic-development.md)",
+        )
         description = descriptions.get(toml_path.stem, f"{toml_path.stem} agent")
         frontmatter = "\n".join(
             [
