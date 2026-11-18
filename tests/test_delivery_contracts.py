@@ -249,7 +249,7 @@ class DeliveryContractTests(unittest.TestCase):
         self.assertFalse((ROOT / "src" / ("project" + "-templates")).exists())
         for relative in expected:
             instruction = (ROOT / relative).read_text(encoding="utf-8")
-            self.assertIn("src/tool-instructions/shared/delivery-workflow.md", instruction)
+            self.assertIn("`tool-instructions/shared/delivery-workflow.md`", instruction)
             self.assertNotIn("goal-to-delivery/references/", instruction)
 
         build = (ROOT / "scripts/build.py").read_text(encoding="utf-8")
@@ -407,6 +407,9 @@ class DeliveryContractTests(unittest.TestCase):
             stages = STAGE_REFERENCES / "delivery-stages.md"
             stage_text = (ROOT / stages).read_text(encoding="utf-8")
             stage_file = write(root, stages, stage_text)
+            quality_gates = STAGE_REFERENCES / "quality-gates.md"
+            quality_text = (ROOT / quality_gates).read_text(encoding="utf-8")
+            quality_file = write(root, quality_gates, quality_text)
             write(
                 root,
                 SHARED_REFERENCES / "completion-boundaries.md",
@@ -467,6 +470,13 @@ class DeliveryContractTests(unittest.TestCase):
                 "design conformance review",
             )
             self.assertEqual([], check_shared_specialists_and_routing(root))
+
+            quality_file.write_text(
+                quality_text.replace("before publishing code or finishing automatic code delivery", "for automatic code delivery"),
+                encoding="utf-8",
+            )
+            self.assertTrue(any("review before code publication" in item for item in check_shared_specialists_and_routing(root)))
+            quality_file.write_text(quality_text, encoding="utf-8")
 
             qa_row = next(line for line in stage_text.splitlines() if line.startswith("| `qa` |"))
             review_row = next(line for line in stage_text.splitlines() if line.startswith("| `review` |"))

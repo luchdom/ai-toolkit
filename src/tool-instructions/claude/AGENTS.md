@@ -3,7 +3,7 @@
 
 ## Delivery workflow
 
-Follow the [shared delivery workflow](<{{LUCHDOM_AI_TOOLKIT_ROOT}}/src/tool-instructions/shared/delivery-workflow.md>). It links the delivery stages and the shared rules for artifacts, publication, and worktrees. Use this repository's commands and stricter rules.
+Read `tool-instructions/shared/delivery-workflow.md` in the active tool's home. Use `~/.codex` for Codex or `~/.claude` for Claude Code. The guide links the stages and shared rules for artifacts, publication, and worktrees. Follow this repository's commands and stricter rules.
 
 ## Execution platform
 

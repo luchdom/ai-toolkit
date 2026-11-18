@@ -446,6 +446,14 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
     findings.extend(
         _require_fragments(
             root,
+            root / STAGE_REFERENCES / "quality-gates.md",
+            ("one independent code review before publishing code",),
+            "review before code publication",
+        )
+    )
+    findings.extend(
+        _require_fragments(
+            root,
             root / SHARED_REFERENCES / "completion-boundaries.md",
             ("applicable UI design conformance", "one independent code review", "applicable QA"),
             "merge requirements",
@@ -799,12 +807,13 @@ def check_guidance_alignment(root: Path) -> list[str]:
     findings: list[str] = []
     for relative in GUIDANCE_FILES:
         path = root / relative
+        guide = WORKFLOW_GUIDE.relative_to("src") if relative.startswith("src/") else WORKFLOW_GUIDE
         findings.extend(
             _require_fragments(
                 root,
                 path,
-                (WORKFLOW_GUIDE.as_posix(),),
-                "shared delivery workflow link",
+                (guide.as_posix(),),
+                "shared delivery workflow reference",
             )
         )
         if path.is_file():

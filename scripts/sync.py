@@ -46,7 +46,6 @@ def render_template_text(src: Path) -> str:
             file.read()
             .replace("{{LUCHDOM_AI_TOOLKIT_DOCS}}", docs_root)
             .replace("{{LUCHDOM_AI_CONFIG_DOCS}}", docs_root)
-            .replace("{{LUCHDOM_AI_TOOLKIT_ROOT}}", ROOT.as_posix())
         )
 
 
@@ -169,6 +168,7 @@ def sync_delivery_guidance(tool: str, tool_home: Path, instructions: Path) -> No
         "## Git worktrees\n\n"
         "Before creating, resuming, or removing a linked Git worktree, "
         f"follow the [shared worktree policy](<{worktree_policy}>).\n"
+        "Use this policy when an older project instruction points to the former Goal to Delivery location.\n"
         "<!-- AI-TOOLKIT-WORKTREES:END -->\n"
     )
     sync_user_instruction_block(instructions, block, "WORKTREES", "Git worktree")

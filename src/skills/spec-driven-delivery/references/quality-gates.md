@@ -11,9 +11,11 @@ Use an independent auditor when work is high risk, ambiguous, unusually large, o
 1. Run focused tests for the changed area.
 2. For changed rendered UI or interaction, obtain a current product-designer `PASS` using the [design gates](./design-gates.md).
 3. Run QA for behavioral acceptance criteria. Exercise the real HTTP, browser, CLI, or other runtime path and record the result.
-4. Complete one independent code review for automatic code delivery. Review the exact diff or commit with the applicable QA and design results.
+4. Complete one independent code review before publishing code or finishing automatic code delivery. Review the exact diff or commit with the applicable QA and design results.
 5. Update durable docs when behavior, architecture, setup, or operations changed.
 6. Before merge, verify that the PR head passed the standard local validation command and all applicable gates. Reuse results for that head.
+
+The [Linear loop](../../linear-delivery-loop/SKILL.md#checkpoint-or-split-the-work) can commit and push an authorized checkpoint before review. Keep the issue active until the work passes review and reaches its completion boundary.
 
 ## Independent code review
 

@@ -125,7 +125,7 @@ python3 scripts/sync.py --tool all --project "$HOME/path/to/repo"
 
 Use `--tool codex` or `--tool claude` to install for one tool. Use `--tool all` for both. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
 
-User sync installs the shared delivery references next to the skills in each tool's home. Project instructions link to the toolkit checkout. Sync the project instructions again if that checkout moves.
+User sync installs the shared delivery references next to the skills in each tool's home. When upgrading an existing project, rerun sync with `--project "<project-path>"` to refresh its managed instruction block.
 
 Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). The manifest header contains the preview and sync commands. See the [external skill guide](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
 

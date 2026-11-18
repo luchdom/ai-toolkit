@@ -103,19 +103,32 @@ class DeliveryRoutingSyncTests(unittest.TestCase):
                 self.assertTrue(content.startswith("# Personal rules\n\n"))
                 self.assertIn("# More personal rules\n", content)
                 self.assertIn(f"(<{policy.as_posix()}>)", content)
+                self.assertIn("when an older project instruction points to the former Goal to Delivery location", content)
                 self.assertNotIn("worktree-policy.md", content)
                 self.assertFalse(obsolete_policy.exists())
                 self.assertIn("git worktree add -b <branch> <exact-path> <resolved-base-commit>", policy.read_text(encoding="utf-8"))
                 self.assert_delivery_links_resolve(tool_home)
 
-    def test_project_routers_use_the_shared_workflow(self) -> None:
+    def test_project_sync_upgrades_to_a_portable_delivery_route(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             for tool in ("codex", "claude"):
                 with self.subTest(tool=tool), redirect_stdout(io.StringIO()):
                     project = Path(directory) / tool
+                    project.mkdir()
+                    target = project / "AGENTS.md"
+                    target.write_text(
+                        "# Local instructions\n\n"
+                        f"{sync.MARKER_START}\n"
+                        "Read `goal-to-delivery/references/worktree-policy.md`.\n"
+                        f"{sync.MARKER_END}\n",
+                        encoding="utf-8",
+                    )
                     sync.sync_tool_instructions(project, {tool}, False)
-                    guide = ROOT / "src/tool-instructions/shared/delivery-workflow.md"
-                    self.assertIn(f"(<{guide.as_posix()}>)", (project / "AGENTS.md").read_text(encoding="utf-8"))
+                    content = target.read_text(encoding="utf-8")
+                    self.assertTrue(content.startswith("# Local instructions\n\n"))
+                    self.assertIn("`tool-instructions/shared/delivery-workflow.md` in the active tool's home", content)
+                    self.assertNotIn("src/tool-instructions/shared/delivery-workflow.md", content)
+                    self.assertNotIn("goal-to-delivery/references/worktree-policy.md", content)
 
 
 class CodexRoutingSyncTests(unittest.TestCase):
