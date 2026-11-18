@@ -68,17 +68,11 @@ def write_skill_sources() -> None:
 def write_tool_instructions() -> None:
     codex_dir = SRC_TOOL_INSTRUCTIONS / "codex"
     claude_dir = SRC_TOOL_INSTRUCTIONS / "claude"
-    copilot_dir = SRC_TOOL_INSTRUCTIONS / "copilot" / ".github"
-    cursor_dir = SRC_TOOL_INSTRUCTIONS / "cursor"
     codex_dir.mkdir(parents=True, exist_ok=True)
     claude_dir.mkdir(parents=True, exist_ok=True)
-    copilot_dir.mkdir(parents=True, exist_ok=True)
-    cursor_dir.mkdir(parents=True, exist_ok=True)
 
     codex_instruction = codex_dir / "AGENTS.md"
     claude_instruction = claude_dir / "AGENTS.md"
-    copilot_instruction = copilot_dir / "copilot-instructions.md"
-    cursor_instruction = cursor_dir / "AGENTS.md"
 
     defaults = {
         codex_instruction: (
@@ -92,20 +86,6 @@ def write_tool_instructions() -> None:
             "# Project AI Instructions\n\n"
             "- Keep project-specific rules here.\n"
             "- Keep reusable workflows in the shared ai-toolkit skills.\n"
-            "- Read this repo's docs, architecture notes, and established patterns before coding.\n"
-            "- Prefer existing components, abstractions, and tests over new ones.\n"
-        ),
-        copilot_instruction: (
-            "# Project AI Instructions\n\n"
-            "- Keep project-specific rules here.\n"
-            "- Keep reusable workflows in the shared ai-toolkit skills.\n"
-            "- Read this repo's docs, architecture notes, and established patterns before coding.\n"
-            "- Prefer existing components, abstractions, and tests over new ones.\n"
-        ),
-        cursor_instruction: (
-            "# Project AI Instructions\n\n"
-            "- Keep project-specific rules here.\n"
-            "- Keep reusable workflows in the shared ai-toolkit skills and generated Cursor rules.\n"
             "- Read this repo's docs, architecture notes, and established patterns before coding.\n"
             "- Prefer existing components, abstractions, and tests over new ones.\n"
         ),

@@ -1,14 +1,13 @@
 <!-- AI-TOOLKIT-LUCHDOM:START -->
-# Project AI Instructions
+# Project AI instructions
 
-Use this file as the repository-specific router for shared delivery skills.
+## Delivery workflow
 
-## Sources and precedence
+Read `tool-instructions/shared/delivery-workflow.md` in the active tool's home. Use `~/.codex` for Codex or `~/.claude` for Claude Code. The guide links the stages and shared rules for artifacts, publication, and worktrees. Follow this repository's commands and stricter rules.
 
-- The canonical cross-tool protocol is under `goal-to-delivery/references`; project docs link to it instead of copying it.
-- This repository owns repository-specific commands, domain rules, definitions of done, and stricter safety constraints.
-- Additional curated docs path: `{{LUCHDOM_AI_TOOLKIT_DOCS}}`.
-- Precedence is user/system requirements and repository-specific stricter safety, then the explicit entry policy, then the shared contract. Unresolved conflict fails closed before implementation or external mutation.
+## Execution platform
+
+Before setup or runtime commands, follow the [platform guide](<{{LUCHDOM_AI_TOOLKIT_DOCS}}/platform-support.md>). Identify the execution host OS, active shell, actual checkout/home, and available interpreter; never infer the OS from old paths or the shell name. Use macOS/POSIX or Windows/PowerShell commands as appropriate. From the toolkit checkout, run `python3 scripts/platform_info.py` on macOS or `py -3 scripts/platform_info.py` on Windows and retain the verified Python 3.11+ executable. Resolve paths on the current host; model and sandbox preferences are separate from platform selection.
 
 ## Markdown linting
 
@@ -16,29 +15,8 @@ Lint every Markdown file you create or edit before reporting completion. Use the
 
 {{PROJECT_DOCUMENTATION_GUIDANCE}}
 
-## Three entries
+## .NET implementation
 
-- `$goal-to-delivery <goal-or-selected-issue>`: semi-autonomous delivery of one user-selected goal, defaulting to tested `working-tree` output.
-- `$spec-driven-delivery <stage> <goal-or-selector>`: manual delivery of exactly one requested stage. Use this for non-trivial work when no entry was explicitly chosen.
-- `$linear-delivery-loop`: autonomous delivery of at most one eligible Linear issue using `.ai/loop.json`. Only an explicit scheduled task or attended pilot may invoke it.
+For authorized C#/.NET backend implementation, use `$dotnet-implementation`.
 
-Never infer a workflow from a label, branch, prior chat, or artifact folder.
-
-## Lightweight delivery
-
-- Use the smallest applicable stages. Routine work may plan and task inline; add independent audit, runtime QA, or durable evidence when risk or acceptance criteria justify them. Frontend/UI work must follow the active delivery entry's canonical design-gate and UI-review contracts: initialize or resume a registered `artifactFolder`, route unresolved UI decisions to product-designer before implementation, and require product-designer conformance afterward.
-- Keep applicable UI design conformance, one independent code review, and applicable behavior QA before autonomous merge.
-- Linear is the durable autonomous queue and decision record. An active attended issue blocks autonomous selection.
-- Use the workflow descriptor's exact registered `artifactFolder`: new/current work belongs under `.ai/work`, an exact registered legacy workflow may continue only at its exact `docs-ai` path, and unregistered or tracked historical `docs-ai` evidence is read-only.
-- Repository-owned local commands and real acceptance behavior are authoritative. Respect `.ai/loop.json` time, test, file, and changed-line budgets.
-
-## Authority and Git safety
-
-- Manual implementation and the default semi-autonomous boundary permit scoped edits and local validation, not publication.
-- Semi-autonomous Commit, PR, or Merge requires the declared boundary or a later grant. Manual publication requires each named stage.
-- The explicit autonomous entry may claim/update its selected issue and use a branch, PR, and squash merge within repository policy.
-- Before creating, resuming, or removing a linked worktree, follow `goal-to-delivery/references/worktree-policy.md`; do not copy that policy here, and honor stricter repository-local rules.
-- Preserve unrelated work. Never infer force-push, history rewrite, direct default-branch push, destructive cleanup, provider-setting changes, or unrelated external mutation.
-
-Use `$pr-description` for pull request text and follow the repository template when present.
 <!-- AI-TOOLKIT-LUCHDOM:END -->

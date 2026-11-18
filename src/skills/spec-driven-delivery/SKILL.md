@@ -1,37 +1,28 @@
 ---
 name: spec-driven-delivery
-description: Perform exactly one explicitly requested delivery stage for a user-selected goal, issue, or existing work. Use when the user invokes `$spec-driven-delivery` for manual Discover, Plan, Clarify, Design, Task, Audit, Implement, Design Review, Review, QA, Docs, Commit, PR, Merge, or Post-merge control without automatic advancement.
+description: Define and run the delivery stages from plan to publication. A direct request runs exactly one named stage. Goal to Delivery uses the same stages for automatic delivery.
 ---
 
 # Spec-driven Delivery
 
-Run exactly one named stage and return control to the user.
+Use the [stage order and prerequisites](./references/delivery-stages.md) for manual and automatic delivery. Plan, clarify the open decisions, break down the work, audit when required, implement, run quality assurance (QA), then review. Include the applicable design and documentation stages. Publish only to the [authorized boundary](../../tool-instructions/shared/completion-boundaries.md).
+
+## Run one stage manually
 
 ```text
 $spec-driven-delivery <stage> <goal|selected-issue|exact-work-selector>
 ```
 
-Read the canonical shared protocol:
+Check the named stage's prerequisites, perform it, and report the result. Return control to the user at the end of the stage. For `clarify`, ask one focused question at a time when a material decision remains open. For `implement`, make scoped edits and run focused tests. For `commit`, `pr`, or `merge`, require an explicit request for that stage.
 
-- [delivery-stages.md](../goal-to-delivery/references/delivery-stages.md)
-- [design-gates.md](../goal-to-delivery/references/design-gates.md)
-- [artifact-contract.md](../goal-to-delivery/references/artifact-contract.md)
-- [clarification-policy.md](../goal-to-delivery/references/clarification-policy.md)
-- [quality-gates.md](../goal-to-delivery/references/quality-gates.md)
-- [completion-boundaries.md](../goal-to-delivery/references/completion-boundaries.md)
-- [worktree-policy.md](../goal-to-delivery/references/worktree-policy.md)
-- [work-descriptor.schema.json](../goal-to-delivery/references/work-descriptor.schema.json)
+## Use the same stages in automatic delivery
 
-Apply repository-specific stricter rules first and fail closed before implementation or external mutation when they conflict.
+[Goal to Delivery](../goal-to-delivery/SKILL.md) runs these stages in order with the authority it received from the user or the active Linear loop. The caller chooses when to advance, retry, ask for a decision, or stop. An issue label or saved artifact alone grants no authority to advance.
 
-## Policy
+## Follow the rules for the current stage
 
-1. Validate the named stage's prerequisites. When frontend/UI design gates apply, resolve an existing registered `artifactFolder` or initialize one solely as the required identity/storage prerequisite before Design, Implement, or Design Review; this does not authorize another delivery stage.
-2. Perform exactly one stage and only its authorized output.
-3. Report the result and valid next stages without automatic advancement.
-
-Planning stages do not authorize implementation. `Implement` permits scoped edits and focused tests, not Design Review, Review, QA, Commit, PR, or Merge. For frontend/UI work, `Implement` must validate the pre-build design-gate prerequisites; a separate `Design Review` stage owns the required rendered conformance verdict. QA reports behavior and does not imply fixes. Publication stages require separate explicit requests.
-
-During `Clarify`, ask one focused question at a time and never silently resolve a material decision. Reject `mode: autonomous`; labels, prior chat, and artifacts cannot elevate this entry.
-
-Create a concise work note only when the user requests durable evidence, the work spans sessions, or an applicable stage requires a persisted specialist artifact. The workflow helper is optional for a small manual stage only when no such artifact is required; frontend/UI design gates require it. Resume only from an explicit issue, branch/PR, workflow ID, or exact artifact path.
+- Use the [clarification policy](./references/clarification-policy.md) when a decision blocks progress.
+- Use the [design gates](./references/design-gates.md) for UI work. Initialize or resume the registered `artifactFolder` before design or implementation when they apply.
+- Use the [quality gates](./references/quality-gates.md) for audit, QA, review, and validation.
+- Use [Multi-agent Delivery](../multi-agent-delivery/SKILL.md) when handing a stage to a specialist.
+- Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md) when saving evidence and the [worktree policy](../../tool-instructions/shared/worktrees.md) when using a linked worktree. Keep one concise work note when requested, useful across sessions, or required by a stage.

@@ -58,7 +58,7 @@ class RepositoryTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory(prefix="goal-delivery-base-")
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
         self.repository = self.root / "repository"
         self.repository.mkdir()
         git(self.repository, "init", "--initial-branch=main")

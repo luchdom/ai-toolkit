@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import os
 import subprocess
 import tempfile
 import unittest
@@ -26,6 +27,9 @@ aggregate_validation = load_aggregate_validation()
 from validation.delivery_contracts import (
     CANONICAL_REFERENCES,
     DOCS_AI_ALLOWLIST,
+    SHARED_REFERENCES,
+    STAGE_REFERENCES,
+    WORKFLOW_ROUTES,
     check_artifact_layout,
     check_canonical_references,
     check_docs_ai_allowlist,
@@ -39,7 +43,7 @@ from validation.delivery_contracts import (
 )
 
 
-def write(root: Path, relative: str, content: str) -> Path:
+def write(root: Path, relative: str | Path, content: str) -> Path:
     path = root / relative
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
@@ -82,17 +86,15 @@ def valid_schema() -> str:
 
 
 def canonical_fixture(root: Path) -> None:
-    references = "src/skills/goal-to-delivery/references"
-    for name in CANONICAL_REFERENCES:
-        content = valid_schema() if name.endswith(".json") else f"# {name}\n"
-        write(root, f"{references}/{name}", content)
-    for skill in ("goal-to-delivery", "spec-driven-delivery", "linear-delivery-loop"):
-        if skill == "goal-to-delivery":
-            prefix = "references"
-        else:
-            prefix = "../goal-to-delivery/references"
-        links = "\n".join(f"- [{name}]({prefix}/{name})" for name in CANONICAL_REFERENCES)
-        write(root, f"src/skills/{skill}/SKILL.md", links)
+    for reference in CANONICAL_REFERENCES:
+        content = valid_schema() if reference.suffix == ".json" else f"# {reference.name}\n"
+        write(root, reference, content)
+    for source, targets in WORKFLOW_ROUTES.items():
+        links = []
+        for target in targets:
+            relative = Path(os.path.relpath(target, start=source.parent)).as_posix()
+            links.append(f"- [{target.name}]({relative})")
+        write(root, source, "\n".join(links))
 
 
 class DeliveryContractTests(unittest.TestCase):
@@ -125,12 +127,22 @@ class DeliveryContractTests(unittest.TestCase):
             root = Path(directory)
             canonical_fixture(root)
             self.assertEqual([], check_canonical_references(root))
-            (root / "src/skills/goal-to-delivery/references/design-gates.md").unlink()
-            write(root, "src/skills/spec-driven-delivery/references/design-gates.md", "competing copy")
+            (root / STAGE_REFERENCES / "design-gates.md").unlink()
+            write(root, "src/skills/goal-to-delivery/references/design-gates.md", "competing copy")
             findings = check_canonical_references(root)
             self.assertTrue(any("Missing canonical" in finding for finding in findings))
             self.assertTrue(any("Competing delivery reference" in finding for finding in findings))
             self.assertTrue(any("broken local reference" in finding for finding in findings))
+
+    def test_workflow_route_cannot_skip_goal_to_delivery(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            canonical_fixture(root)
+            loop = root / "src/skills/linear-delivery-loop/SKILL.md"
+            text = loop.read_text(encoding="utf-8")
+            loop.write_text(text.replace("../goal-to-delivery/", "../spec-driven-delivery/"), encoding="utf-8")
+            findings = check_canonical_references(root)
+            self.assertTrue(any("missing canonical reference links" in item and "goal-to-delivery" in item for item in findings))
 
     def test_renamed_normative_protocol_copy_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -146,7 +158,7 @@ class DeliveryContractTests(unittest.TestCase):
             )
             write(
                 root,
-                "src/skills/goal-to-delivery/references/delivery-stages.md",
+                STAGE_REFERENCES / "delivery-stages.md",
                 f"# Delivery Stages\n\n{first_block}\n\n{second_block}\n",
             )
             write(
@@ -163,7 +175,7 @@ class DeliveryContractTests(unittest.TestCase):
             legacy_root = "docs" + "-ai"
             write(
                 root,
-                "src/skills/goal-to-delivery/references/artifact-contract.md",
+                SHARED_REFERENCES / "artifact-contract.md",
                 f".ai/work/ artifactFolder exact registered legacy {legacy_root} historical read-only",
             )
             write(root, "src/agents/planner.md", f"Use {legacy_root}/<NNN>-<slug>-<YYYY-MM-DD>/")
@@ -172,7 +184,8 @@ class DeliveryContractTests(unittest.TestCase):
 
     def test_legacy_literal_allowlist_is_path_and_purpose_specific(self) -> None:
         literal = "docs" + "-ai"
-        readme_line = next(line for line in (ROOT / "README.md").read_text(encoding="utf-8").splitlines() if literal in line)
+        artifact = SHARED_REFERENCES / "artifact-contract.md"
+        contract_line = next(line for line in (ROOT / artifact).read_text(encoding="utf-8").splitlines() if literal in line)
         runtime_line = next(
             line
             for line in (
@@ -180,22 +193,16 @@ class DeliveryContractTests(unittest.TestCase):
             ).read_text(encoding="utf-8").splitlines()
             if literal in line
         )
-        tool_line = next(
-            line
-            for line in (ROOT / "src/tool-instructions/codex/AGENTS.md").read_text(encoding="utf-8").splitlines()
-            if literal in line
-        )
-
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            write(root, "README.md", readme_line)
-            write(root, "dist/tool-instructions/codex/AGENTS.md", tool_line)
+            write(root, artifact, contract_line)
+            write(root, Path("dist/codex") / artifact.relative_to("src"), contract_line)
             self.assertEqual([], check_docs_ai_allowlist(root))
 
-            write(root, "README.md", readme_line + f"\nCreate current work in {literal}/new-work.\n")
+            write(root, artifact, contract_line + f"\nCreate current work in {literal}/new-work.\n")
             self.assertTrue(check_docs_ai_allowlist(root), "stale current doctrine must fail in an allowlisted path")
 
-            write(root, "README.md", runtime_line)
+            write(root, artifact, runtime_line)
             self.assertTrue(check_docs_ai_allowlist(root), "an allowed line must fail under the wrong path/purpose")
 
         for relative in (
@@ -237,49 +244,13 @@ class DeliveryContractTests(unittest.TestCase):
         expected = (
             "src/tool-instructions/codex/AGENTS.md",
             "src/tool-instructions/claude/AGENTS.md",
-            "src/tool-instructions/copilot/.github/copilot-instructions.md",
-            "src/tool-instructions/cursor/AGENTS.md",
         )
         self.assertTrue(all((ROOT / relative).is_file() for relative in expected))
         self.assertFalse((ROOT / "src" / ("project" + "-templates")).exists())
         for relative in expected:
             instruction = (ROOT / relative).read_text(encoding="utf-8")
-            self.assertIn("canonical design-gate and UI-review contracts", instruction)
-            self.assertNotIn("goal-to-delivery/references/design-gates.md", instruction)
-            self.assertNotIn(".cursor/rules/ui-design-gates.mdc", instruction)
-            self.assertIn("applicable UI design conformance", instruction)
-
-        self.assertEqual(
-            (ROOT / "src/tool-instructions/codex/AGENTS.md").read_text(encoding="utf-8"),
-            (ROOT / "src/tool-instructions/cursor/AGENTS.md").read_text(encoding="utf-8"),
-        )
-
-        cursor_rules = ROOT / "dist" / "cursor" / "rules"
-        expected_cursor_support = (
-            "ui-design-gates.mdc",
-            "ui-review-spec.mdc",
-            "ui-design-spec-template.mdc",
-            "ui-design-review-template.mdc",
-            "ui-audit-checklist.mdc",
-            "ui-component-selection.mdc",
-        )
-        self.assertTrue(all((cursor_rules / name).is_file() for name in expected_cursor_support))
-        self.assertIn(
-            ".cursor/rules/ui-design-gates.mdc",
-            (cursor_rules / "product-designer.mdc").read_text(encoding="utf-8"),
-        )
-        for specialist in ("planner.mdc", "auditor.mdc"):
-            rule = (cursor_rules / specialist).read_text(encoding="utf-8")
-            self.assertIn(".cursor/rules/ui-design-gates.mdc", rule)
-            self.assertNotIn("`design-gates.md`", rule)
-        self.assertIn(
-            "./ui-design-review-template.mdc",
-            (cursor_rules / "ui-review-spec.mdc").read_text(encoding="utf-8"),
-        )
-        self.assertNotIn(
-            "./references/",
-            (cursor_rules / "ui-review-spec.mdc").read_text(encoding="utf-8"),
-        )
+            self.assertIn("`tool-instructions/shared/delivery-workflow.md`", instruction)
+            self.assertNotIn("goal-to-delivery/references/", instruction)
 
         build = (ROOT / "scripts/build.py").read_text(encoding="utf-8")
         sync = (ROOT / "scripts/sync.py").read_text(encoding="utf-8")
@@ -289,34 +260,13 @@ class DeliveryContractTests(unittest.TestCase):
         self.assertIn("SRC_TOOL_INSTRUCTIONS", bootstrap)
         self.assertIn("def write_tool_instructions", bootstrap)
 
-    def test_worktree_policy_and_all_tool_routes_are_enforced(self) -> None:
+    def test_worktree_policy_requires_the_recorded_commit(self) -> None:
         self.assertEqual([], check_worktree_policy(ROOT))
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            relative_paths = (
-                "src/skills/goal-to-delivery/references/worktree-policy.md",
-                "src/tool-instructions/codex/AGENTS.md",
-                "src/tool-instructions/claude/AGENTS.md",
-                "src/tool-instructions/copilot/.github/copilot-instructions.md",
-                "src/tool-instructions/cursor/AGENTS.md",
-            )
-            for relative in relative_paths:
-                write(root, relative, (ROOT / relative).read_text(encoding="utf-8"))
+            relative = SHARED_REFERENCES / "worktrees.md"
+            policy = write(root, relative, (ROOT / relative).read_text(encoding="utf-8"))
             self.assertEqual([], check_worktree_policy(root))
-
-            codex = root / "src/tool-instructions/codex/AGENTS.md"
-            canonical_codex = codex.read_text(encoding="utf-8")
-            codex.write_text(
-                canonical_codex.replace(
-                    "goal-to-delivery/references/worktree-policy.md",
-                    "missing-worktree-policy.md",
-                ),
-                encoding="utf-8",
-            )
-            self.assertTrue(check_worktree_policy(root))
-
-            codex.write_text(canonical_codex, encoding="utf-8")
-            policy = root / "src/skills/goal-to-delivery/references/worktree-policy.md"
             resolved_command = "git worktree add -b <branch> <exact-path> <resolved-base-commit>"
             movable_command = "git worktree add -b <branch> <exact-path> <remote-ref>"
             policy.write_text(
@@ -383,13 +333,13 @@ class DeliveryContractTests(unittest.TestCase):
             write(
                 root,
                 "src/skills/goal-to-delivery/SKILL.md",
-                "semi-autonomous automatic working-tree queue selection never mode: autonomous "
-                "registered `artifactFolder`",
+                "automatically working-tree queue selection only when called by the active loop "
+                "one focused question staff-engineer authorized boundary is verified",
             )
             write(
                 root,
                 "src/skills/spec-driven-delivery/SKILL.md",
-                "manual exactly one without automatic advancement one focused question reject mode: autonomous "
+                "manual exactly one return control one focused question explicit request for that stage "
                 "registered `artifactFolder`",
             )
             linear = write(
@@ -399,7 +349,7 @@ class DeliveryContractTests(unittest.TestCase):
                 "In Progress Backlog Done continuation issue "
                 "DECIDE <ISSUE> CUSTOM <SUGGESTION> notification click target "
                 "quiet standalone scheduled run set_thread_archived raw archive directive "
-                "applicable UI design conformance registered `artifactFolder`",
+                "record any new decisions verify that Goal to Delivery reached",
             )
             self.assertEqual([], check_entry_policies(root))
             linear.write_text("autonomous helper", encoding="utf-8")
@@ -454,20 +404,20 @@ class DeliveryContractTests(unittest.TestCase):
                 "code-reviewer",
                 "qa",
             )
+            stages = STAGE_REFERENCES / "delivery-stages.md"
+            stage_text = (ROOT / stages).read_text(encoding="utf-8")
+            stage_file = write(root, stages, stage_text)
+            quality_gates = STAGE_REFERENCES / "quality-gates.md"
+            quality_text = (ROOT / quality_gates).read_text(encoding="utf-8")
+            quality_file = write(root, quality_gates, quality_text)
             write(
                 root,
-                "src/skills/goal-to-delivery/references/delivery-stages.md",
-                "planner product-manager product-designer staff-engineer tasker auditor matching implementer design_review "
-                "code-reviewer qa docs-as-code proven not to affect rendered UI or interaction",
-            )
-            write(
-                root,
-                "src/skills/goal-to-delivery/references/completion-boundaries.md",
-                "merge applicable UI design conformance one code review applicable QA",
+                SHARED_REFERENCES / "completion-boundaries.md",
+                "merge applicable UI design conformance one independent code review applicable QA",
             )
             design_gates = write(
                 root,
-                "src/skills/goal-to-delivery/references/design-gates.md",
+                STAGE_REFERENCES / "design-gates.md",
                 "binding design sources design specification mechanical change design conformance review "
                 "every change to rendered UI or interaction real browser PASS FAIL registered `artifactFolder` "
                 "reviewed state `--02`",
@@ -515,10 +465,24 @@ class DeliveryContractTests(unittest.TestCase):
             write(
                 root,
                 "src/skills/multi-agent-delivery/SKILL.md",
-                "$goal-to-delivery $spec-driven-delivery $linear-delivery-loop; "
-                "do not choose a policy; do not select work; design conformance review",
+                "$goal-to-delivery $spec-driven-delivery $linear-delivery-loop "
+                "caller supplies the stage. queue selection and external actions stay with the caller. "
+                "design conformance review",
             )
             self.assertEqual([], check_shared_specialists_and_routing(root))
+
+            quality_file.write_text(
+                quality_text.replace("before publishing code or finishing automatic code delivery", "for automatic code delivery"),
+                encoding="utf-8",
+            )
+            self.assertTrue(any("review before code publication" in item for item in check_shared_specialists_and_routing(root)))
+            quality_file.write_text(quality_text, encoding="utf-8")
+
+            qa_row = next(line for line in stage_text.splitlines() if line.startswith("| `qa` |"))
+            review_row = next(line for line in stage_text.splitlines() if line.startswith("| `review` |"))
+            stage_file.write_text(stage_text.replace(f"{qa_row}\n{review_row}", f"{review_row}\n{qa_row}"), encoding="utf-8")
+            self.assertTrue(any("out of order" in item for item in check_shared_specialists_and_routing(root)))
+            stage_file.write_text(stage_text, encoding="utf-8")
 
             original_gates = design_gates.read_text(encoding="utf-8")
             design_gates.write_text("binding design sources", encoding="utf-8")
@@ -593,6 +557,18 @@ class DeliveryContractTests(unittest.TestCase):
         self.assertIn("scripts/test_sync_markers.py", rendered)
         self.assertIn('"startdirectory": "tests"', rendered)
         self.assertNotIn("sync.py --tool", rendered)
+
+    def test_aggregate_gate_passes_physical_temp_root_to_children(self) -> None:
+        step = {"name": "build", "type": "command", "argv": ["{python}", "scripts/build.py"]}
+        temporary_alias = str(ROOT / ".." / ROOT.name)
+        with mock.patch.object(aggregate_validation, "load_manifest", return_value={"steps": [step]}), mock.patch.object(
+            aggregate_validation.tempfile, "gettempdir", return_value=temporary_alias
+        ), mock.patch.object(aggregate_validation.subprocess, "run", return_value=subprocess.CompletedProcess([], 0)) as run:
+            self.assertEqual(0, aggregate_validation.main())
+        environment = run.call_args.kwargs["env"]
+        for name in ("TMPDIR", "TEMP", "TMP"):
+            self.assertEqual(str(ROOT.resolve()), environment[name])
+        self.assertEqual("1", environment["PYTHONDONTWRITEBYTECODE"])
 
     def test_aggregate_manifest_accepts_only_fixed_local_shapes(self) -> None:
         safe = {

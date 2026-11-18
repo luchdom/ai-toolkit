@@ -1,20 +1,18 @@
 # ai-toolkit
 
-Reusable AI agents, skills, and project-local tool instructions for Codex, Claude Code, GitHub Copilot CLI, and Cursor.
+Reusable AI agents, skills, and project instructions for Codex and Claude Code.
 
 ## Delivery workflows
 
-There are exactly three user-facing entries:
+Choose one of the three [delivery entries](src/tool-instructions/shared/delivery-workflow.md).
 
-- `$linear-delivery-loop`: autonomous. A Codex scheduled task resumes or claims one eligible Linear issue, delivers it within configurable local budgets, and merges or checkpoints it.
-- `$goal-to-delivery <goal-or-selected-issue>`: semi-autonomous. The user chooses one goal; Codex advances applicable stages and stops at the declared boundary.
-- `$spec-driven-delivery <stage> <goal-or-selector>`: manual. Codex performs exactly one requested stage and returns control.
+- [Spec-driven Delivery](src/skills/spec-driven-delivery/SKILL.md) defines the process. Use `$spec-driven-delivery <stage> <goal-or-selector>` to run one stage.
+- [Goal to Delivery](src/skills/goal-to-delivery/SKILL.md) runs the applicable stages automatically for one goal. Use `$goal-to-delivery <goal-or-selected-issue>` to stop at tested working-tree changes by default.
+- [Linear Delivery Loop](src/skills/linear-delivery-loop/SKILL.md) selects or resumes one eligible Linear issue and runs Goal to Delivery for it. Invoke `$linear-delivery-loop` from a scheduled task or an attended pilot.
 
-For non-trivial work without an explicit entry, use manual `$spec-driven-delivery`. All entries share the canonical cross-tool protocol under [`src/skills/goal-to-delivery/references/`](src/skills/goal-to-delivery/references/), including the [linked-worktree policy](src/skills/goal-to-delivery/references/worktree-policy.md), while repositories own their commands, domain rules, and stricter safety requirements. Unresolved conflicts fail closed before implementation or external mutation.
+Plan the work, clarify decisions, break it into tasks, audit when required, and implement. Run applicable QA before code review, then publish to the authorized boundary. For the full sequence and when each stage applies, see the [delivery stages](src/skills/spec-driven-delivery/references/delivery-stages.md).
 
-Codex sync adds the worktree location and a reference to the policy in `~/.codex/AGENTS.md`. This gives Codex the placement rule even in projects without toolkit instructions.
-
-The workflows reuse the same specialist skills, but they do not require every specialist for every issue. Routine work plans inline; risky work can add tasking, audit, runtime QA, or documentation stages as needed. Frontend/UI work follows the canonical [design gates](src/skills/goal-to-delivery/references/design-gates.md): unresolved UI decisions require a pre-build product-designer spec, and every changed rendered UI or interaction requires a post-build real-browser design conformance review.
+Use the shared [artifact contract](src/tool-instructions/shared/artifact-contract.md) for plans and evidence and the [worktree policy](src/tool-instructions/shared/worktrees.md) for linked Git worktrees.
 
 ## Project documentation
 
@@ -22,16 +20,19 @@ Use [`$project-docs`](src/skills/project-docs/SKILL.md) to create or refine a re
 
 Templates provide populated examples and minimum coverage requirements. For UI projects, the skill also defines a working component catalogue using the real tokens/components, with its source and startup/access instructions linked from the project docs map. Implement the catalogue within authorized UI work, or record a concrete proposal during docs-only work.
 
-Sync adds a shared docs-discovery rule to user instructions and generated project/specialist instructions. Agents suggest the specific missing documentation when relevant, honor earlier declines, and keep applicable docs current within the active task. Codex, Claude Code, and Cursor project setup share `AGENTS.md`. See [Project documentation](docs/project-documentation.md) for examples, placement, and installation.
+Sync adds a shared docs-discovery rule to user instructions and generated project/specialist instructions. Agents suggest the specific missing documentation when relevant, honor earlier declines, and keep applicable docs current within the active task. Codex and Claude Code share `AGENTS.md`. See [Project documentation](docs/project-documentation.md) for examples, placement, and installation.
 
 ## Product and engineering specialists
 
 | Agent | Use it for |
 |---|---|
+| [`dotnet`](src/agents/dotnet.md) | Authorized C#/.NET backend implementation, including ASP.NET Core APIs, persistence, authorization, workers, and tests. |
 | [`product-manager`](src/agents/product-manager.md) | Product and acceptance-criteria clarifications, evaluating implementation against customer outcomes and AC, benchmark work with PD, and PRDs on request. |
 | [`staff-engineer`](src/agents/staff-engineer.md) | Technical clarification for the team, feasibility with PM/PD, code review, simplification and duplication analysis, and requested RFCs, ADRs, diagrams, and implementation guidance. Writes documents; implementers write code. |
 
-The active workflow routes questions to these specialists under the shared [clarification policy](src/skills/goal-to-delivery/references/clarification-policy.md). They can make supported decisions within approved scope, while unresolved material choices go to the human owner. Consult them when their expertise is useful; PD, the independent reviewer, and QA retain their existing gates.
+For .NET implementation, use [`$dotnet-implementation`](src/skills/dotnet-implementation/SKILL.md) to route the work and apply the same guidance when working inline. The skill bundles a [modular monolith guide](src/skills/dotnet-implementation/references/modular-monolith.md) for projects that use or explicitly adopt module-first vertical slices. Codex sync adds the route to the user instructions so it also applies in projects without toolkit instructions.
+
+Goal to Delivery can consult the product manager for goals and product behavior, the product designer for UI and user experience, and the staff engineer for technical choices. A staff engineer can also perform the independent code review when they meet the review requirements. See the [clarification policy](src/skills/spec-driven-delivery/references/clarification-policy.md) and [quality gates](src/skills/spec-driven-delivery/references/quality-gates.md).
 
 Examples: ask PM to evaluate a named implementation against its approved AC or draft a PRD; ask Staff Engineer to compare simpler implementation options, review a named diff, or document an architectural decision. Both use the repository's canonical agent metadata; regenerate and sync after changing their configuration.
 
@@ -46,7 +47,7 @@ The MVP deliberately uses existing systems instead of a separate orchestration s
 - Git branches and pull requests store implementation history and review.
 - Linear comments are the authoritative human-decision channel; listed choices and explicit custom suggestions are supported, while ntfy is optional best-effort attention that links directly to the issue.
 
-The loop handles one issue at a time. It resumes eligible autonomous work, does nothing while attended work is active, and selects a new labeled backlog issue only when no work is active. Quiet standalone scheduled runs archive their own chat when native task archiving is available; decision requests, checkpoints, errors, and runs with mutations remain visible. When configured size limits expose a larger remainder, the loop may create one linked, bounded continuation issue without selecting it in the same run. Code is Done only after required local checks, applicable UI design conformance, one code review, applicable QA, and merge into the default branch.
+The loop resumes eligible active work before selecting a labeled backlog issue. An active attended issue pauses intake. The loop moves an issue to Done after it verifies the boundary reported by Goal to Delivery. See the [loop guide](docs/mvp-linear-delivery-loop.md) for checkpoints, continuations, and quiet runs.
 
 Linear labels have separate responsibilities:
 
@@ -67,7 +68,7 @@ A useful engineering harness needs seven capabilities. The MVP covers all seven 
 | System prompt | Repository instructions plus the three explicit entry skills define behavior and authority. |
 | Tools | Codex local tools, Linear, Git/GitHub, and optional browser/HTTP checks provide only the needed capabilities. |
 | Context management | Skills load progressively; `.ai/loop.json`, the selected issue, repository instructions, and relevant code form the working set. |
-| Verification | Focused tests, one local project gate, applicable UI design conformance, one code review, and acceptance-driven runtime QA check the work. |
+| Verification | Focused tests, applicable UI design conformance and runtime QA, independent code review, and the repository's local validation command check the work. |
 | Memory | Linear comments/issues, Git/PR history, curated docs, and optional concise notes in the exact registered `artifactFolder` persist useful knowledge. |
 | Sandboxes | Codex repository/worktree isolation and repository-owned disposable test data constrain execution. |
 | Human hooks | `needs-decision` marks pre-work owner choices; `needs-human`, a structured Linear choice or custom suggestion, the Codex task inbox, and an optional issue-linked ntfy notification pause active work safely. |
@@ -78,7 +79,7 @@ Memory curation and observability are intentionally modest: persist decisions an
 
 - `src/agents/`: canonical specialist agent definitions
 - `src/skills/`: canonical reusable skills and references
-- `src/tool-instructions/`: project-local routing instructions for each supported tool
+- `src/tool-instructions/`: shared workflow rules and project-local instructions for each supported tool
 - `scripts/build.py`: generate tool adapters into `dist/`
 - `scripts/sync.py`: install generated output and selected external skills into user homes and optional projects
 - `external-skills.toml`: selected upstream skill directories, pinned revisions, and compatible tools
@@ -88,7 +89,7 @@ Memory curation and observability are intentionally modest: persist decisions an
 - `dist/tool-instructions/`: generated project-local projections for each supported tool
 - `dist/`: generated projections; never edit directly
 
-Per-work evidence uses the workflow descriptor's exact registered `artifactFolder`. New/current workflows use `.ai/work`; an exact registered legacy workflow may continue at its exact `docs-ai` path, while unregistered or tracked historical `docs-ai` evidence remains read-only. Durable reusable guidance belongs in the repository's curated docs. The workflow helper and descriptor remain optional for routine work with no required specialist artifact, but frontend/UI design gates require registration before design or implementation so the design specification and conformance review have an authoritative destination.
+Save delivery notes in `.ai/work` and use the exact registered `artifactFolder` when a workflow has one. See the [artifact contract](src/tool-instructions/shared/artifact-contract.md) for registration and legacy folders.
 
 ## Build, validate, and install
 
@@ -122,17 +123,19 @@ py -3 scripts/sync.py --tool all --project "C:/path/to/repo"
 python3 scripts/sync.py --tool all --project "$HOME/path/to/repo"
 ```
 
-Use `--tool codex`, `claude`, `copilot`, or `cursor` to limit installation. Cursor project sync writes `AGENTS.md` plus `.cursor/rules/*.mdc`, including the projected UI design-gate, review procedure, and templates. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
+Use `--tool codex` or `--tool claude` to install for one tool. Use `--tool all` for both. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
+
+User sync installs the shared delivery references next to the skills in each tool's home. When upgrading an existing project, rerun sync with `--project "<project-path>"` to refresh its managed instruction block.
 
 Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). The manifest header contains the preview and sync commands. See the [external skill guide](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
 
-Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Existing unmarked instruction files, project Copilot agents/skills, and Cursor rules remain untouched unless `--force` explicitly adopts or refreshes them. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
+Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Use `--force` to adopt an unmarked project instruction file. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
 
 For a fresh Codex environment, start with the [import manifest](external-skills.toml) and the [external skill guide](EXTERNAL-SKILLS.md). For older system and plugin skills, consult the historical [additional skill restore checklist](docs/codex-skill-restore.md) and follow current upstream instructions.
 
 ## Maintenance
 
-Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.md). Install with `npm ci`, then run `npm run lint:md:files -- ":path/to/changed.md"`; use `npm run lint:md` for an all-file audit. The Python gate remains dependency-free. Toolkit sync installs a dedicated Markdown rule in user-level Codex, Claude Code, and Copilot instructions and includes it in generated specialist agents and project routers. Install the global CLI separately for use outside this repository.
+Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.md). Install with `npm ci`, then run `npm run lint:md:files -- ":path/to/changed.md"`; use `npm run lint:md` for an all-file audit. The Python gate remains dependency-free. Toolkit sync installs a dedicated Markdown rule in user-level Codex and Claude Code instructions and includes it in generated specialist agents and project routers. Install the global CLI separately for use outside this repository.
 
 - Change `src/`, regenerate `dist/`, and validate; do not edit generated output.
 - Keep tool instructions as concise routers rather than copies of the canonical protocol.

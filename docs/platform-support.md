@@ -42,14 +42,20 @@ On macOS, `python3` may still select an older system interpreter even when a new
 
 Normal sync includes compatible selected imports from [external-skills.toml](../external-skills.toml). It requires Git and network access to the pinned public repositories. Preview the local import plan with `python3 scripts/external_skills.py --tool all --dry-run` on macOS or `py -3 scripts/external_skills.py --tool all --dry-run` on Windows. Use `--skip-external` with `scripts/sync.py` for offline installation of repository-generated content only. CLI installation, plugin setup, MCP configuration, and login remain separate operations.
 
-`scripts/validate.py` rebuilds generated adapters and runs the repository gate without syncing to a user home. Runtime path guards remain enabled.
+`scripts/validate.py` rebuilds generated adapters and runs the repository gate without syncing to a user home. It resolves the temporary-directory base for subprocesses so macOS `/var` aliases do not trigger workflow symlink protection. Runtime path guards remain enabled.
 
 ## Paths and persistent state
 
 | Purpose | Windows | macOS |
 |---|---|---|
 | Toolkit location | Actual checkout path | Actual checkout path |
-| User-level adapters | `Path.home()/.codex`, `.claude`, `.copilot` | `Path.home()/.codex`, `.claude`, `.copilot` |
+| User-level adapters | `Path.home()/.codex` and `Path.home()/.claude` | `Path.home()/.codex` and `Path.home()/.claude` |
+| Workflow registry default | `%LOCALAPPDATA%/Luchdom/ai-delivery` | `~/Library/Application Support/Luchdom/ai-delivery` |
+| Linear loop lease default | `%LOCALAPPDATA%/Luchdom/ai-toolkit` | `$XDG_STATE_HOME/luchdom-ai`, otherwise `~/.local/state/luchdom-ai` |
+
+Workflow helpers use an explicit `--state-home` first, then `LUCHDOM_DELIVERY_STATE_HOME`, then the OS default. Workflow state roots must be absolute, outside the checkout and Git directory, and free of symlink/reparse components. Other OSes require an explicit workflow state root. Windows requires an absolute `LOCALAPPDATA` for its workflow default. Inherited Windows variables do not change macOS defaults.
+
+The loop helper uses a separate override, `LUCHDOM_AI_STATE_HOME`, for its lease directory. It does not set the workflow registry root. Existing roots are not migrated automatically. Keep each helper's existing explicit override when resuming work, and do not run concurrent copies against different roots for the same queue.
 
 The sync script uses `Path.home()` for user-level destinations. Shared docs links are rendered from `LUCHDOM_AI_TOOLKIT_DOCS`, then legacy `LUCHDOM_AI_CONFIG_DOCS`, then this checkout's `docs` directory. These overrides must name a real location on the execution host. After moving the toolkit checkout, refresh marker-managed project instructions so their docs links point to the new location.
 
@@ -59,7 +65,7 @@ Before a requested sync, compare and back up any intentional local changes to to
 
 Normal sync preflights the selected external imports before writing repository-generated output. External imports use ownership receipts and preserve unmanaged directories or locally modified imports; `--force` does not bypass these checks. Resolve a reported conflict using [external skill recovery](../EXTERNAL-SKILLS.md#ownership-conflicts-and-recovery), or explicitly select `--skip-external` to sync only repository-generated content.
 
-Project instruction files preserve text outside toolkit markers. Existing unmarked instruction files, project Copilot agents/skills, and Cursor rules are skipped unless `--force` is supplied. `--force` replaces project instruction files in full; use it only when that replacement is intended.
+Project instruction files preserve text outside toolkit markers. Use `--force` to adopt an unmarked project instruction file. `--force` replaces project instruction files in full; use it only when that replacement is intended.
 
 After sync, verify the intended destination files exist and inspect the rendered docs path. To undo a sync, restore the backed-up managed files and instruction blocks. Do not delete unrelated skills or tool configuration. Repo development needs build/validation only; syncing live user homes is a separate installation action.
 

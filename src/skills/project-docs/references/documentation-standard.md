@@ -62,7 +62,7 @@ Before building frontend pages, follow [the working design-system guide](working
 
 Global guidance routes the agent to root `AGENTS.md`. That project file must link the actual PRD, design system, architecture equivalents, and any working catalogue source/access instructions, with a condition for reading each. Maintain this map when documentation edits are in scope. Default filenames in a global rule do not replace these project-specific links.
 
-Existing project-specific tool routers point to this root map, avoiding another copy of the project brief. For example, `.github/copilot-instructions.md` can say `Follow [the project instructions](../AGENTS.md) and their task-specific documentation links.` Resolve relative links from each instruction file's location, including scoped files. Root `AGENTS.md` remains the shared project entry point.
+Existing project-specific tool routers point to this root map, avoiding another copy of the project brief. Resolve relative links from each instruction file's location, including scoped files. Root `AGENTS.md` remains the shared project entry point.
 
 Verify the full route from each relevant project instruction file through the map to the actual documents. For a working catalogue, verify the source link and record the real local URL, startup command, and access boundary. A proposed catalogue is recorded as a proposal in the design-system document, not as a link to a nonexistent page.
 

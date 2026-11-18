@@ -1,11 +1,11 @@
 ---
 name: goal-to-delivery
-description: Deliver one user-selected local goal or explicitly selected issue semi-autonomously to a declared completion boundary. Use only when the user explicitly invokes `$goal-to-delivery`; continue routine stages automatically, ask for material decisions, and never perform queue selection or self-declare autonomous mode.
+description: Run Spec-driven Delivery automatically for one goal selected by the user or by Linear Delivery Loop. Continue through the applicable stages and stop at the authorized boundary or an unresolved decision.
 ---
 
 # Goal to Delivery
 
-Deliver one bounded goal using the lightest applicable workflow.
+Run [Spec-driven Delivery](../spec-driven-delivery/SKILL.md) automatically for one goal.
 
 ## Invocation
 
@@ -13,31 +13,15 @@ Deliver one bounded goal using the lightest applicable workflow.
 $goal-to-delivery <goal-or-selected-issue> [--completion artifact|working-tree|commit|pr|merge]
 ```
 
-Default to a local goal and the `working-tree` boundary. Accept a Linear issue only when the user selected it explicitly. Never perform queue selection, start a second goal, or accept `mode: autonomous`; backlog polling belongs to `$linear-delivery-loop`.
+For a direct request, use the goal or issue the user selected. Default to a local goal with scoped edits and local checks through the `working-tree` boundary. Follow repository policy for updates to a selected issue.
 
-Read the canonical shared protocol:
+[Linear Delivery Loop](../linear-delivery-loop/SKILL.md) can call this skill with one selected issue, the permitted actions, a completion boundary, and run limits. Use that authority only when called by the active loop. Queue selection stays with the loop.
 
-- [delivery-stages.md](./references/delivery-stages.md)
-- [design-gates.md](./references/design-gates.md)
-- [artifact-contract.md](./references/artifact-contract.md)
-- [clarification-policy.md](./references/clarification-policy.md)
-- [quality-gates.md](./references/quality-gates.md)
-- [completion-boundaries.md](./references/completion-boundaries.md)
-- [worktree-policy.md](./references/worktree-policy.md)
-- [work-descriptor.schema.json](./references/work-descriptor.schema.json)
+## Run the stages
 
-Repository-specific commands and stricter safety rules take precedence; unresolved conflicts fail closed before implementation or external mutation.
-
-## Policy
-
-1. Discover the repository and define a bounded outcome and acceptance criteria.
-2. Plan and task inline for routine work. Use a formal plan, task breakdown, or independent audit when risk or complexity justifies it. For frontend/UI work, apply `design-gates.md`; initialize or resume the registered `artifactFolder` before design or implementation, and never let risk waive a required design spec or post-build conformance review.
-3. Advance automatically through applicable implementation, UI design conformance, one code review, runtime QA, and documentation checks.
-4. Repair scoped findings within a small retry budget. Ask one focused question when a material decision cannot be safely derived.
-5. Stop exactly at the declared completion boundary.
-
-The invocation authorizes scoped repository edits and local validation through `working-tree`. `commit`, `pr`, and `merge` require the declared boundary or a later explicit grant. A selected Linear issue may be updated only when repository tracking policy allows it; a local goal performs no Linear mutation.
-
-Use the workflow helper when durable multi-session evidence is valuable or an applicable stage requires a persisted specialist artifact. It is optional for a small goal only when no such artifact is required; frontend/UI design gates require it. Resume explicit work by issue, branch/PR, workflow ID, or exact artifact path; never guess from the newest folder or similar goal text.
-
-Report the achieved boundary, changed scope, validation, assumptions, and any remaining decision.
+1. Confirm the goal, acceptance criteria, and [completion boundary](../../tool-instructions/shared/completion-boundaries.md). Read the repository rules and the [shared workflow](../../tool-instructions/shared/delivery-workflow.md).
+2. Run the applicable Spec-driven Delivery stages in order. Keep routine planning and task breakdown short. Use its stage requirements, including any required audit, design work, and verification.
+3. At the stage where a question comes up, use the [clarification policy](../spec-driven-delivery/references/clarification-policy.md). Call `product-manager` for the goal or product behavior, `product-designer` for UI and user experience, and `staff-engineer` for technical choices. For code review, use `code-reviewer` by default. A separate `staff-engineer` can review when technical depth is needed and they meet the same [independent review requirements](../spec-driven-delivery/references/quality-gates.md#independent-code-review).
+4. Send failures back to the stage that can fix them. Rerun any checks that the fix invalidates. If scoped retries or the run budget are exhausted, stop with the blocker and the next action.
+5. Ask the user one focused question if a material decision is unresolved. If the loop called this skill, return the question, options, and recommendation to the loop. Return a checkpoint the same way when the run needs to pause.
+6. Stop when the authorized boundary is verified. Report the outcome, checks, material assumptions, and any remaining work.

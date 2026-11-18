@@ -7,7 +7,7 @@ description: "Support two separate roles over a delivery specification: help tas
 
 Keep task decomposition and independent audit separate. The calling role determines which operation is allowed.
 
-Read the user requirement, repository instructions, relevant docs, registered plan, and required design from the exact `artifactFolder` recorded by the active work descriptor/registry. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt or rewrite them. Use the canonical artifact/stage/quality contracts under `../goal-to-delivery/references/`.
+Read the user requirement, repository instructions, relevant docs, registered plan, and required design. Use the exact `artifactFolder` from the workflow descriptor and registry. Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md) and the [Spec-driven Delivery stages](../spec-driven-delivery/references/delivery-stages.md).
 
 ## Tasker operation
 

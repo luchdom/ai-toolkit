@@ -69,10 +69,9 @@ class ExternalSkillTests(unittest.TestCase):
     def test_boundary_ancestor_symlink_is_rejected_before_writes(self) -> None:
         alias = self.root / "alias"
         alias.symlink_to(self.home, target_is_directory=True)
-        project = alias / "selected-project"
         with self.assertRaisesRegex(imports.ImportError, "symlink"):
-            imports.preflight([{**self.entry, "tools": ["cursor"]}], {"cursor"}, [project], home=self.home)
-        self.assertFalse((self.home / "selected-project").exists())
+            imports.preflight([self.entry], {"codex"}, home=alias / "selected-home")
+        self.assertFalse((self.home / "selected-home").exists())
 
     def test_manifest_accepts_selected_pinned_skills_and_empty_selection(self) -> None:
         self.assertEqual([self.entry], imports.load_manifest(self.write_manifest(), self.canonical))
@@ -243,15 +242,14 @@ class ExternalSkillTests(unittest.TestCase):
         self.assertIn("Would sync", output.getvalue())
         self.assertFalse(self.skill_root.exists())
 
-    def test_cursor_is_project_only_and_other_agent_targets_are_selected(self) -> None:
-        project = self.root / "project"
-        entry = {**self.entry, "tools": ["cursor", "claude", "copilot"]}
-        imports.sync_external_skills([entry], {"cursor"}, home=self.home, fetcher=mock.Mock(side_effect=AssertionError("must skip")))
-        self.assertFalse((self.home / ".cursor").exists())
-        imports.sync_external_skills([entry], {"cursor", "claude", "copilot"}, [project], home=self.home, fetcher=lambda *_: self.source)
-        self.assertTrue((project / ".cursor/skills/sample/SKILL.md").is_file())
+    def test_sync_installs_only_for_the_selected_compatible_tools(self) -> None:
+        entry = {**self.entry, "tools": ["claude"]}
+        fetch = mock.Mock(return_value=self.source)
+        imports.sync_external_skills([entry], {"codex"}, home=self.home, fetcher=fetch)
+        fetch.assert_not_called()
+        imports.sync_external_skills([entry], {"codex", "claude"}, home=self.home, fetcher=fetch)
+        fetch.assert_called_once()
         self.assertTrue((self.home / ".claude/skills/sample/SKILL.md").is_file())
-        self.assertTrue((self.home / ".copilot/skills/sample/SKILL.md").is_file())
         self.assertFalse(self.target.exists())
 
     def test_fetch_failure_is_nonzero_and_does_not_expose_raw_error(self) -> None:

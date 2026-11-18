@@ -18,7 +18,7 @@ The manifest uses `version = 1`. Each `[[skills]]` block contains the following 
 | `repo` | Public GitHub HTTPS repository URL ending in `.git`. |
 | `path` | Repository-relative directory containing `SKILL.md`. Use `.` for the repo root. |
 | `revision` | Full lowercase 40-character Git commit SHA. Sync fetches this commit on every import. |
-| `tools` | One or more distinct compatible targets from `codex`, `claude`, `copilot`, and `cursor`. |
+| `tools` | One or more distinct compatible targets from `codex` and `claude`. |
 
 Replace the example values with those from the reviewed source.
 
@@ -34,7 +34,7 @@ tools = ["codex", "claude"]
 
 ## How sync uses the manifest
 
-The importer selects entries whose `tools` include the requested agent. It copies each skill directory and its bundled files at the pinned revision. Codex, Claude Code, and Copilot use user-level destinations. Cursor uses the supplied project. The preview checks the selection and destination ownership locally.
+The importer selects entries whose `tools` include the requested agent. It copies each skill directory and its bundled files at the pinned revision. Codex and Claude Code use user-level skill directories. The preview checks the selection and destination ownership locally.
 
 ## Exclude an import
 

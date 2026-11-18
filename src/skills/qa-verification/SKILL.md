@@ -27,4 +27,4 @@ Write the dated `*-qa.md` in the exact `artifactFolder` recorded by the active w
 
 QA does not implement fixes, perform the pre-implementation audit, or replace exact-diff code review. Route defects to the caller for a separately authorized implementation pass. Do not mutate Linear or perform Git/provider actions.
 
-Read [qa-checklist.md](./references/qa-checklist.md) before reporting and the canonical quality contract in `../goal-to-delivery/references/quality-gates.md`.
+Read [qa-checklist.md](./references/qa-checklist.md) before reporting and the canonical quality contract in `../spec-driven-delivery/references/quality-gates.md`.

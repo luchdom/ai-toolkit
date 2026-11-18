@@ -47,7 +47,7 @@ Frontend requirement:
 Workflow rules:
 
 - Read AGENTS.md first and follow it.
-- Read the canonical `goal-to-delivery/references/design-gates.md`. Read `workflow.json`, the plan, tasks, audit, and design from the exact `artifactFolder` recorded by the active work descriptor/registry when they exist. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, or rewrite them.
+- Read the canonical `spec-driven-delivery/references/design-gates.md`. Read `workflow.json`, the plan, tasks, audit, and design from the exact `artifactFolder` recorded by the active work descriptor/registry when they exist. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, or rewrite them.
 - For every UI change, read the recorded design-gate decision and exact binding design sources. Stop before coding when a required design spec is missing or a material UI decision remains unresolved.
 - Before coding, locate and read relevant docs in /docs and existing UI patterns/components in the repo.
 - Update relevant docs when behavior, workflow, setup, or architecture changes.

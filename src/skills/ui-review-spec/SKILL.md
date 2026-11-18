@@ -9,7 +9,7 @@ Turn current-product evidence into the registered workflow's design specificatio
 
 ## Workflow
 
-1. Read `AGENTS.md`, the registered plan, approved design, implementation manifest when present, `../goal-to-delivery/references/design-gates.md`, and the smallest relevant product/design docs set.
+1. Read `AGENTS.md`, the registered plan, approved design, implementation manifest when present, `../spec-driven-delivery/references/design-gates.md`, and the smallest relevant product/design docs set.
 2. Identify binding design sources: issue-tied design artifacts or frozen references, then repository design-system docs, theme/tokens, component catalog, and established feature patterns.
 3. Inspect the affected screen with an available real-browser tool. Fall back to screenshots/images only when interactive inspection is impossible and state the limitation.
 4. For an initial or implementation-time design specification, find existing components and design-system patterns before proposing changes. Prefer repository components, then approved library primitives, then justified new components. Write a new dated artifact with supersession notes instead of overwriting prior design evidence.

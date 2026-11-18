@@ -34,20 +34,24 @@ Read [source-workflows.md](./references/source-workflows.md) for commands and th
 
 ## Prepare tooling and temporary state
 
-1. Check `yt-dlp --version` and `python --version`. Check `ffmpeg -version` when a retained download needs separate audio and video merged.
-2. Use an isolated Python environment containing `faster-whisper`. Do not install packages into a repository environment without repository permission.
+1. Detect the current runtime OS and shell; current host facts take precedence over remembered paths. PowerShell can run on macOS, so the shell alone does not identify the OS. Select Python 3.11 or newer: on macOS, verify `python3 --version` (or a known absolute interpreter); on Windows, verify `py -3 --version` (or `python --version`) is at least 3.11. Check `yt-dlp --version`, and check `ffmpeg -version` when a retained download needs separate audio and video merged.
+2. Use an isolated Python environment containing `faster-whisper`; see the setup commands in [source-workflows.md](./references/source-workflows.md#dependency-setup). Do not install packages into a repository environment without repository permission.
 3. Create a uniquely named workspace under the operating system's temporary directory. Store manifests, raw JSON, and any transient media there.
-4. Resolve the directory containing this `SKILL.md` and prefer its bundled helper for repeatability. The examples below assume that directory is the current working directory:
+4. Resolve the directory containing this `SKILL.md` and prefer its bundled helper for repeatability. The examples below assume that directory is the current working directory. Replace the venv path with the environment prepared above; keep raw output in the task's temporary workspace.
 
-```powershell
-python .\scripts\transcribe_media.py --input "<video-url-or-file>" --output ".\raw.json" --title "<title>" --slug "<slug>" --language <language-code>
+macOS with zsh/bash:
+
+```sh
+"<venv>/bin/python" scripts/transcribe_media.py --input "<video-url-or-file>" --output "<temporary-dir>/raw.json" --title "<title>" --slug "<slug>" --language <language-code>
 ```
 
-For a direct authorized media stream, add `--direct-media`. For a course manifest, use:
+Windows with PowerShell:
 
 ```powershell
-python .\scripts\transcribe_media.py --manifest ".\manifest.json" --output-dir ".\transcripts" --language <language-code>
+& "<venv>\Scripts\python.exe" scripts/transcribe_media.py --input "<video-url-or-file>" --output "<temporary-dir>/raw.json" --title "<title>" --slug "<slug>" --language <language-code>
 ```
+
+For a direct authorized media stream, add `--direct-media`. For a course manifest, replace the single-input arguments with `--manifest "<temporary-dir>/manifest.json" --output-dir "<temporary-dir>/transcripts"`; retain `--language`. For PowerShell on macOS, use `& "<venv>/bin/python"` with the same arguments.
 
 Use `small`, CPU, and `int8` as reliable defaults. Increase model size or use a GPU only when accuracy requirements and available hardware justify the added cost.
 
