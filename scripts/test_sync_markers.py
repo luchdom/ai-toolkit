@@ -132,6 +132,26 @@ def test_bootstrap_writes_tool_instruction_source_tree() -> None:
         assert all(path.is_file() for path in expected)
 
 
+def test_bootstrap_restores_twelve_factor_guide_link() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        codex_home = root / ".codex"
+        source_agents = root / "src" / "agents"
+        write(
+            codex_home / "agents" / "staff-engineer.toml",
+            'model = "test-model"\n'
+            'model_reasoning_effort = "high"\n'
+            'sandbox_mode = "workspace-write"\n'
+            'developer_instructions = "Read [the guide](../tool-instructions/shared/twelve-factor-for-agentic-development.md)."\n',
+        )
+        with mock.patch.object(bootstrap_existing, "CODEX_HOME", codex_home):
+            with mock.patch.object(bootstrap_existing, "SRC_AGENTS", source_agents):
+                bootstrap_existing.write_agent_sources()
+        assert "[the guide](../../docs/twelve-factor-for-agentic-development.md)" in read(
+            source_agents / "staff-engineer.md"
+        )
+
+
 def main() -> int:
     tests = (
         test_fresh_write_and_splice,
@@ -141,6 +161,7 @@ def main() -> int:
         test_project_help_names_tool_instruction_destination,
         test_sync_tool_instructions_reads_renamed_dist_root,
         test_bootstrap_writes_tool_instruction_source_tree,
+        test_bootstrap_restores_twelve_factor_guide_link,
     )
     for test in tests:
         test()

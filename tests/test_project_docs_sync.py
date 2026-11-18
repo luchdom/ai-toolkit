@@ -57,6 +57,12 @@ class ProjectDocsSyncTests(unittest.TestCase):
                 for name in ("PRD.md", "DESIGN_SYSTEM.md", "ARCHITECTURE.md", "AGENTS.md"):
                     self.assertTrue((skills / "project-docs" / "assets" / name).is_file())
 
+                agent_name = "staff-engineer.toml" if folder == ".codex" else "staff-engineer.md"
+                staff_engineer = tool_home / "agents" / agent_name
+                guide = tool_home / "tool-instructions" / "shared" / "twelve-factor-for-agentic-development.md"
+                self.assertIn(f"](../{guide.relative_to(tool_home).as_posix()})", staff_engineer.read_text(encoding="utf-8"))
+                self.assertEqual((ROOT / "docs" / guide.name).read_bytes(), guide.read_bytes())
+
     def test_malformed_docs_markers_preserve_existing_instructions(self) -> None:
         start = "<!-- AI-TOOLKIT-PROJECT-DOCS:START -->"
         end = "<!-- AI-TOOLKIT-PROJECT-DOCS:END -->"

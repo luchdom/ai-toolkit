@@ -36,6 +36,8 @@ For .NET implementation, use [`$dotnet-implementation`](src/skills/dotnet-implem
 
 Goal to Delivery can consult the product manager for goals and product behavior, the product designer for UI and user experience, and the staff engineer for technical choices. A staff engineer can also perform the independent code review when they meet the review requirements. See the [clarification policy](src/skills/spec-driven-delivery/references/clarification-policy.md) and [quality gates](src/skills/spec-driven-delivery/references/quality-gates.md).
 
+The staff engineer uses [Twelve-Factor for agentic development](docs/twelve-factor-for-agentic-development.md) when refining plans and designs, writing engineering docs, and reviewing pull requests.
+
 Examples: ask PM to evaluate a named implementation against its approved AC or draft a PRD; ask Staff Engineer to compare simpler implementation options, review a named diff, or document an architectural decision. Both use the repository's canonical agent metadata; regenerate and sync after changing their configuration.
 
 ## MVP autonomous loop

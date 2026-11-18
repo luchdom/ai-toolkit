@@ -7,6 +7,8 @@ Use this repo as the source of truth for shared AI agents, skills, project-local
 
 When changing project documentation skills, templates, or tool routing, read [Project documentation](docs/project-documentation.md) and its linked canonical standard.
 
+Use [Twelve-Factor for agentic development](docs/twelve-factor-for-agentic-development.md) for engineering refinements, architecture docs, and pull request reviews.
+
 ## Platform selection
 
 Before running setup or runtime commands, follow [platform support](docs/platform-support.md). Detect the execution host, active shell, actual checkout/home, and Python version; do not infer the OS from shell names, old paths, or imported memory. Run `python3 scripts/platform_info.py` on macOS or `py -3 scripts/platform_info.py` on Windows, then use the verified Python 3.11+ executable consistently. Keep Windows/PowerShell and macOS/POSIX instructions available together.
