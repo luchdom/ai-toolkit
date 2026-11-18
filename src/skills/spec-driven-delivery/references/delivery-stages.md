@@ -22,6 +22,7 @@ Run the applicable stages in the order shown. Revisit the plan when clarificatio
 
 ## Stage requirements
 
+- During `plan`, apply the [critical workflow checks](quality-gates.md#critical-workflows) to affected workflows.
 - Before task breakdown, resolve open material decisions and finish any required design spec. Use the [clarification policy](clarification-policy.md) to record decisions. If a later stage reveals a gap, return to the stage that owns it and update any affected evidence.
 - For UI work, use the [design gates](design-gates.md) to decide whether a spec is required. Every change to rendered UI or interaction requires a current design conformance verdict before QA or code review can pass.
 - Use the [quality gates](quality-gates.md) to decide when an independent pre-build audit or behavior QA applies, and to verify the evidence needed for code review and publication.

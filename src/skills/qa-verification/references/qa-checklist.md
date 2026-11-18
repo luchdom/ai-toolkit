@@ -19,6 +19,7 @@
 - [ ] Exercise affected HTTP/browser/CLI/user paths with non-default values.
 - [ ] Use bounded readiness predicates rather than fixed sleeps.
 - [ ] Verify failure, validation, authorization/tenant, and accessibility paths when applicable.
+- [ ] Record evidence for applicable [critical workflow checks](../../spec-driven-delivery/references/quality-gates.md#critical-workflows).
 - [ ] Complete and verify cleanup.
 
 ## Report

@@ -19,7 +19,8 @@ Verify the exact implementation target against observable acceptance criteria.
 2. Map every acceptance criterion to a concrete observed result.
 3. Use real HTTP/browser/CLI/user flows for behavioral criteria. Mock only true boundaries.
 4. Use environment guards, non-default values, isolated disposable data, bounded readiness predicates, and verified cleanup. Avoid fixed sleeps.
-5. Treat skipped required checks, cleanup failures, identity mismatch, or an unexercised behavior path as incomplete verification.
+5. Run the applicable [critical workflow checks](../spec-driven-delivery/references/quality-gates.md#critical-workflows) using the planned tools and test identities.
+6. Treat skipped required checks, cleanup failures, identity mismatch, or an unexercised behavior path as incomplete verification.
 
 ## Report, do not fix
 
