@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refine"
+  short_description: "Pressure-test a product or engineering decision"
+  default_prompt: "Use $refine to challenge this goal with the relevant specialists and help me settle the open decisions."
