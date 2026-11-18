@@ -860,7 +860,10 @@ def check_projection_manifest(root: Path) -> list[str]:
         path.relative_to(root).as_posix()
         for area in (root / "src" / "agents", root / "src" / "skills", root / "src" / "tool-instructions")
         for path in area.rglob("*")
-        if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+        if path.is_file()
+        and path.name != ".DS_Store"
+        and "__pycache__" not in path.parts
+        and path.suffix != ".pyc"
     }
     observed_sources: set[str] = set()
     observed_outputs: set[str] = set()

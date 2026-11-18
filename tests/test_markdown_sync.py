@@ -1,9 +1,11 @@
-"""Protect existing user instructions when installing Markdown lint guidance."""
+"""Protect existing user instructions when installing toolkit guidance."""
 from __future__ import annotations
 
 import importlib.util
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
@@ -60,6 +62,20 @@ class MarkdownSyncTests(unittest.TestCase):
                         sync.sync_markdown_guidance(dest)
                 self.assertEqual(original, dest.read_text())
                 self.assertFalse((home / ".config").exists())
+
+
+class CodexRoutingSyncTests(unittest.TestCase):
+    def test_sync_installs_worktree_route_and_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            codex = home / ".codex"
+            with mock.patch.object(Path, "home", return_value=home), redirect_stdout(io.StringIO()):
+                sync.sync_codex()
+
+            instructions = (codex / "AGENTS.md").read_text(encoding="utf-8")
+            self.assertIn("<main-worktree-root>/.ai/worktrees/<name>", instructions)
+            self.assertIn("`~/.codex/skills/goal-to-delivery/references/worktree-policy.md`", instructions)
+            self.assertTrue((codex / "skills/goal-to-delivery/references/worktree-policy.md").is_file())
 
 
 if __name__ == "__main__":

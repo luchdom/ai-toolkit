@@ -113,7 +113,7 @@ def validate_tool_instruction_skills() -> None:
     errors: list[str] = []
 
     for instruction_path in sorted((SRC / "tool-instructions").rglob("*")):
-        if not instruction_path.is_file():
+        if instruction_path.name == ".DS_Store" or not instruction_path.is_file():
             continue
         for skill_id in sorted(set(SKILL_REF_PATTERN.findall(instruction_path.read_text(encoding="utf-8")))):
             if skill_id not in available_skills:
@@ -208,6 +208,11 @@ def rebuild_dist() -> None:
     shutil.copy2(project_docs_source, project_docs_output)
     projections[project_docs_source] = [project_docs_output]
 
+    worktree_source = markdown_source.with_name("worktrees.md")
+    worktree_output = markdown_output.with_name(worktree_source.name)
+    shutil.copy2(worktree_source, worktree_output)
+    projections[worktree_source] = [worktree_output]
+
     config_source = SRC / "tool-instructions" / "shared" / "markdownlint.json"
     config_output = markdown_output.parent / "markdownlint-cli2.jsonc"
     config_output.write_text(
@@ -241,11 +246,18 @@ def rebuild_dist() -> None:
                 DIST / "copilot" / "skills" / skill_dir.name,
             ]
             for destination in destinations:
-                shutil.copytree(skill_dir, destination, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+                shutil.copytree(
+                    skill_dir,
+                    destination,
+                    ignore=shutil.ignore_patterns(".DS_Store", "__pycache__", "*.pyc"),
+                )
             for source in sorted(
                 path
                 for path in skill_dir.rglob("*")
-                if path.is_file() and "__pycache__" not in path.parts and path.suffix != ".pyc"
+                if path.is_file()
+                and path.name != ".DS_Store"
+                and "__pycache__" not in path.parts
+                and path.suffix != ".pyc"
             ):
                 relative = source.relative_to(skill_dir)
                 projections[source] = [destination / relative for destination in destinations]

@@ -12,6 +12,8 @@ There are exactly three user-facing entries:
 
 For non-trivial work without an explicit entry, use manual `$spec-driven-delivery`. All entries share the canonical cross-tool protocol under [`src/skills/goal-to-delivery/references/`](src/skills/goal-to-delivery/references/), including the [linked-worktree policy](src/skills/goal-to-delivery/references/worktree-policy.md), while repositories own their commands, domain rules, and stricter safety requirements. Unresolved conflicts fail closed before implementation or external mutation.
 
+Codex sync adds the worktree location and a reference to the policy in `~/.codex/AGENTS.md`. This gives Codex the placement rule even in projects without toolkit instructions.
+
 The workflows reuse the same specialist skills, but they do not require every specialist for every issue. Routine work plans inline; risky work can add tasking, audit, runtime QA, or documentation stages as needed. Frontend/UI work follows the canonical [design gates](src/skills/goal-to-delivery/references/design-gates.md): unresolved UI decisions require a pre-build product-designer spec, and every changed rendered UI or interaction requires a post-build real-browser design conformance review.
 
 ## Project documentation

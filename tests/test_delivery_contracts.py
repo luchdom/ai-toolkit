@@ -554,6 +554,7 @@ class DeliveryContractTests(unittest.TestCase):
             output = write(root, "dist/codex/agents/example.toml", "generated")
             (root / "src/skills").mkdir(parents=True)
             (root / "src/tool-instructions").mkdir(parents=True)
+            (root / "src/tool-instructions/.DS_Store").write_bytes(b"\xff")
 
             import hashlib
 

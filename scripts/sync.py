@@ -169,6 +169,12 @@ def sync_codex() -> None:
     sync_skill_dirs(DIST / "codex" / "skills", codex_home / "skills")
     sync_markdown_guidance(codex_home / "AGENTS.md")
     sync_project_docs_guidance(codex_home / "AGENTS.md")
+    sync_user_instruction_block(
+        codex_home / "AGENTS.md",
+        DIST / "tool-instructions" / "shared" / "worktrees.md",
+        "WORKTREES",
+        "Git worktree",
+    )
 
 
 def sync_claude() -> None:
