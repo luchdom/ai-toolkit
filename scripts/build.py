@@ -13,6 +13,13 @@ SRC = ROOT / "src"
 DIST = ROOT / "dist"
 SKILL_REF_PATTERN = re.compile(r"\$([a-z0-9][a-z0-9-]*)")
 MANIFEST_VERSION = 1
+SKILL_ADAPTERS = ("codex", "claude", "copilot")
+SHARED_DELIVERY_FILES = (
+    "artifact-contract.md",
+    "completion-boundaries.md",
+    "delivery-workflow.md",
+    "worktrees.md",
+)
 CURSOR_RULE_PATH_REPLACEMENTS = (
     ("`$project-docs-review`", "the `.cursor/rules/project-docs-review.mdc` rule"),
     ("`$project-docs`", "the `.cursor/rules/project-docs.mdc` rule"),
@@ -25,12 +32,14 @@ CURSOR_RULE_PATH_REPLACEMENTS = (
     ("assets/ARCHITECTURE.md", "./project-architecture-template.mdc"),
     ("assets/AGENTS.md", "./project-agents-template.mdc"),
     ("`$ui-review-spec`", "the `.cursor/rules/ui-review-spec.mdc` rule"),
-    ("../goal-to-delivery/references/design-gates.md", "./ui-design-gates.mdc"),
+    ("../spec-driven-delivery/references/design-gates.md", "./ui-design-gates.mdc"),
+    ("spec-driven-delivery/references/clarification-policy.md", ".cursor/rules/clarification-policy.mdc"),
+    ("(./clarification-policy.md)", "(./clarification-policy.mdc)"),
     ("./references/design-review-template.md", "./ui-design-review-template.mdc"),
     ("./references/spec-template.md", "./ui-design-spec-template.mdc"),
     ("./references/ui-audit-checklist.md", "./ui-audit-checklist.mdc"),
     ("./references/component-selection.md", "./ui-component-selection.mdc"),
-    ("goal-to-delivery/references/design-gates.md", ".cursor/rules/ui-design-gates.mdc"),
+    ("spec-driven-delivery/references/design-gates.md", ".cursor/rules/ui-design-gates.mdc"),
     ("`design-gates.md`", "`.cursor/rules/ui-design-gates.mdc`"),
 )
 
@@ -195,26 +204,22 @@ def rebuild_dist() -> None:
 
     projections: dict[Path, list[Path]] = {}
 
-    markdown_source = SRC / "tool-instructions" / "shared" / "markdown-lint.md"
-    markdown_guidance = markdown_source.read_text(encoding="utf-8")
-    markdown_output = DIST / "tool-instructions" / "shared" / "markdown-lint.md"
-    markdown_output.parent.mkdir(parents=True, exist_ok=True)
-    markdown_output.write_text(markdown_guidance, encoding="utf-8")
-    projections[markdown_source] = [markdown_output]
+    shared = Path("tool-instructions/shared")
+    for source in sorted((SRC / shared).glob("*.md")):
+        destinations = [DIST]
+        if source.name in SHARED_DELIVERY_FILES:
+            # Match the source layout so links from skills work after sync.
+            destinations = [DIST / tool for tool in SKILL_ADAPTERS]
+        outputs = [destination / shared / source.name for destination in destinations]
+        for output in outputs:
+            output.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, output)
+        projections[source] = outputs
 
-    project_docs_source = markdown_source.with_name("project-docs.md")
-    project_docs_guidance = project_docs_source.read_text(encoding="utf-8")
-    project_docs_output = markdown_output.with_name(project_docs_source.name)
-    shutil.copy2(project_docs_source, project_docs_output)
-    projections[project_docs_source] = [project_docs_output]
-
-    worktree_source = markdown_source.with_name("worktrees.md")
-    worktree_output = markdown_output.with_name(worktree_source.name)
-    shutil.copy2(worktree_source, worktree_output)
-    projections[worktree_source] = [worktree_output]
-
-    config_source = SRC / "tool-instructions" / "shared" / "markdownlint.json"
-    config_output = markdown_output.parent / "markdownlint-cli2.jsonc"
+    markdown_guidance = (SRC / shared / "markdown-lint.md").read_text(encoding="utf-8")
+    project_docs_guidance = (SRC / shared / "project-docs.md").read_text(encoding="utf-8")
+    config_source = SRC / shared / "markdownlint.json"
+    config_output = DIST / shared / "markdownlint-cli2.jsonc"
     config_output.write_text(
         json.dumps({"config": json.loads(config_source.read_text(encoding="utf-8"))}, indent=2) + "\n",
         encoding="utf-8",
@@ -240,11 +245,7 @@ def rebuild_dist() -> None:
 
     for skill_dir in sorted((SRC / "skills").iterdir()):
         if skill_dir.is_dir():
-            destinations = [
-                DIST / "codex" / "skills" / skill_dir.name,
-                DIST / "claude" / "skills" / skill_dir.name,
-                DIST / "copilot" / "skills" / skill_dir.name,
-            ]
+            destinations = [DIST / tool / "skills" / skill_dir.name for tool in SKILL_ADAPTERS]
             for destination in destinations:
                 shutil.copytree(
                     skill_dir,
@@ -312,9 +313,15 @@ def rebuild_dist() -> None:
             False,
         ),
         (
-            SRC / "skills" / "goal-to-delivery" / "references" / "design-gates.md",
+            SRC / "skills" / "spec-driven-delivery" / "references" / "design-gates.md",
             "ui-design-gates.mdc",
             "Binding frontend/UI design gates for planning, implementation, and rendered conformance review.",
+            False,
+        ),
+        (
+            SRC / "skills" / "spec-driven-delivery" / "references" / "clarification-policy.md",
+            "clarification-policy.mdc",
+            "Decision authority and specialist guidance for delivery.",
             False,
         ),
         (

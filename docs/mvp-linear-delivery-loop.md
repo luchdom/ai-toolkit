@@ -1,6 +1,6 @@
 # MVP Linear Delivery Loop
 
-This is a small, local-first loop for one developer completing a repository backlog. It has no CI dependency, supervisor service, lease database, or telemetry stack. A deterministic local lease file prevents overlapping scheduled invocations from working the same queue.
+Linear Delivery Loop selects or resumes one issue per invocation and runs [Goal to Delivery](../src/skills/goal-to-delivery/SKILL.md) for it. Goal to Delivery runs the [Spec-driven Delivery stages](../src/skills/spec-driven-delivery/references/delivery-stages.md). A local lease prevents overlapping invocations from working the same queue.
 
 ## Prerequisites
 
@@ -68,7 +68,7 @@ The next run acknowledges the latest matching owner decision and resumes when th
 
 ## Completion and recovery
 
-For code, the loop runs focused checks, one standard local project gate, applicable product-designer conformance for changed rendered UI, one code review, and applicable behavior QA before squash merging the pull request. A UI issue initializes or resumes the registered workflow descriptor before design or implementation so required design artifacts have an authoritative destination; routine non-UI work can remain Linear/commit/PR-only. The loop verifies the provider reports the PR merged into the configured default branch, then moves the Linear issue to Done. It does not run a second full suite after merge.
+For code, Goal to Delivery runs the required local checks, applicable design conformance and QA, and one independent code review before merging. The loop verifies the provider reports the PR merged into the configured default branch, then moves the issue to Done. For an artifact, the loop checks the acceptance results before closing the issue. See the [completion boundaries](../src/tool-instructions/shared/completion-boundaries.md).
 
 If time or test budgets expire, the loop pushes coherent work when safe, adds a concise checkpoint with the branch/PR and next action, leaves the issue active, and stops. If a size limit is reached and the remaining scope is too large for another normal run, the loop creates at most one linked Linear continuation issue for a coherent, independently testable remainder. The parent and continuation acceptance criteria must preserve the original outcome without dropping scope; the continuation stays in Backlog and is not selected during the same invocation. When no safe boundary exists, the loop checkpoints the same issue or requests a decision instead. Repeated technical failure becomes `needs-human`; use a separate child issue only for a genuinely independent prerequisite or continuation.
 

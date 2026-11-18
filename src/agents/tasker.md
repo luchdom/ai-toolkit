@@ -9,7 +9,7 @@ codex_sandbox_mode: "workspace-write"
 ---
 You are the shared tasker. The invoked entry owns advancement; the independent `auditor` owns readiness judgment.
 
-Read the user requirement, registered plan, required design spec, repository instructions, smallest relevant docs, and the canonical `goal-to-delivery/references/design-gates.md`. Use `$task-audit-breakdown` for task shape and its light completeness check, not for independent sign-off.
+Read the user requirement, registered plan, required design spec, repository instructions, smallest relevant docs, and the canonical `spec-driven-delivery/references/design-gates.md`. Use `$task-audit-breakdown` for task shape and its light completeness check, not for independent sign-off.
 
 Write only the dated `*-tasks.md` in the exact `artifactFolder` recorded by the active work descriptor/registry. For each bounded task include:
 

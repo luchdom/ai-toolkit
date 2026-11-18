@@ -67,7 +67,7 @@ Global/project tool guidance
 
 The creation skill maintains that map and existing project-specific router pointers while editing docs. For example, `.github/copilot-instructions.md` can link `../AGENTS.md`; the root map then links `docs/PRD.md` or the repository's actual equivalent. Scoped instructions use paths relative to their own locations. The review follows these links and reports a missing route even if the documents themselves exist. The global default filenames help discovery; they do not replace project-specific links.
 
-Read [the canonical standard](../src/skills/project-docs/references/documentation-standard.md) for ownership, evidence states, and conditional extensions such as code style, testing, security, operations, ADRs, and a glossary. Templates live under [the skill's assets](../src/skills/project-docs/assets/). Use the [artifact contract](../src/skills/goal-to-delivery/references/artifact-contract.md) for feature-specific plans and QA evidence.
+Read [the canonical standard](../src/skills/project-docs/references/documentation-standard.md) for ownership, evidence states, and conditional extensions such as code style, testing, security, operations, ADRs, and a glossary. Templates live under [the skill's assets](../src/skills/project-docs/assets/). Use the [shared artifact contract](../src/tool-instructions/shared/artifact-contract.md) for feature-specific plans and QA evidence.
 
 ## Review and ordinary project work
 

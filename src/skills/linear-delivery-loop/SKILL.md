@@ -1,26 +1,15 @@
 ---
 name: linear-delivery-loop
-description: Run one lightweight autonomous delivery iteration from a repository's Linear backlog. Use only when explicitly invoked as `$linear-delivery-loop` by a Codex scheduled task or attended pilot; select or resume at most one labeled issue, work within local budgets, request decisions in Linear, and stop after merge or checkpoint.
+description: Pick or resume one Linear issue and run Goal to Delivery for it. Use when a scheduled task or an attended pilot explicitly invokes this skill. Keep queue state, checkpoints, and decisions in Linear.
 ---
 
 # Linear Delivery Loop
 
-Complete at most one Linear issue using Linear as the durable queue and checkpoint store. Do not build or require a separate supervisor, lease database, memory service, telemetry pipeline, or CI system.
+Use Linear as the autonomous queue. Run [Goal to Delivery](../goal-to-delivery/SKILL.md) for at most one issue per invocation.
 
 ## Setup
 
-Read `.ai/loop.json` from the target repository and [project-config.example.json](./references/project-config.example.json). Stop without mutation when the file is missing, invalid, or `enabled` is false. Read the canonical shared protocol:
-
-- [delivery-stages.md](../goal-to-delivery/references/delivery-stages.md)
-- [design-gates.md](../goal-to-delivery/references/design-gates.md)
-- [artifact-contract.md](../goal-to-delivery/references/artifact-contract.md)
-- [clarification-policy.md](../goal-to-delivery/references/clarification-policy.md)
-- [quality-gates.md](../goal-to-delivery/references/quality-gates.md)
-- [completion-boundaries.md](../goal-to-delivery/references/completion-boundaries.md)
-- [worktree-policy.md](../goal-to-delivery/references/worktree-policy.md)
-- [work-descriptor.schema.json](../goal-to-delivery/references/work-descriptor.schema.json)
-
-Repository-specific commands and stricter safety rules take precedence. Never expose API keys or notification topics.
+Read `.ai/loop.json` from the target repository and compare it with [project-config.example.json](./references/project-config.example.json). Stop without mutation if the file is missing, invalid, or disabled. Follow repository rules and the [shared delivery workflow](../../tool-instructions/shared/delivery-workflow.md). Keep API keys and notification topics private.
 
 The normal state mapping is Backlog for eligible intake, In Progress for the single active issue, and Done only after the configured completion boundary.
 
@@ -58,38 +47,31 @@ After releasing any acquired lease, archive only the current quiet standalone sc
 
 Never archive an attended pilot, a scheduled task attached to an existing long-lived chat, or a run that claimed or resumed delivery work. Keep the run visible when it created or changed anything, requested or refined a decision, sent a notification, checkpointed work, encountered an error or invalid configuration, found multiple active issues, or discovered another condition that needs attention.
 
-## Deliver within the MVP budget
+## Run Goal to Delivery
 
-Use the lightest applicable stages. Plan and task inline for routine work; create a concise work note only when useful. Use specialists selectively based on risk, not as a mandatory chain. When frontend/UI design gates apply, initialize or resume the workflow descriptor and registered `artifactFolder` before design or implementation; non-UI routine work may continue to use Linear, commits, and the pull request as its complete record.
+Pass the selected issue, approved decisions, permitted actions, and run limits to Goal to Delivery. For code, set the boundary to `merge` and authorize the branch, push, pull request, and merge actions allowed by the configuration and repository. Prefer one branch and pull request per issue. For other work, set the boundary to `artifact`. Record any new decisions in the issue before dependent work continues.
 
-- Prefer one branch and pull request per issue.
-- Route new product/AC clarifications to `product-manager` and technical choices or simplification to `staff-engineer`, with PD input for user experience, using the canonical [clarification policy](../goal-to-delivery/references/clarification-policy.md). Record authorized decisions through this entry before dependent work resumes. A specialist cannot resolve an existing human-decision pause in place of the required owner reply.
-- For frontend/UI work, require product-designer input when `design-gates.md` requires a pre-build specification, and require a current rendered design conformance `PASS` after implementation. Risk-based specialist selection cannot waive either applicable gate.
-- Run focused checks first and one repository-owned local validation command before merge.
-- Perform applicable UI design conformance, one independent code review, and applicable runtime QA. Use HTTP, CLI, or browser behavior only when acceptance criteria require it.
-- Update durable documentation only when behavior, setup, architecture, or operations changed.
-- Keep total validation within `maxTestMinutes`, the run within `maxRunMinutes`, and the normal change within `maxFiles` and `maxChangedLines`. Treat the file and changed-line budgets as planning thresholds, not targets or reasons to abandon a coherent edit midway.
-- When a limit is reached and the remaining scope is still too large for one more normal run, create at most one linked Linear continuation issue for a coherent, independently testable remainder. Preserve the original outcome across the parent and continuation acceptance criteria, state what is complete and what remains, retain the same project and priority, and add the autonomous label only when the continuation is bounded and locally testable. Leave it in Backlog and never select it during the current invocation.
-- Complete the current issue before the continuation only when its retained acceptance criteria are satisfied at a reviewable boundary. If the work cannot be split without incomplete behavior, silently dropping an acceptance criterion, or making a product decision, do not create or close around a continuation; checkpoint the same issue or request a human decision instead.
+Use `maxRunMinutes` for the run and `maxTestMinutes` for tests. Use `maxFiles` and `maxChangedLines` as planning thresholds. Finish a coherent edit before deciding whether to split the remaining scope.
 
-For safe interruptions or the run-time limit, commit and push coherent work when safe, add a concise Linear checkpoint with branch/PR, completed checks, and next action, leave the issue active, and stop. After bounded repair attempts, treat a technical blocker as a human decision instead of looping indefinitely.
+## Checkpoint or split the work
+
+When the run or test limit is reached or work is interrupted, commit and push coherent work when safe and allowed. Add the branch or PR, completed checks, and next action to a Linear checkpoint. Keep the issue active and stop. If scoped retries leave a technical blocker, use the decision process below.
+
+Create at most one linked continuation issue when a limit is reached and the remainder is too large for another normal run. Split only at a reviewable boundary with independently testable acceptance criteria. Preserve the original goal across the two issues. Record what is complete and what remains. Use the same project and priority, add the autonomous label only when the continuation is eligible, and leave it in Backlog for a later run. Checkpoint the current issue or request a decision if no safe split exists.
 
 ## Ask for a decision
 
-Use this path when the canonical clarification policy leaves a material choice unresolved after the relevant product or engineering consultation. Include the specialist recommendation and its evidence; agreement among agents does not count as the owner's decision.
+Use this path when Goal to Delivery returns an unresolved choice. Include the specialist recommendation and evidence. Resume a human-decision pause only on a newer matching reply from the owner.
 
-Keep the issue active, add the configured human-decision label, and comment with:
+Keep the issue active and add the configured human-decision label. Include these details in the Linear comment.
 
-- the blocked decision;
-- two or three concrete options and consequences;
-- one recommendation;
-- the listed-choice reply syntax `DECIDE <ISSUE> <OPTION>`;
-- the owner-suggestion reply syntax `DECIDE <ISSUE> CUSTOM <SUGGESTION>`.
+- The blocked decision
+- Two or three concrete options and consequences
+- One recommendation
+- How to choose an option with `DECIDE <ISSUE> <OPTION>` or supply a direction with `DECIDE <ISSUE> CUSTOM <SUGGESTION>`
 
-Send at most one best-effort ntfy notification when enabled. Use the Linear issue URL as the notification click target so opening the notification opens the decision, and include the URL in the message as a fallback when the transport cannot expose a click action. The Linear comment is authoritative; notification failure must not create retries or duplicate comments. Stop after requesting the decision.
+When enabled, send one best-effort ntfy notification. Use the Linear issue URL as the notification click target and include the URL in the message. Keep the decision request in Linear if the notification fails. Stop after requesting the decision.
 
 ## Complete
 
-For code, target the `merge` boundary: validate locally, open the PR, complete applicable UI design conformance, one code review, and applicable QA, squash merge when authorized by this entry and repository policy, verify the provider reports the PR merged into the configured default branch, then move the issue to Done with a short result comment. Do not rerun the full suite in a clean post-merge worktree.
-
-For a non-code artifact, use the `artifact` boundary and close the issue only after its acceptance checks pass. Never select a second issue in the same invocation.
+Verify that Goal to Delivery reached the [completion boundary](../../tool-instructions/shared/completion-boundaries.md). For code, use the configured merge method and confirm the provider reports a merge into the configured default branch. For an artifact, confirm the acceptance checks passed. Then move the issue to Done, add a short result comment, release the lease, and end the run.

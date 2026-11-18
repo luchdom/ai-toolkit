@@ -8,17 +8,48 @@ from pathlib import Path
 from typing import Iterable
 
 
-CANONICAL_REFERENCES = (
-    "delivery-stages.md",
-    "design-gates.md",
-    "artifact-contract.md",
-    "clarification-policy.md",
-    "quality-gates.md",
-    "completion-boundaries.md",
-    "worktree-policy.md",
-    "work-descriptor.schema.json",
+SKILLS = Path("src/skills")
+STAGE_REFERENCES = SKILLS / "spec-driven-delivery/references"
+SHARED_REFERENCES = Path("src/tool-instructions/shared")
+DESCRIPTOR_SCHEMA = SKILLS / "goal-to-delivery/references/work-descriptor.schema.json"
+WORKFLOW_GUIDE = SHARED_REFERENCES / "delivery-workflow.md"
+STAGE_CONTRACTS = (
+    STAGE_REFERENCES / "delivery-stages.md",
+    STAGE_REFERENCES / "design-gates.md",
+    STAGE_REFERENCES / "clarification-policy.md",
+    STAGE_REFERENCES / "quality-gates.md",
 )
-ENTRY_SKILLS = ("goal-to-delivery", "spec-driven-delivery", "linear-delivery-loop")
+SHARED_CONTRACTS = (
+    SHARED_REFERENCES / "artifact-contract.md",
+    SHARED_REFERENCES / "completion-boundaries.md",
+    SHARED_REFERENCES / "worktrees.md",
+)
+CANONICAL_REFERENCES = (*STAGE_CONTRACTS, *SHARED_CONTRACTS, WORKFLOW_GUIDE, DESCRIPTOR_SCHEMA)
+WORKFLOW_ROUTES = {
+    WORKFLOW_GUIDE: (
+        SKILLS / "spec-driven-delivery/SKILL.md",
+        SKILLS / "goal-to-delivery/SKILL.md",
+        SKILLS / "linear-delivery-loop/SKILL.md",
+        *SHARED_CONTRACTS,
+    ),
+    SKILLS / "spec-driven-delivery/SKILL.md": (
+        *STAGE_CONTRACTS,
+        *SHARED_CONTRACTS,
+        SKILLS / "goal-to-delivery/SKILL.md",
+    ),
+    SKILLS / "goal-to-delivery/SKILL.md": (
+        SKILLS / "spec-driven-delivery/SKILL.md",
+        WORKFLOW_GUIDE,
+    ),
+    SKILLS / "linear-delivery-loop/SKILL.md": (
+        SKILLS / "goal-to-delivery/SKILL.md",
+        WORKFLOW_GUIDE,
+    ),
+}
+DELIVERY_STAGE_ORDER = (
+    "discover", "plan", "clarify", "design", "task", "audit", "implement",
+    "design_review", "qa", "review", "docs", "commit", "pr", "merge", "post_merge",
+)
 SPECIALIST_AGENTS = (
     "planner",
     "product-manager",
@@ -65,22 +96,12 @@ DOCS_AI_ALLOWED_PURPOSES = frozenset(
     ("legacy runtime compatibility", "intentional legacy test", "classified history")
 )
 DOCS_AI_ALLOWLIST: dict[str, dict[str, frozenset[str]]] = {
-    "AGENTS.md": {
+    "src/tool-instructions/shared/artifact-contract.md": {
         "legacy runtime compatibility": frozenset(
-            {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
-        )
-    },
-    "README.md": {
-        "legacy runtime compatibility": frozenset(
-            {"c3024d51ad95cc2b6810d47eb0e85924f0e72da18ea53d2c4a8ce6f59a0cb68b"}
-        )
-    },
-    "src/skills/goal-to-delivery/references/artifact-contract.md": {
-        "legacy runtime compatibility": frozenset(
-            {"60b8e0b7d2829676c3a3f873556df074d82d9846fc55f663047b6a47adadf71d"}
+            {"1ba2d57dc5ffdae02017d2b434ac40391782e3ee651d50c938be2ab8fc1ac23f"}
         ),
         "classified history": frozenset(
-            {"0969aa7926b8f14f63757838691918d124f7535c55b4b88a39db1a4c17490b8b"}
+            {"42fe02906b138b1e606406fcd8248c7fc37aabfc99b3cfa779f3f342f305575d"}
         ),
     },
     "src/skills/goal-to-delivery/scripts/descriptor.py": {
@@ -97,26 +118,6 @@ DOCS_AI_ALLOWLIST: dict[str, dict[str, frozenset[str]]] = {
                 "45375bba04c3d99ef61a3f54e35767ecf4b14d5e183b5d3a85f1f006dfa19854",
                 "ffda759438c1e0bed28f8e7b20abd0f9af285a31ca3d0934f294ebb3498ef19d",
             }
-        )
-    },
-    "src/tool-instructions/codex/AGENTS.md": {
-        "legacy runtime compatibility": frozenset(
-            {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
-        )
-    },
-    "src/tool-instructions/claude/AGENTS.md": {
-        "legacy runtime compatibility": frozenset(
-            {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
-        )
-    },
-    "src/tool-instructions/copilot/.github/copilot-instructions.md": {
-        "legacy runtime compatibility": frozenset(
-            {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
-        )
-    },
-    "src/tool-instructions/cursor/AGENTS.md": {
-        "legacy runtime compatibility": frozenset(
-            {"e300897cfebba5099aec32422a44cff0e182353f3fc4caefa93978296ef36ceb"}
         )
     },
     "tests/goal_to_delivery_base/support.py": {
@@ -202,7 +203,7 @@ def check_forbidden_operational_terms(root: Path) -> list[str]:
 def _resolved_local_links(path: Path) -> set[Path]:
     resolved: set[Path] = set()
     for raw_target in MARKDOWN_LINK_PATTERN.findall(_read(path)):
-        target = raw_target.split("#", 1)[0].strip()
+        target = raw_target.strip().strip("<>").split("#", 1)[0]
         if not target or "://" in target or target.startswith("#"):
             continue
         resolved.add((path.parent / target).resolve())
@@ -265,19 +266,19 @@ def _schema_findings(root: Path, schema_path: Path) -> list[str]:
 
 def check_canonical_references(root: Path) -> list[str]:
     findings: list[str] = []
-    skills_root = root / "src" / "skills"
-    canonical = skills_root / "goal-to-delivery" / "references"
-    expected_paths = {canonical / name for name in CANONICAL_REFERENCES}
+    expected_paths = {root / relative for relative in CANONICAL_REFERENCES}
     for path in sorted(expected_paths):
         if not path.is_file():
             findings.append(f"Missing canonical delivery reference: {_relative(root, path)}")
 
-    for name in CANONICAL_REFERENCES:
-        copies = [path for path in skills_root.rglob(name) if path.parent != canonical]
-        for copy in copies:
+        for copy in sorted((root / "src").rglob(path.name)):
+            if copy == path:
+                continue
             findings.append(
-                f"Competing delivery reference {_relative(root, copy)} duplicates canonical filename {name}."
+                f"Competing delivery reference {_relative(root, copy)} duplicates canonical filename {path.name}."
             )
+    for retired in sorted((root / SKILLS).rglob("worktree-policy.md")):
+        findings.append(f"{_relative(root, retired)}: use {SHARED_REFERENCES / 'worktrees.md'} instead.")
 
     canonical_markdown = [path for path in expected_paths if path.suffix == ".md" and path.is_file()]
     canonical_full_hashes = {
@@ -286,7 +287,7 @@ def check_canonical_references(root: Path) -> list[str]:
     }
     canonical_block_hashes = {path: _doctrine_blocks(_read(path)) for path in canonical_markdown}
     for candidate in operational_markdown(root):
-        if candidate.parent == canonical:
+        if candidate in canonical_markdown:
             continue
         candidate_text = _read(candidate)
         full_hash = hashlib.sha256(_normalized_doctrine(candidate_text).encode("utf-8")).hexdigest()
@@ -309,7 +310,7 @@ def check_canonical_references(root: Path) -> list[str]:
                 )
                 break
 
-    schema_path = canonical / "work-descriptor.schema.json"
+    schema_path = root / DESCRIPTOR_SCHEMA
     canonical_schema = _normalized_json(schema_path) if schema_path.is_file() else None
     if canonical_schema is not None:
         for candidate in (root / "src").rglob("*.json"):
@@ -321,21 +322,26 @@ def check_canonical_references(root: Path) -> list[str]:
                     f"{_relative(root, schema_path)}."
                 )
 
-    for skill_name in ENTRY_SKILLS:
-        skill_path = skills_root / skill_name / "SKILL.md"
-        if not skill_path.is_file():
-            findings.append(f"Missing workflow entry skill: {_relative(root, skill_path)}")
+    routes: dict[Path, tuple[Path, ...]] = dict.fromkeys(
+        (reference for reference in CANONICAL_REFERENCES if reference.suffix == ".md"), ()
+    )
+    routes.update(WORKFLOW_ROUTES)
+    for source, required_links in routes.items():
+        source_path = root / source
+        if not source_path.is_file():
+            if source not in CANONICAL_REFERENCES:
+                findings.append(f"Missing workflow entry skill: {source.as_posix()}")
             continue
-        links = _resolved_local_links(skill_path)
-        missing_links = sorted(expected_paths - links)
+        links = _resolved_local_links(source_path)
+        missing_links = sorted(target for target in required_links if (root / target).resolve() not in links)
         if missing_links:
             findings.append(
-                f"{_relative(root, skill_path)}: missing canonical reference links: "
-                + ", ".join(path.name for path in missing_links)
+                f"{source.as_posix()}: missing canonical reference links: "
+                + ", ".join(target.as_posix() for target in missing_links)
             )
         broken = [link for link in links if not link.is_file() and root.resolve() in link.parents]
         for link in sorted(broken):
-            findings.append(f"{_relative(root, skill_path)}: broken local reference {_relative(root, link)}")
+            findings.append(f"{source.as_posix()}: broken local reference {_relative(root.resolve(), link)}")
 
     if schema_path.is_file():
         findings.extend(_schema_findings(root, schema_path))
@@ -353,21 +359,22 @@ def _require_fragments(root: Path, path: Path, fragments: Iterable[str], label: 
 
 
 def check_entry_policies(root: Path) -> list[str]:
-    skills = root / "src" / "skills"
+    skills = root / SKILLS
     findings: list[str] = []
     findings.extend(
         _require_fragments(
             root,
             skills / "goal-to-delivery" / "SKILL.md",
             (
-                "semi-autonomous",
-                "automatic",
+                "automatically",
                 "working-tree",
                 "queue selection",
-                "mode: autonomous",
-                "registered `artifactFolder`",
+                "only when called by the active loop",
+                "one focused question",
+                "staff-engineer",
+                "authorized boundary is verified",
             ),
-            "semi-autonomous entry policy",
+            "automatic delivery entry policy",
         )
     )
     findings.extend(
@@ -377,9 +384,9 @@ def check_entry_policies(root: Path) -> list[str]:
             (
                 "manual",
                 "exactly one",
-                "automatic advancement",
+                "return control",
                 "one focused question",
-                "mode: autonomous",
+                "explicit request for that stage",
                 "registered `artifactFolder`",
             ),
             "manual entry policy",
@@ -404,8 +411,8 @@ def check_entry_policies(root: Path) -> list[str]:
                 "quiet standalone scheduled run",
                 "set_thread_archived",
                 "raw archive directive",
-                "applicable UI design conformance",
-                "registered `artifactFolder`",
+                "record any new decisions",
+                "verify that Goal to Delivery reached",
             ),
             "autonomous entry policy",
         )
@@ -415,34 +422,35 @@ def check_entry_policies(root: Path) -> list[str]:
 
 def check_shared_specialists_and_routing(root: Path) -> list[str]:
     findings: list[str] = []
-    stages = root / "src" / "skills" / "goal-to-delivery" / "references" / "delivery-stages.md"
+    stages = root / STAGE_REFERENCES / "delivery-stages.md"
     findings.extend(
         _require_fragments(
             root,
             stages,
             (
                 "planner",
-                "product-manager",
                 "product-designer",
-                "staff-engineer",
                 "tasker",
                 "auditor",
                 "matching implementer",
                 "design_review",
-                "code-reviewer",
+                "independent reviewer",
                 "qa",
-                "proven not to affect rendered UI or interaction",
             ),
             "shared specialist contract",
         )
     )
+    if stages.is_file():
+        stage_names = tuple(re.findall(r"^\| `([a-z_]+)` \|", _read(stages), flags=re.MULTILINE))
+        if stage_names != DELIVERY_STAGE_ORDER:
+            findings.append(f"{_relative(root, stages)}: delivery stages are missing or out of order.")
     findings.extend(_require_fragments(root, stages, ("docs-as-code",), "shared documentation owner"))
     findings.extend(
         _require_fragments(
             root,
-            root / "src" / "skills" / "goal-to-delivery" / "references" / "completion-boundaries.md",
-            ("applicable UI design conformance", "one code review", "applicable QA"),
-            "merge UI design gate",
+            root / SHARED_REFERENCES / "completion-boundaries.md",
+            ("applicable UI design conformance", "one independent code review", "applicable QA"),
+            "merge requirements",
         )
     )
     for agent in SPECIALIST_AGENTS:
@@ -450,7 +458,7 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
         if not path.is_file():
             findings.append(f"Missing shared specialist agent: {_relative(root, path)}")
 
-    design_gates = root / "src" / "skills" / "goal-to-delivery" / "references" / "design-gates.md"
+    design_gates = root / STAGE_REFERENCES / "design-gates.md"
     findings.extend(
         _require_fragments(
             root,
@@ -597,8 +605,8 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
                 "$goal-to-delivery",
                 "$spec-driven-delivery",
                 "$linear-delivery-loop",
-                "do not choose",
-                "do not select",
+                "caller supplies the stage",
+                "queue selection and external actions stay with the caller",
                 "design conformance review",
             ),
             "policy-neutral specialist handoff primitive",
@@ -609,7 +617,7 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
 
 def check_artifact_layout(root: Path) -> list[str]:
     findings: list[str] = []
-    contract = root / "src" / "skills" / "goal-to-delivery" / "references" / "artifact-contract.md"
+    contract = root / SHARED_REFERENCES / "artifact-contract.md"
     legacy_root = "docs" + "-ai"
     findings.extend(
         _require_fragments(
@@ -661,6 +669,9 @@ def _canonical_projection_source(relative: str) -> str:
     if len(parts) >= 3 and parts[0] == "dist" and parts[1] == "tool-instructions":
         return "/".join(("src", "tool-instructions", *parts[2:]))
 
+    if len(parts) >= 4 and parts[0] == "dist" and parts[2] == "tool-instructions":
+        return "/".join(("src", *parts[2:]))
+
     if len(parts) >= 5 and parts[0] == "dist" and parts[2] == "skills":
         return "/".join(("src", "skills", *parts[3:]))
 
@@ -678,7 +689,8 @@ def _canonical_projection_source(relative: str) -> str:
 
     if len(parts) == 4 and parts[:3] == ["dist", "cursor", "rules"] and parts[3].endswith(".mdc"):
         support_sources = {
-            "ui-design-gates.mdc": "src/skills/goal-to-delivery/references/design-gates.md",
+            "ui-design-gates.mdc": (STAGE_REFERENCES / "design-gates.md").as_posix(),
+            "clarification-policy.mdc": (STAGE_REFERENCES / "clarification-policy.md").as_posix(),
             "ui-review-spec.mdc": "src/skills/ui-review-spec/SKILL.md",
             "ui-design-spec-template.mdc": "src/skills/ui-review-spec/references/spec-template.md",
             "ui-design-review-template.mdc": "src/skills/ui-review-spec/references/design-review-template.md",
@@ -756,7 +768,7 @@ def check_tool_instruction_cutover(root: Path) -> list[str]:
 
 
 def check_worktree_policy(root: Path) -> list[str]:
-    policy = root / "src" / "skills" / "goal-to-delivery" / "references" / "worktree-policy.md"
+    policy = root / SHARED_REFERENCES / "worktrees.md"
     resolved_command = "git worktree add -b <branch> <exact-path> <resolved-base-commit>"
     findings = _require_fragments(
         root,
@@ -764,21 +776,21 @@ def check_worktree_policy(root: Path) -> list[str]:
         (
             "direct owner instruction",
             "explicitly invoked delivery entry",
-            "is not authority",
+            "does not grant creation authority",
             "git worktree list --porcelain -z",
-            ".ai/worktrees/<safe-worktree-name>",
+            ".ai/worktrees/<name>",
             "windows reserved names",
             "reparse traversal",
             "git check-ignore -v --no-index",
-            "remote ref is provenance only",
-            "bind the recorded full commit sha into the imminent command",
+            "fetched ref as provenance only",
+            "recorded full commit id",
             resolved_command,
-            "must never change the command operand",
-            "creation authority never implies removal authority",
+            "keep the recorded base commit",
+            "separate removal authority",
             "git worktree remove",
             "git clean -x",
-            "never recursively delete",
-            "stricter repository-local",
+            "use only `git worktree remove <exact-path>`",
+            "stricter repository rules",
         ),
         "canonical worktree authority and safety contract",
     )
@@ -796,21 +808,6 @@ def check_worktree_policy(root: Path) -> list[str]:
                 "resolved base commit, never a movable remote ref."
             )
 
-    for relative in GUIDANCE_FILES[2:]:
-        findings.extend(
-            _require_fragments(
-                root,
-                root / relative,
-                (
-                    "goal-to-delivery/references/worktree-policy.md",
-                    "artifactFolder",
-                    ".ai/work",
-                    "exact registered legacy",
-                    "read-only",
-                ),
-                "tool-instruction artifact and worktree routing contract",
-            )
-        )
     return findings
 
 
@@ -822,15 +819,8 @@ def check_guidance_alignment(root: Path) -> list[str]:
             _require_fragments(
                 root,
                 path,
-                (
-                    "goal-to-delivery/references",
-                    "cross-tool",
-                    "repository-specific",
-                    "stricter",
-                    "closed before implementation",
-                    "$spec-driven-delivery",
-                ),
-                "canonical ownership, precedence, and default-entry guidance",
+                (WORKFLOW_GUIDE.as_posix(),),
+                "shared delivery workflow link",
             )
         )
         if path.is_file():

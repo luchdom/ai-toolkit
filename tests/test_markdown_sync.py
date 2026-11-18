@@ -9,6 +9,7 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
+from validation.delivery_contracts import CANONICAL_REFERENCES, WORKFLOW_ROUTES, _resolved_local_links
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("markdown_sync", ROOT / "scripts" / "sync.py")
@@ -64,18 +65,61 @@ class MarkdownSyncTests(unittest.TestCase):
                 self.assertFalse((home / ".config").exists())
 
 
-class CodexRoutingSyncTests(unittest.TestCase):
-    def test_sync_installs_worktree_route_and_policy(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            home = Path(directory)
-            codex = home / ".codex"
-            with mock.patch.object(Path, "home", return_value=home), redirect_stdout(io.StringIO()):
-                sync.sync_codex()
+class DeliveryRoutingSyncTests(unittest.TestCase):
+    def assert_delivery_links_resolve(self, installed_root: Path) -> None:
+        for reference in {*CANONICAL_REFERENCES, *WORKFLOW_ROUTES}:
+            installed = installed_root / reference.relative_to("src")
+            self.assertTrue(installed.is_file(), installed)
+            if installed.suffix == ".md":
+                for target in _resolved_local_links(installed):
+                    self.assertTrue(target.is_file() and installed_root.resolve() in target.parents, target)
 
-            instructions = (codex / "AGENTS.md").read_text(encoding="utf-8")
-            self.assertIn("<main-worktree-root>/.ai/worktrees/<name>", instructions)
-            self.assertIn("`~/.codex/skills/goal-to-delivery/references/worktree-policy.md`", instructions)
-            self.assertTrue((codex / "skills/goal-to-delivery/references/worktree-policy.md").is_file())
+    def test_sync_installs_portable_delivery_links_and_upgrades_old_worktree_route(self) -> None:
+        installations = (
+            ("codex", "AGENTS.md", sync.sync_codex),
+            ("claude", "CLAUDE.md", sync.sync_claude),
+            ("copilot", "copilot-instructions.md", sync.sync_copilot),
+        )
+        for tool, instruction_name, install in installations:
+            with self.subTest(tool=tool), tempfile.TemporaryDirectory() as directory:
+                home = Path(directory) / "Tool Home"
+                tool_home = home / f".{tool}"
+                obsolete_policy = tool_home / "skills/goal-to-delivery/references/worktree-policy.md"
+                obsolete_policy.parent.mkdir(parents=True)
+                obsolete_policy.write_text("Old worktree policy\n", encoding="utf-8")
+                instructions = tool_home / instruction_name
+                instructions.write_text(
+                    "# Personal rules\n\n"
+                    "<!-- AI-TOOLKIT-WORKTREES:START -->\n"
+                    "Read skills/goal-to-delivery/references/worktree-policy.md.\n"
+                    "<!-- AI-TOOLKIT-WORKTREES:END -->\n"
+                    "\n# More personal rules\n",
+                    encoding="utf-8",
+                )
+                with mock.patch.object(Path, "home", return_value=home), redirect_stdout(io.StringIO()):
+                    install()
+
+                content = instructions.read_text(encoding="utf-8")
+                policy = tool_home / "tool-instructions/shared/worktrees.md"
+                self.assertTrue(content.startswith("# Personal rules\n\n"))
+                self.assertIn("# More personal rules\n", content)
+                self.assertIn(f"(<{policy.as_posix()}>)", content)
+                self.assertNotIn("worktree-policy.md", content)
+                self.assertFalse(obsolete_policy.exists())
+                self.assertIn("git worktree add -b <branch> <exact-path> <resolved-base-commit>", policy.read_text(encoding="utf-8"))
+                self.assert_delivery_links_resolve(tool_home)
+
+    def test_project_routers_use_the_shared_workflow(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            for tool in ("codex", "claude", "copilot", "cursor"):
+                with self.subTest(tool=tool), redirect_stdout(io.StringIO()):
+                    project = Path(directory) / tool
+                    sync.sync_tool_instructions(project, {tool}, False)
+                    instructions = ".github/copilot-instructions.md" if tool == "copilot" else "AGENTS.md"
+                    guide = ROOT / "src/tool-instructions/shared/delivery-workflow.md"
+                    self.assertIn(f"(<{guide.as_posix()}>)", (project / instructions).read_text(encoding="utf-8"))
+                    if tool == "copilot":
+                        self.assert_delivery_links_resolve(project / ".github")
 
 
 if __name__ == "__main__":

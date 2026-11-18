@@ -46,6 +46,7 @@ def render_template_text(src: Path) -> str:
             file.read()
             .replace("{{LUCHDOM_AI_TOOLKIT_DOCS}}", docs_root)
             .replace("{{LUCHDOM_AI_CONFIG_DOCS}}", docs_root)
+            .replace("{{LUCHDOM_AI_TOOLKIT_ROOT}}", ROOT.as_posix())
         )
 
 
@@ -123,9 +124,8 @@ def sync_skill_dirs(src_root: Path, dest_root: Path) -> None:
         print(f"Synced skill {skill_dir.name} -> {target}")
 
 
-def sync_user_instruction_block(dest: Path, source: Path, marker: str, label: str) -> None:
+def sync_user_instruction_block(dest: Path, block: str, marker: str, label: str) -> None:
     """Update one toolkit-owned block without replacing personal instructions."""
-    block = source.read_text(encoding="utf-8")
     start = f"<!-- AI-TOOLKIT-{marker}:START -->"
     end = f"<!-- AI-TOOLKIT-{marker}:END -->"
     existing = ""
@@ -149,17 +149,35 @@ def sync_user_instruction_block(dest: Path, source: Path, marker: str, label: st
 
 def sync_markdown_guidance(dest: Path) -> None:
     shared = DIST / "tool-instructions" / "shared"
-    sync_user_instruction_block(dest, shared / "markdown-lint.md", "MARKDOWN", "Markdown lint")
+    guidance = (shared / "markdown-lint.md").read_text(encoding="utf-8")
+    sync_user_instruction_block(dest, guidance, "MARKDOWN", "Markdown lint")
     sync_file(shared / "markdownlint-cli2.jsonc", Path.home() / ".config" / "ai-toolkit" / "markdownlint-cli2.jsonc")
 
 
 def sync_project_docs_guidance(dest: Path) -> None:
-    sync_user_instruction_block(
-        dest,
-        DIST / "tool-instructions" / "shared" / "project-docs.md",
-        "PROJECT-DOCS",
-        "Project documentation",
+    source = DIST / "tool-instructions" / "shared" / "project-docs.md"
+    sync_user_instruction_block(dest, source.read_text(encoding="utf-8"), "PROJECT-DOCS", "Project documentation")
+
+
+def sync_delivery_references(tool: str, destination: Path, *, overwrite: bool) -> None:
+    shared = Path("tool-instructions/shared")
+    for source in sorted((DIST / tool / shared).glob("*.md")):
+        target = destination / shared / source.name
+        if overwrite or not target.exists():
+            sync_file(source, target)
+
+
+def sync_delivery_guidance(tool: str, tool_home: Path, instructions: Path) -> None:
+    sync_delivery_references(tool, tool_home, overwrite=True)
+    worktree_policy = (tool_home / "tool-instructions/shared/worktrees.md").as_posix()
+    block = (
+        "<!-- AI-TOOLKIT-WORKTREES:START -->\n"
+        "## Git worktrees\n\n"
+        "Before creating, resuming, or removing a linked Git worktree, "
+        f"follow the [shared worktree policy](<{worktree_policy}>).\n"
+        "<!-- AI-TOOLKIT-WORKTREES:END -->\n"
     )
+    sync_user_instruction_block(instructions, block, "WORKTREES", "Git worktree")
 
 
 def sync_codex() -> None:
@@ -169,12 +187,7 @@ def sync_codex() -> None:
     sync_skill_dirs(DIST / "codex" / "skills", codex_home / "skills")
     sync_markdown_guidance(codex_home / "AGENTS.md")
     sync_project_docs_guidance(codex_home / "AGENTS.md")
-    sync_user_instruction_block(
-        codex_home / "AGENTS.md",
-        DIST / "tool-instructions" / "shared" / "worktrees.md",
-        "WORKTREES",
-        "Git worktree",
-    )
+    sync_delivery_guidance("codex", codex_home, codex_home / "AGENTS.md")
 
 
 def sync_claude() -> None:
@@ -184,6 +197,7 @@ def sync_claude() -> None:
     sync_skill_dirs(DIST / "claude" / "skills", claude_home / "skills")
     sync_markdown_guidance(claude_home / "CLAUDE.md")
     sync_project_docs_guidance(claude_home / "CLAUDE.md")
+    sync_delivery_guidance("claude", claude_home, claude_home / "CLAUDE.md")
 
 
 def sync_copilot() -> None:
@@ -193,6 +207,7 @@ def sync_copilot() -> None:
     sync_skill_dirs(DIST / "copilot" / "skills", copilot_home / "skills")
     sync_markdown_guidance(copilot_home / "copilot-instructions.md")
     sync_project_docs_guidance(copilot_home / "copilot-instructions.md")
+    sync_delivery_guidance("copilot", copilot_home, copilot_home / "copilot-instructions.md")
 
 
 def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
@@ -206,6 +221,7 @@ def sync_tool_instructions(project: Path, tools: set[str], force: bool) -> None:
     if "copilot" in tools:
         target = project / ".github" / "copilot-instructions.md"
         write_or_splice_template(DIST / "tool-instructions" / "copilot" / ".github" / "copilot-instructions.md", target, force)
+        sync_delivery_references("copilot", project / ".github", overwrite=force)
 
         agents_root = project / ".github" / "agents"
         for agent_file in sorted((DIST / "copilot" / "agents").glob("*.agent.md")):

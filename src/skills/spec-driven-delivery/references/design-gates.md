@@ -1,4 +1,4 @@
-# Frontend And UI Design Gates
+# Frontend and UI design gates
 
 Use these gates for work that changes a rendered screen, user flow, navigation, layout, component choice, interaction, responsive behavior, accessibility behavior, UI state presentation, visual styling, design token, or content hierarchy.
 
@@ -13,13 +13,13 @@ Before making a UI decision, identify the applicable repository sources in this 
 
 Record the exact paths or tools consulted. A stricter repository rule wins. If binding sources conflict and repository precedent does not resolve the conflict, stop for clarification. Do not silently replace an existing design system with personal preference or a new visual direction.
 
-A frozen reference is an acceptance oracle, not inspiration. Compare the implementation at the same viewport, state, content, and theme. Record any unavoidable deviation instead of redesigning it.
+Use a frozen reference as the acceptance standard. Compare the implementation at the same viewport, state, content, and theme. Record any unavoidable deviation.
 
 ## Before implementation
 
 The planner records whether the work changes rendered UI and whether a design specification is required.
 
-When these gates apply, the caller entry must initialize or resume a workflow descriptor and its registered `artifactFolder` before invoking product-designer or beginning implementation. This registration is the required identity and storage destination for the later design-conformance result even when the workflow helper would otherwise be optional. The product-designer must never allocate or infer that destination.
+When these gates apply, the caller initializes or resumes the workflow descriptor and its registered `artifactFolder` before asking product-designer for a spec or starting implementation. Use that folder for the spec and later design review.
 
 A product-designer design specification is required when any of these conditions apply:
 
@@ -29,7 +29,7 @@ A product-designer design specification is required when any of these conditions
 - the available product/design sources are missing, ambiguous, conflicting, or do not cover the requested state;
 - the user explicitly requests UI/UX design, review, redesign, fidelity, or design-system alignment.
 
-A new design specification may be marked not required only for a mechanical change whose UI decisions are fully dictated by a binding source. Examples are an exact copy correction inside unchanged structure, a test-selector change, or restoring already documented behavior without changing component choice, layout, styling, interaction, responsiveness, state presentation, or accessibility. Record the exact binding source and reason; the absence of a design spec is not itself a reason.
+A mechanical change can proceed without a new spec when a binding source already settles every UI decision. Examples include a specific copy correction in an existing layout or restoring documented behavior. Record the binding source and why it covers the change.
 
 Tasking, audit, and implementation must stop when a required design specification is missing or a material design decision remains unresolved.
 
@@ -47,6 +47,6 @@ A product-designer design conformance review is required for every change to ren
 
 The product-designer inspects the exact implementation identity in a real browser and compares the affected routes, states, themes, and representative mobile and desktop viewports against the binding design sources and approved specification. The result is a dated `*-design-review.md` with `PASS` or `FAIL`, exact evidence, deviations, and required corrections. Use the base dated name for the first result; if that name already exists, insert deterministic `--02`, `--03`, and later sequences before `-design-review.md`. Never overwrite historical evidence.
 
-The review cannot pass from source code, compilation, unit tests, or screenshots alone when the affected UI can be run. If real rendering is unavailable, record the limitation and leave visual or interaction conformance unverified. Any unresolved mismatch with a binding design source or approved acceptance criterion produces `FAIL`; optional improvements remain advisory and do not fail conforming work.
+Run the affected UI in a real browser. If rendering is unavailable, record the limitation and leave conformance unverified. An unresolved mismatch with a binding design source or approved acceptance criterion produces `FAIL`. Record optional improvements separately.
 
 Any implementation change that affects rendered UI, interaction, responsive or accessibility behavior, or a reviewed state invalidates the previous design-review result. Route a failed result to the implementer, then rerun the affected conformance review. This gate does not replace code review, accessibility/runtime QA, or repository validation.

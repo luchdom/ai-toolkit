@@ -1,4 +1,4 @@
-# Specialist Handoff Order
+# Specialist roles
 
 The caller entry policy controls advancement and authority throughout.
 
@@ -12,12 +12,12 @@ The caller entry policy controls advancement and authority throughout.
 | `auditor` | Independent pre-implementation audit | Tasks, code changes, code review |
 | implementer | Scoped changes, tests, real-file manifest | Independent gates or external authority |
 | `product-designer` after UI implementation | Real-browser design-system and approved-spec conformance verdict | Code fixes, code review, QA substitution |
-| `code-reviewer` | Exact-diff/head review findings | Fixes, plan audit, runtime QA |
 | `qa` | Acceptance-mapped runtime evidence | Fixes or code-review substitution |
+| `code-reviewer` | Independent code review of the exact diff or commit | Fixes, plan audit, runtime QA |
 | docs skills | Durable docs update or no-impact record | Review/QA substitution |
 
 Hand back a failed artifact to its owner. Return failed post-build design conformance to the implementer, then rerun the affected review on the new implementation identity. Do not silently let one specialist absorb another's independence contract.
 
-PM and Staff Engineer join where their expertise resolves a question; they are not required on every issue. Apply the canonical clarification policy and return one decision record to the caller, with clear product, design, and engineering responsibilities. Required independent gates retain their named owners.
+Use the [clarification policy](../../spec-driven-delivery/references/clarification-policy.md) for decisions. For independent code review, use the [same requirements for either reviewer](../../spec-driven-delivery/references/quality-gates.md#independent-code-review).
 
-Specialists never mutate Linear or perform state-changing Git/provider operations independently; they return results to the active entry. Semi/manual authority remains limited by the explicit caller boundary/stage.
+Specialists return their results to the caller. The caller handles tracking, Git, and publication.
