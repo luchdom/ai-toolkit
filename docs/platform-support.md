@@ -8,7 +8,7 @@ Use the OS of the host executing the command, then choose syntax for its active 
 2. Run the read-only probe from the toolkit checkout with an available Python: `python3 scripts/platform_info.py` on macOS, or `py -3 scripts/platform_info.py` on Windows. A verified `python` executable is also usable. The JSON identifies the execution OS, architecture, Python executable/version, home, checkout, shell environment hints, and available command paths.
 3. Require Python **3.11 or newer** for toolkit maintenance, including the TOML bootstrap helper. The probe itself runs on Python 3.9+ and exits 1 when the interpreter is too old or the host is outside the Windows/macOS support matrix. Select an installed supported interpreter and rerun it. Keep that same executable for build, validation, and sync.
 4. Confirm the active shell from the execution tool before choosing syntax. `shellHints` are only environment hints. Verify needed CLIs with their version/status commands; a path in the probe means discoverable, not authenticated or working.
-5. Follow the matching commands below, [External Skills](../EXTERNAL-SKILLS.md) for upstream imports and native plugins, [External Tools](../EXTERNAL-TOOLS.md) for companion CLIs, and [MCP Servers](../MCP-SERVERS.md) for explicit server setup. Unsupported hosts need their own verified commands; do not silently use the Windows branch.
+5. Follow the matching commands below. Use the [external skill guide](../EXTERNAL-SKILLS.md) for pinned imports, [External Tools](../EXTERNAL-TOOLS.md) for companion CLIs, and [MCP Servers](../MCP-SERVERS.md) for server setup. Unsupported hosts need their own verified commands.
 
 The probe does not install tools, authenticate services, edit configuration, or select a delivery workflow.
 
