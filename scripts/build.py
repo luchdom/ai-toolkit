@@ -166,6 +166,8 @@ def rebuild_dist() -> None:
 
     markdown_guidance = (SRC / shared / "markdown-lint.md").read_text(encoding="utf-8")
     project_docs_guidance = (SRC / shared / "project-docs.md").read_text(encoding="utf-8")
+    reply_guidance = (SRC / shared / "reply-style.md").read_text(encoding="utf-8")
+    agent_guidance = "\n".join((markdown_guidance, project_docs_guidance, reply_guidance))
     config_source = SRC / shared / "markdownlint.json"
     config_output = DIST / shared / "markdownlint-cli2.jsonc"
     config_output.write_text(
@@ -176,7 +178,7 @@ def rebuild_dist() -> None:
 
     for agent_path in sorted((SRC / "agents").glob("*.md")):
         meta, body = parse_frontmatter(agent_path.read_text(encoding="utf-8"))
-        body = body.rstrip() + "\n\n" + markdown_guidance + "\n" + project_docs_guidance
+        body = body.rstrip() + "\n\n" + agent_guidance
         codex_text = render_codex_toml(meta, body)
         claude_text = render_claude_agent(meta, body)
         outputs = [

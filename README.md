@@ -127,6 +127,8 @@ Use `--tool codex` or `--tool claude` to install for one tool. Use `--tool all` 
 
 User sync installs the shared delivery references next to the skills in each tool's home. When upgrading an existing project, rerun sync with `--project "<project-path>"` to refresh its managed instruction block.
 
+User instructions and generated specialist agents ask for plain, concise English and direct agents to `clear-technical-english` and `unslop` for technical writing. See the [reply style rules](src/tool-instructions/shared/reply-style.md).
+
 Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). The manifest header contains the preview and sync commands. See the [external skill guide](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
 
 Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Use `--force` to adopt an unmarked project instruction file. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
