@@ -13,6 +13,10 @@ $refine <goal-or-selected-issue> [--with pm|staff|both] [--output linear|prd|adr
 
 Accept the same choices in plain language. Read any selected issue or proposal and use [Repo Discovery](../repo-discovery/SKILL.md) for the relevant docs, code, and precedents in the selected project. Reuse answers and decisions from earlier turns.
 
+## Choose the output
+
+If the user has not specified an output, ask which one they want before starting the interview. Offer the options below and recommend one that fits the goal and any named specialists. Honor an explicit request for a decision summary in the conversation.
+
 ## Choose the specialists
 
 Honor the user's explicit role choice. If it excludes the author of a requested document below, ask which choice to change. For automatic selection, use the scope of the decision and include the requested document's author.
@@ -36,7 +40,7 @@ The interview draws on [AI Hero's Grill Me](https://www.aihero.dev/skills-grill-
 
 ## Produce the requested output
 
-If the user leaves the format open, return the decision summary and recommend the lightest suitable artifact. Use the [project documentation standard](../project-docs/references/documentation-standard.md) and repository conventions for document placement, templates, and decision status. Use [the artifact contract](../../tool-instructions/shared/artifact-contract.md) for any evidence that belongs to an active delivery workflow.
+Use the [project documentation standard](../project-docs/references/documentation-standard.md) and repository conventions for document placement, templates, and decision status. Use [the artifact contract](../../tool-instructions/shared/artifact-contract.md) for any evidence that belongs to an active delivery workflow.
 
 | Output | When and how |
 |---|---|

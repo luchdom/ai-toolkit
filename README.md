@@ -24,7 +24,7 @@ Sync adds a shared docs-discovery rule to user instructions and generated projec
 
 ## Product and engineering specialists
 
-Use [`$refine`](src/skills/refine/SKILL.md) to pressure-test a goal before delivery. For example, `$refine choose a migration approach --with staff --output rfc` starts an interview with Staff Engineer and produces a proposal for review.
+Say "I want to refine ..." or invoke [`$refine`](src/skills/refine/SKILL.md) to pressure-test a goal before delivery. If you leave the output open, the skill asks you to choose one. For example, `$refine choose a migration approach --with staff --output rfc` starts an interview with Staff Engineer and produces a proposal for review.
 
 | Agent | Use it for |
 |---|---|
