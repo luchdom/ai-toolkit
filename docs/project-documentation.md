@@ -99,7 +99,7 @@ python3 scripts/sync.py --tool codex
 
 On Windows use `py -3` or the verified executable. Use `--tool claude` for Claude Code or `--tool all` for both tools. Normal sync includes selected external imports; `--skip-external` limits it to repository-generated content. Add `--project "<actual-repository-path>"` when project-local routing is wanted.
 
-User-level sync adds an `AI-TOOLKIT-PROJECT-DOCS` block to the tool's existing user-instruction location and installs both skills with their resources. The block also points substantive planning requests to the manual Plan stage and its artifact contract. Sync preserves content outside the block. The project setup uses root `AGENTS.md`; the existing Claude user-level instruction destination is independent of that project layout. Existing unmarked project instructions remain protected by the normal sync rules.
+User-level sync adds an `AI-TOOLKIT-PROJECT-DOCS` block to the tool's existing user-instruction location and installs both skills with their resources. The block routes requests for a plan to the default `plan` stage in the [shared delivery workflow](../src/tool-instructions/shared/delivery-workflow.md). Sync preserves content outside the block. The project setup uses root `AGENTS.md`; the existing Claude user-level instruction destination is independent of that project layout. Existing unmarked project instructions remain protected by the normal sync rules.
 
 Verify the two installed `SKILL.md` files, the creation skill's four assets and two references, and the docs rule in the selected user/project instructions. Start a new agent session to discover newly installed skills/instructions. Build and validation alone do not install into live user homes.
 
