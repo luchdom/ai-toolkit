@@ -1,7 +1,7 @@
 <!-- AI-TOOLKIT-PROJECT-DOCS:START -->
 ## Project documentation
 
-For a substantive planning request without a selected workflow, use the `plan` stage of `$spec-driven-delivery`. Read the shared artifact contract linked from that skill before saving a plan.
+When the user asks for a plan, run `$spec-driven-delivery plan <goal>` unless they choose another workflow. Return the plan and hand control back to the user. Follow the skill's artifact contract when saving a plan. Read `tool-instructions/shared/delivery-workflow.md` in the active tool's home to continue with `clarify`, `task`, and later stages.
 
 Before substantive project planning or implementation, locate the root `AGENTS.md` and relevant product, design, and architecture docs. New projects default to `docs/PRD.md`, `docs/DESIGN_SYSTEM.md` (when a UI exists), and `docs/ARCHITECTURE.md`; reuse existing equivalents and follow their actual links. Read the sections needed for the task. Use `$project-docs-review` for missing, misplaced, outdated, or conflicting foundations, and suggest `$project-docs` for specific creation or refinement. Respect earlier declines and continue authorized work when gaps are nonblocking. Keep the relevant docs current within the active editing scope. Project setup uses `AGENTS.md` as its shared entry point.
 

@@ -8,7 +8,11 @@ Use the entry that matches the request.
 | [`$goal-to-delivery`](../../skills/goal-to-delivery/SKILL.md) | Runs the applicable stages automatically for one selected goal. |
 | [`$linear-delivery-loop`](../../skills/linear-delivery-loop/SKILL.md) | Picks or resumes one Linear issue per run and passes it to Goal to Delivery. |
 
-When a non-trivial request names no entry, use Spec-driven Delivery and run only the requested stage. For a planning request, run `plan`.
+When the user asks for a plan, such as "create a plan" or "plan this change", run `$spec-driven-delivery plan <goal>` unless they choose another entry. Return the plan and hand control back to the user.
+
+Resume the same work one stage at a time when the user asks to continue. Use `clarify` to resolve open decisions, then `task` to break down the work after those decisions and any required design are complete. Follow the [delivery stages](../../skills/spec-driven-delivery/references/delivery-stages.md) for the remaining work.
+
+For other non-trivial requests without a selected entry, use Spec-driven Delivery and run only the requested stage.
 
 Follow user and system requirements, then stricter repository rules, then the authority granted by the active entry. The repository owns its local commands and acceptance checks. Resolve any conflict about authority before implementing or changing external state. Keep unrelated changes intact.
 
