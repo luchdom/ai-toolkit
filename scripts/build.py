@@ -14,6 +14,7 @@ DIST = ROOT / "dist"
 SKILL_REF_PATTERN = re.compile(r"\$([a-z0-9][a-z0-9-]*)")
 MANIFEST_VERSION = 1
 SKILL_ADAPTERS = ("codex", "claude")
+SENIOR_AGENT = "senior-full-stack-engineer"
 TWELVE_FACTOR_GUIDE = Path("docs/twelve-factor-for-agentic-development.md")
 SHARED_DELIVERY_FILES = (
     "artifact-contract.md",
@@ -72,6 +73,13 @@ def render_claude_agent(meta: dict[str, str], body: str) -> str:
         lines.append(f'disallowedTools: {json.dumps(meta["claude_disallowed_tools"])}')
     lines.append("---")
     return "\n".join(lines) + "\n\n" + body.rstrip() + "\n"
+
+
+def senior_agent_footer(tool: str, body: bytes) -> bytes:
+    """Identify an unchanged toolkit-managed Senior profile across future updates."""
+    digest = hashlib.sha256(body).hexdigest()
+    marker = f"ai-toolkit/{SENIOR_AGENT} sha256={digest}"
+    return (f"# {marker}\n" if tool == "codex" else f"<!-- {marker} -->\n").encode("ascii")
 
 
 def validate_tool_instruction_skills() -> None:
@@ -187,7 +195,9 @@ def rebuild_dist() -> None:
             DIST / "codex" / "agents" / f"{agent_path.stem}.toml",
             DIST / "claude" / "agents" / f"{agent_path.stem}.md",
         ]
-        for output, content in zip(outputs, (codex_text, claude_text), strict=True):
+        for tool, output, content in zip(SKILL_ADAPTERS, outputs, (codex_text, claude_text), strict=True):
+            if agent_path.stem == SENIOR_AGENT:
+                content += senior_agent_footer(tool, content.encode("utf-8")).decode("ascii")
             output.write_text(content, encoding="utf-8")
         projections[agent_path] = outputs
 

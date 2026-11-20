@@ -89,7 +89,7 @@
               {
                 "properties": {
                   "externalId": {
-                    "pattern": "^SAAS-[1-9][0-9]*$",
+                    "pattern": "^(?:SAAS|LUCH)-[1-9][0-9]*$",
                     "type": "string"
                   },
                   "provider": {
@@ -124,7 +124,7 @@
           "tracking": {
             "properties": {
               "externalId": {
-                "pattern": "^SAAS-[1-9][0-9]*$",
+                "pattern": "^(?:SAAS|LUCH)-[1-9][0-9]*$",
                 "type": "string"
               },
               "provider": {
@@ -133,7 +133,7 @@
             }
           },
           "workKey": {
-            "pattern": "^SAAS-[1-9][0-9]*$"
+            "pattern": "^(?:SAAS|LUCH)-[1-9][0-9]*$"
           }
         }
       }

@@ -29,12 +29,14 @@ Say "I want to refine ..." or invoke [`$refine`](src/skills/refine/SKILL.md) to 
 | Agent | Use it for |
 |---|---|
 | [`dotnet`](src/agents/dotnet.md) | Authorized C#/.NET backend implementation, including ASP.NET Core APIs, persistence, authorization, workers, and tests. |
-| [`product-manager`](src/agents/product-manager.md) | Product and acceptance-criteria clarifications, evaluating implementation against customer outcomes and AC, benchmark work with PD, and PRDs on request. |
-| [`staff-engineer`](src/agents/staff-engineer.md) | Technical clarification for the team, feasibility with PM/PD, code review, simplification and duplication analysis, and requested RFCs, ADRs, diagrams, and implementation guidance. Writes documents; implementers write code. |
+| [`senior-full-stack-engineer`](src/agents/senior-full-stack-engineer.md) | Plan, clarify, break down and implement one selected OpenBot issue across the stack, including its UI specification when needed. |
+| [`product-manager`](src/agents/product-manager.md) | Clarify the user journey, set acceptance criteria, compare relevant products and judge the delivered experience. Write PRDs on request. |
+| [`qa`](src/agents/qa.md) | Verify the running change against its criteria and check changed screens in a real browser. |
+| [`staff-engineer`](src/agents/staff-engineer.md) | Assess technical feasibility, audit readiness and independently review the exact implementation. Write requested RFCs, ADRs and engineering guidance. |
 
 For .NET implementation, use [`$dotnet-implementation`](src/skills/dotnet-implementation/SKILL.md) to route the work and apply the same guidance when working inline. The skill bundles a [modular monolith guide](src/skills/dotnet-implementation/references/modular-monolith.md) for projects that use or explicitly adopt module-first vertical slices. Codex sync adds the route to the user instructions so it also applies in projects without toolkit instructions.
 
-Goal to Delivery can consult the product manager for goals and product behavior, the product designer for UI and user experience, and the staff engineer for technical choices. A staff engineer can also perform the independent code review when they meet the review requirements. See the [clarification policy](src/skills/spec-driven-delivery/references/clarification-policy.md) and [quality gates](src/skills/spec-driven-delivery/references/quality-gates.md).
+In OpenBot, the Senior Full-Stack Engineer carries one assignment through planning and implementation. QA checks rendered design and real behavior, the Staff Engineer reviews the exact change, and the Product Manager checks the user journey before handoff. Assign another independent Staff Engineer when a reviewer materially authored a decision or change under review. See the [clarification policy](src/skills/spec-driven-delivery/references/clarification-policy.md) and [quality gates](src/skills/spec-driven-delivery/references/quality-gates.md).
 
 The staff engineer uses [Twelve-Factor for agentic development](docs/twelve-factor-for-agentic-development.md) when refining plans and designs, writing engineering docs, and reviewing pull requests.
 

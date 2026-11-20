@@ -40,12 +40,12 @@ Workflow rules:
 
 - Read AGENTS.md first and follow it.
 - Read the canonical `spec-driven-delivery/references/design-gates.md`. Read `workflow.json`, the plan, tasks, audit, and design from the exact `artifactFolder` recorded by the active work descriptor/registry when they exist. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, or rewrite them.
-- For every UI change, read the recorded design-gate decision and exact binding design sources. Stop before coding when a required design spec is missing or a material UI decision remains unresolved.
+- For every UI change, read the recorded design-gate decision and exact binding design sources. When assigned the design stage, write the required design spec before tasking with `$ui-review-spec`. Stop before coding when a required design spec is missing or a material UI decision remains unresolved.
 - Before coding, locate and read relevant docs in /docs and existing React UI patterns/components in the repo.
 - Update relevant docs when behavior, workflow, setup, or architecture changes.
 - Prefer existing repo components first, then approved library primitives such as MUI or shadcn, and only then new components if the approved artifacts clearly require them.
-- Implement the approved component and token mapping. Do not add one-off styling, a new primitive, or a visual/interaction deviation that the approved artifacts do not authorize; return uncovered UI decisions to product-designer or planner clarification.
-- Exercise affected routes, states, themes, and representative mobile/desktop viewports in a real browser when available. Return that exact matrix and implementation identity for the required product-designer design conformance review.
+- Implement the approved component and token mapping. Do not add one-off styling, a new primitive, or a visual/interaction deviation that the approved artifacts do not authorize; record an uncovered UI decision through the caller, involving the Product Manager for UX or the Staff Engineer for feasibility.
+- Exercise affected routes, states, themes, and representative mobile/desktop viewports in a real browser when available. Return that exact matrix and implementation identity for the independent QA design conformance review.
 - Implement in small, safe steps; keep changes minimal and well-scoped.
 - Provide a short summary of changes and a list of files touched.
 - If requirements are unclear or conflict with docs/tasks, stop and ask the planner to clarify rather than guessing.

@@ -53,7 +53,7 @@ DELIVERY_STAGE_ORDER = (
 SPECIALIST_AGENTS = (
     "planner",
     "product-manager",
-    "product-designer",
+    "senior-full-stack-engineer",
     "staff-engineer",
     "tasker",
     "auditor",
@@ -61,7 +61,6 @@ SPECIALIST_AGENTS = (
     "nextjs-mui",
     "react",
     "jekyll-site-builder",
-    "code-reviewer",
     "qa",
 )
 GUIDANCE_FILES = (
@@ -369,7 +368,9 @@ def check_entry_policies(root: Path) -> list[str]:
                 "queue selection",
                 "only when called by the active loop",
                 "one focused question",
-                "staff-engineer",
+                "Staff Engineer",
+                "owner-enabled OpenBot Workflow Coordinator",
+                "references/openbot-handoff.md",
                 "authorized boundary is verified",
             ),
             "automatic delivery entry policy",
@@ -427,21 +428,23 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
             stages,
             (
                 "planner",
-                "product-designer",
                 "tasker",
                 "auditor",
                 "matching implementer",
                 "design_review",
-                "independent reviewer",
                 "qa",
             ),
             "shared specialist contract",
         )
     )
     if stages.is_file():
-        stage_names = tuple(re.findall(r"^\| `([a-z_]+)` \|", _read(stages), flags=re.MULTILINE))
-        if stage_names != DELIVERY_STAGE_ORDER:
+        rows = re.findall(r"^\| `([a-z_]+)` \| ([^|]+)\|", _read(stages), flags=re.MULTILINE)
+        if tuple(name for name, _ in rows) != DELIVERY_STAGE_ORDER:
             findings.append(f"{_relative(root, stages)}: delivery stages are missing or out of order.")
+        owners = dict(rows)
+        for stage, role in (("design_review", "qa"), ("audit", "staff engineer"), ("review", "staff engineer")):
+            if role not in owners.get(stage, "").lower().replace("-", " "):
+                findings.append(f"{_relative(root, stages)}: {stage} must name {role} as its owner.")
     findings.extend(_require_fragments(root, stages, ("docs-as-code",), "shared documentation owner"))
     findings.extend(
         _require_fragments(
@@ -485,25 +488,19 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
             "frontend/UI design gate contract",
         )
     )
-    findings.extend(
-        _require_fragments(
-            root,
-            root / "src" / "agents" / "product-designer.md",
-            (
-                "two product-design operations",
-                "binding design sources",
-                "design specification",
-                "design conformance review",
-                "real-browser",
-                "PASS",
-                "FAIL",
-                "stale",
-                "reviewed state",
-                "`--02`",
-            ),
-            "product-designer design gate ownership",
-        )
-    )
+    ownership_contracts = {
+        "senior-full-stack-engineer": ("plan", "clarif", "task", "implement", "design system"),
+        "product-manager": ("user experience", "acceptance"),
+        "qa": ("browser", "design conformance", "pass", "fail"),
+        "staff-engineer": ("independent", "audit", "exact diff", "qa"),
+    }
+    for role, fragments in ownership_contracts.items():
+        path = root / "src" / "agents" / f"{role}.md"
+        findings.extend(_require_fragments(root, path, fragments, f"{role} delivery responsibilities"))
+    for retired in ("product-designer", "code-reviewer"):
+        obsolete = root / "src" / "agents" / f"{retired}.md"
+        if obsolete.exists():
+            findings.append(f"{_relative(root, obsolete)}: retired role is still installable.")
     findings.extend(
         _require_fragments(
             root,
@@ -516,7 +513,7 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
         _require_fragments(
             root,
             root / "src" / "agents" / "tasker.md",
-            ("design-gates.md", "binding design-source paths", "product-designer conformance-review task"),
+            ("design-gates.md", "binding design-source paths", "conformance"),
             "tasker UI design routing",
         )
     )
@@ -529,12 +526,12 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
                 f"{implementer} UI design gate",
             )
         )
-    for verifier in ("code-reviewer", "qa"):
+    for verifier in ("staff-engineer", "qa"):
         findings.extend(
             _require_fragments(
                 root,
                 root / "src" / "agents" / f"{verifier}.md",
-                ("product-designer", "design conformance", "missing", "stale", "failed"),
+                ("design conformance", "missing", "stale", "failed"),
                 f"{verifier} design-review prerequisite",
             )
         )
@@ -561,14 +558,6 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
             root / "src" / "agents" / "auditor.md",
             ("independent", "pre-implementation", "read-only"),
             "auditor authority contract",
-        )
-    )
-    findings.extend(
-        _require_fragments(
-            root,
-            root / "src" / "agents" / "code-reviewer.md",
-            ("exact diff", "review", "qa"),
-            "code-review authority contract",
         )
     )
     findings.extend(

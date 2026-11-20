@@ -9,11 +9,11 @@ from pathlib import Path
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-    from scripts.errors import DeliveryBaseError
+    from scripts.errors import DeliveryBaseError, ValidationError
     from scripts.redaction import redact_value
     from scripts.workflow_init import WorkflowManager
 else:
-    from .errors import DeliveryBaseError
+    from .errors import DeliveryBaseError, ValidationError
     from .redaction import redact_value
     from .workflow_init import WorkflowManager
 
@@ -26,9 +26,43 @@ def _manager(arguments: argparse.Namespace, *, root_name: str = "repository_root
     )
 
 
+def _verify_assignment(arguments: argparse.Namespace) -> dict[str, str]:
+    """Check the registration bound to a coordinator's already verified assignment."""
+    manager = WorkflowManager(
+        arguments.repository_root,
+        repository_key=arguments.repository_key,
+        state_home_override=arguments.state_home,
+        prepare_state=False,
+    )
+    if Path(manager.identity.git_dir) == Path(manager.identity.common_dir):
+        raise ValidationError("The assigned repository must be a linked issue worktree")
+    descriptor = manager.inspect_registration(workflow_id=arguments.workflow_id)
+    if Path(arguments.repository_root) != Path(descriptor["repositoryRoot"]):
+        raise ValidationError("The assigned worktree differs from the registered repository root")
+    if Path(arguments.artifact_folder) != Path(descriptor["artifactFolder"]):
+        raise ValidationError("The assigned artifact folder differs from the registered folder")
+    if arguments.completion_boundary != descriptor["completionBoundary"]:
+        raise ValidationError("The assigned completion boundary differs from the registered boundary")
+
+    if arguments.local_work_key is None:
+        if descriptor["tracking"] != {"provider": "linear", "externalId": arguments.issue_id}:
+            raise ValidationError("The assigned issue differs from the registered Linear issue")
+    else:
+        # The trusted fixture board owns the issueId-to-workKey mapping.
+        if descriptor["workSource"] != "local" or descriptor["tracking"]["provider"] != "none":
+            raise ValidationError("A local fixture mapping requires an untracked local registration")
+        if not arguments.issue_id.strip() or arguments.local_work_key != descriptor["workKey"]:
+            raise ValidationError("The local fixture needs an issue ID and its registered work key")
+        if arguments.completion_boundary not in {"artifact", "working-tree"}:
+            raise ValidationError("A local fixture mapping supports only local completion boundaries")
+
+    return {"status": "verified", "workflowId": descriptor["workflowId"]}
+
+
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="workflow-init")
     subcommands = parser.add_subparsers(dest="command", required=True)
+    boundaries = ("artifact", "working-tree", "commit", "pr", "merge")
 
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument("--repository-root", required=True)
@@ -41,7 +75,7 @@ def _parser() -> argparse.ArgumentParser:
     initialize.add_argument("--display-title")
     initialize.add_argument(
         "--completion-boundary",
-        choices=("artifact", "working-tree", "commit", "pr", "merge"),
+        choices=boundaries,
         default="working-tree",
     )
 
@@ -50,6 +84,13 @@ def _parser() -> argparse.ArgumentParser:
     selectors.add_argument("--workflow-id")
     selectors.add_argument("--artifact-path")
     selectors.add_argument("--external-id")
+
+    verify = subcommands.add_parser("verify-assignment", parents=[common])
+    verify.add_argument("--workflow-id", required=True)
+    verify.add_argument("--artifact-folder", required=True)
+    verify.add_argument("--issue-id", required=True)
+    verify.add_argument("--completion-boundary", required=True, choices=boundaries)
+    verify.add_argument("--local-work-key", help="Exact registered work key for a local fixture board")
 
     attach = subcommands.add_parser("attach", parents=[common])
     attach.add_argument("--workflow-id", required=True)
@@ -93,6 +134,8 @@ def main(argv: list[str] | None = None) -> int:
                 workflow_id=arguments.workflow_id,
                 external_id=arguments.external_id,
             )
+        elif arguments.command == "verify-assignment":
+            result = _verify_assignment(arguments)
         else:
             result = WorkflowManager(
                 arguments.source_root,

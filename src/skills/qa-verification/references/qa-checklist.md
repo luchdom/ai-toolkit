@@ -2,7 +2,7 @@
 
 ## Target and safety
 
-- [ ] Read repository instructions, acceptance criteria, manifest, and review result.
+- [ ] Read repository instructions, acceptance criteria, the implementation manifest and any binding design sources. For changed UI, record a current rendered conformance result for the tested target.
 - [ ] Record exact target identity and repository-owned local commands.
 - [ ] Reject production credentials/data and unsafe non-local targets where repository policy requires isolation.
 - [ ] Prepare unique disposable resources and cleanup verification.
