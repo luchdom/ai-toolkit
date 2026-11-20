@@ -61,20 +61,17 @@ class WorkflowManager:
         repository_key: str,
         state_home_override: str | Path | None = None,
         environment: dict[str, str] | None = None,
+        prepare_state: bool = True,
     ):
         self.repository_key = validate_repository_key(repository_key)
         self.identity: RepositoryIdentity = observe_repository_identity(repository_root)
         self.repository_root = Path(self.identity.repository_root)
         self.artifacts_root = current_artifact_root(self.repository_root)
         self.legacy_docs_root = legacy_artifact_root(self.repository_root)
-        self.home: StateHome = ensure_state_home(
-            derive_state_home(
-                self.identity,
-                override=state_home_override,
-                environment=environment,
-            ),
+        self.home: StateHome = derive_state_home(
             self.identity,
-            repository_key=self.repository_key,
+            override=state_home_override,
+            environment=environment,
         )
         self.state_paths = StatePathGuard(self.home.repository, base=self.home.base)
         self._bound_repository_key = self.repository_key
@@ -87,10 +84,22 @@ class WorkflowManager:
             ).replace("\\", "/"),
             state_paths=self.state_paths,
         )
+        if not prepare_state:
+            return
+        ensure_state_home(self.home, self.identity, repository_key=self.repository_key)
         self.registry.ensure()
         with self.registry.mutex():
             self._load_registry_unlocked()
         self.recover_incomplete_transactions()
+
+    def inspect_registration(self, *, workflow_id: str) -> dict[str, Any]:
+        """Read a coherent registration without writing lock files or recovering state."""
+        transactions = self.home.repository / "transactions"
+        if os.path.lexists(transactions) and next(self.state_paths.glob_files(transactions, "*.json"), None):
+            raise ResumeError("A workflow transaction needs recovery before verifying an assignment")
+        self._assert_manager_repository_key()
+        _, descriptor = self._preflight_authority(workflow_id=workflow_id)
+        return descriptor
 
     def recover_incomplete_transactions(self) -> None:
         """Finalize a proven commit or roll a split descriptor/registry pair back."""

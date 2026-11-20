@@ -9,7 +9,7 @@ Hand off the current stage to the specialist listed in the [Spec-driven Delivery
 
 ## Caller contract
 
-Use an active `$spec-driven-delivery` or `$goal-to-delivery` request, including one Goal to Delivery receives from `$linear-delivery-loop`. The caller supplies the stage, scope, and authority. Use the exact registered `artifactFolder` for handoff evidence or an explicitly selected historical folder for read-only context. Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md).
+Use an active `$spec-driven-delivery` or `$goal-to-delivery` request, including one Goal to Delivery receives from `$linear-delivery-loop` or an operator-enabled OpenBot Workflow Coordinator through the [issue handoff](../goal-to-delivery/references/openbot-handoff.md). The caller supplies the stage, scope, and authority. Use the exact registered `artifactFolder` for handoff evidence or an explicitly selected historical folder for read-only context. Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md).
 
 ## Hand off the stage
 

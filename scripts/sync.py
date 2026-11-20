@@ -1,25 +1,48 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
+import json
 import os
 import re
 import shutil
+import stat
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
-# Other toolkit skills also provide a package named scripts; load our sibling exactly.
-_external_spec = importlib.util.spec_from_file_location("ai_toolkit_external_skills", Path(__file__).with_name("external_skills.py"))
-external_skills = importlib.util.module_from_spec(_external_spec)
-_external_spec.loader.exec_module(external_skills)
+
+def _load_module(name: str, path: Path):
+    # Toolkit skills can also provide a package named scripts.
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
+build = _load_module("ai_toolkit_build", ROOT / "scripts/build.py")
+external_skills = _load_module("ai_toolkit_external_skills", ROOT / "scripts/external_skills.py")
+contracts = _load_module("ai_toolkit_contracts", ROOT / "validation/delivery_contracts.py")
+AGENT_EXTENSIONS = {"codex": "toml", "claude": "md"}
+REPLACEMENT_AGENTS = (build.SENIOR_AGENT, "staff-engineer", "product-manager", "qa")
 MARKER_START = "<!-- AI-TOOLKIT-LUCHDOM:START -->"
 MARKER_END = "<!-- AI-TOOLKIT-LUCHDOM:END -->"
 LEGACY_MARKER_PAIRS = (("<!-- AI-CONFIG-LUCHDOM:START -->", "<!-- AI-CONFIG-LUCHDOM:END -->"),)
+# Last shipped adapters from 3f4ba06, hashed with LF line endings on both platforms.
+RETIRED_AGENT_DIGESTS = {
+    "codex": {
+        "product-designer.toml": "a2e6f1f839e76f22ec9c5260867db669e00ac5a8d8b277bc1337d3c24eb09d26",
+        "code-reviewer.toml": "decf8c891dd2db7dd5cea5fa979ff05f64d20b2d5f7ae8e19e11be5c338dfd19",
+    },
+    "claude": {
+        "product-designer.md": "4e662143ad3220631d770316f9c2824d6a7da1f6305696e6aa126a0932eb4504",
+        "code-reviewer.md": "de171546c105817c1f92b5d21d596ee5561b559273a882a7664b9ae945f0db23",
+    },
+}
 
 
 def run_build() -> None:
@@ -30,6 +53,107 @@ def sync_file(src: Path, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dest)
     print(f"Copied {src} -> {dest}")
+
+
+def _intact_senior_profile(tool: str, path: Path) -> bool:
+    lines = path.read_bytes().replace(b"\r\n", b"\n").splitlines(keepends=True)
+    return bool(lines) and lines[-1] == build.senior_agent_footer(tool, b"".join(lines[:-1]))
+
+
+def _file_revision(metadata: os.stat_result) -> tuple[int, ...]:
+    return (metadata.st_dev, metadata.st_ino, metadata.st_size, metadata.st_mtime_ns, metadata.st_ctime_ns)
+
+
+def _check_senior_destination(tool: str, tool_home: Path) -> tuple[int, ...] | None:
+    target = tool_home / "agents" / f"{build.SENIOR_AGENT}.{AGENT_EXTENSIONS[tool]}"
+    # The system temporary home can be an alias such as /var on macOS. Do not
+    # resolve the tool home or the agent path inside that selected user home.
+    user_home = tool_home.parent.resolve()
+    candidate = user_home / tool_home.name / "agents" / target.name
+    try:
+        external_skills.check_path(candidate, user_home)
+    except external_skills.ImportError as exc:
+        raise ValueError(f"Preserved {target}. The agent path contains a symlink or junction.") from exc
+    try:
+        observed = candidate.lstat()
+    except FileNotFoundError:
+        return None
+    if stat.S_ISREG(observed.st_mode) and observed.st_nlink == 1 and _intact_senior_profile(tool, candidate):
+        return _file_revision(observed)
+    raise ValueError(f"Preserved {target}. Move or back up this custom profile before installing the toolkit role.")
+
+
+def preflight_agents(tools: set[str], home: Path) -> None:
+    """Prove the complete build and each selected role destination before installation."""
+    findings = contracts.check_projection_manifest(ROOT)
+    if findings:
+        raise ValueError(f"Rebuild dist before syncing. {findings[0]}")
+    manifest = json.loads((DIST / "manifest.json").read_bytes())
+    if manifest.get("generatedRoot") != "dist":
+        raise ValueError("Rebuild dist before syncing. The manifest has a different output root.")
+    by_source = {entry["source"]: entry["projections"] for entry in manifest["entries"]}
+    for tool in sorted(tools):
+        extension = AGENT_EXTENSIONS[tool]
+        generated = DIST / tool / "agents"
+        sources = {path.name for path in generated.glob(f"*.{extension}")}
+        if sources.intersection(RETIRED_AGENT_DIGESTS[tool]):
+            raise ValueError("Generated adapters still include a retired agent. Rebuild dist before syncing.")
+        for role in REPLACEMENT_AGENTS:
+            filename = f"{role}.{extension}"
+            projections = by_source.get(f"src/agents/{role}.md", [])
+            expected = f"dist/{tool}/agents/{filename}"
+            if filename not in sources or expected not in {entry["path"] for entry in projections}:
+                raise ValueError(f"Rebuild dist before syncing. Missing replacement projection {expected}.")
+            external_skills.check_path(generated / filename, ROOT)
+        senior = generated / f"{build.SENIOR_AGENT}.{extension}"
+        if not _intact_senior_profile(tool, senior):
+            raise ValueError(f"Rebuild dist before syncing. The generated Senior profile is unmarked or stale: {senior}.")
+        _check_senior_destination(tool, home / f".{tool}")
+
+
+def _install_senior(tool: str, tool_home: Path, source: Path) -> None:
+    destination = tool_home / "agents" / source.name
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".ai-toolkit-", dir=destination.parent) as directory:
+        staged = Path(directory) / "profile.tmp"
+        shutil.copy2(source, staged)
+        observed = _check_senior_destination(tool, tool_home)
+        if observed is None:
+            try:
+                os.link(staged, destination)  # Exclusive first install.
+            except FileExistsError as exc:
+                raise ValueError(f"Preserved {destination}. Another profile appeared during installation.") from exc
+        elif _file_revision(destination.lstat()) != observed:
+            raise ValueError(f"Preserved {destination}. The managed profile changed during installation.")
+        else:
+            os.replace(staged, destination)
+    print(f"Installed toolkit agent {destination}")
+
+
+def sync_agents(tool: str, tool_home: Path, pattern: str) -> None:
+    preflight_agents({tool}, tool_home.parent)
+    destination = tool_home / "agents"
+    sources = sorted((DIST / tool / "agents").glob(pattern))
+    retired = RETIRED_AGENT_DIGESTS[tool]
+    for source in sources:
+        if source.stem == build.SENIOR_AGENT:
+            _install_senior(tool, tool_home, source)
+        else:
+            sync_file(source, destination / source.name)
+
+    for name, previous_hash in retired.items():
+        target = destination / name
+        if not os.path.lexists(target):
+            continue
+        if target.is_symlink() or not target.is_file() or target.resolve() != target:
+            print(f"Preserved retired agent path {target} (link or special file)")
+            continue
+        content = target.read_bytes().replace(b"\r\n", b"\n")
+        if hashlib.sha256(content).hexdigest() == previous_hash:
+            target.unlink(missing_ok=True)
+            print(f"Removed retired toolkit agent {target}")
+        else:
+            print(f"Preserved {target} (content differs from the retired toolkit agent)")
 
 
 def resolve_docs_root() -> str:
@@ -176,8 +300,7 @@ def sync_delivery_guidance(tool: str, tool_home: Path, instructions: Path) -> No
 
 def sync_codex() -> None:
     codex_home = Path.home() / ".codex"
-    for agent_file in sorted((DIST / "codex" / "agents").glob("*.toml")):
-        sync_file(agent_file, codex_home / "agents" / agent_file.name)
+    sync_agents("codex", codex_home, "*.toml")
     sync_skill_dirs(DIST / "codex" / "skills", codex_home / "skills")
     sync_markdown_guidance(codex_home / "AGENTS.md")
     sync_project_docs_guidance(codex_home / "AGENTS.md")
@@ -193,8 +316,7 @@ def sync_codex() -> None:
 
 def sync_claude() -> None:
     claude_home = Path.home() / ".claude"
-    for agent_file in sorted((DIST / "claude" / "agents").glob("*.md")):
-        sync_file(agent_file, claude_home / "agents" / agent_file.name)
+    sync_agents("claude", claude_home, "*.md")
     sync_skill_dirs(DIST / "claude" / "skills", claude_home / "skills")
     sync_markdown_guidance(claude_home / "CLAUDE.md")
     sync_project_docs_guidance(claude_home / "CLAUDE.md")
@@ -243,11 +365,16 @@ def main() -> int:
     if not args.no_build:
         run_build()
 
-    if "codex" in tools:
-        sync_codex()
-    if "claude" in tools:
-        sync_claude()
-
+    try:
+        if len(tools) > 1:
+            preflight_agents(tools, Path.home())
+        if "codex" in tools:
+            sync_codex()
+        if "claude" in tools:
+            sync_claude()
+    except (OSError, ValueError, TypeError, AttributeError, KeyError, external_skills.ImportError) as exc:
+        print(f"AGENT SYNC ERROR: {exc}", file=sys.stderr)
+        return 1
     for project in args.project:
         sync_tool_instructions(Path(project), tools, args.force)
 

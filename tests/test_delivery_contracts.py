@@ -334,7 +334,8 @@ class DeliveryContractTests(unittest.TestCase):
                 root,
                 "src/skills/goal-to-delivery/SKILL.md",
                 "automatically working-tree queue selection only when called by the active loop "
-                "one focused question staff-engineer authorized boundary is verified",
+                "one focused question Staff Engineer authorized boundary is verified "
+                "owner-enabled OpenBot Workflow Coordinator references/openbot-handoff.md",
             )
             write(
                 root,
@@ -390,20 +391,6 @@ class DeliveryContractTests(unittest.TestCase):
     def test_feature_driver_routing_drift_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            specialists = (
-                "planner",
-                "product-manager",
-                "product-designer",
-                "staff-engineer",
-                "tasker",
-                "auditor",
-                "dotnet",
-                "nextjs-mui",
-                "react",
-                "jekyll-site-builder",
-                "code-reviewer",
-                "qa",
-            )
             stages = STAGE_REFERENCES / "delivery-stages.md"
             stage_text = (ROOT / stages).read_text(encoding="utf-8")
             stage_file = write(root, stages, stage_text)
@@ -422,34 +409,8 @@ class DeliveryContractTests(unittest.TestCase):
                 "every change to rendered UI or interaction real browser PASS FAIL registered `artifactFolder` "
                 "reviewed state `--02`",
             )
-            for agent in specialists:
-                anchors = ""
-                if agent == "auditor":
-                    anchors = "independent pre-implementation read-only"
-                elif agent == "product-designer":
-                    anchors = (
-                        "two product-design operations binding design sources design specification "
-                        "design conformance review real-browser PASS FAIL stale reviewed state `--02`"
-                    )
-                elif agent == "planner":
-                    anchors = "design-gates.md binding design sources post-implementation design conformance review"
-                elif agent == "tasker":
-                    anchors = (
-                        "design-gates.md binding design-source paths product-designer conformance-review task"
-                    )
-                elif agent in ("react", "nextjs-mui", "jekyll-site-builder"):
-                    anchors = (
-                        "design-gates.md binding design sources required design spec design conformance review"
-                    )
-                elif agent == "code-reviewer":
-                    anchors = (
-                        "exact diff review qa product-designer design conformance missing stale failed"
-                    )
-                elif agent == "qa":
-                    anchors = (
-                        "real behavior do not fix defects product-designer design conformance missing stale failed"
-                    )
-                write(root, f"src/agents/{agent}.md", anchors)
+            for source in (ROOT / "src/agents").glob("*.md"):
+                write(root, source.relative_to(ROOT), source.read_text(encoding="utf-8"))
             write(
                 root,
                 "src/skills/ui-review-spec/SKILL.md",
@@ -491,16 +452,20 @@ class DeliveryContractTests(unittest.TestCase):
             )
             design_gates.write_text(original_gates, encoding="utf-8")
 
-            designer = root / "src/agents/product-designer.md"
-            original_designer = designer.read_text(encoding="utf-8")
-            designer.write_text("design specification only", encoding="utf-8")
-            self.assertTrue(
-                any(
-                    "product-designer design gate ownership" in item
-                    for item in check_shared_specialists_and_routing(root)
+            for role in ("senior-full-stack-engineer", "product-manager", "qa", "staff-engineer"):
+                profile = root / f"src/agents/{role}.md"
+                original = profile.read_text(encoding="utf-8")
+                profile.write_text("Profile without assigned responsibilities", encoding="utf-8")
+                self.assertTrue(
+                    any(f"{role} delivery responsibilities" in item for item in check_shared_specialists_and_routing(root))
                 )
-            )
-            designer.write_text(original_designer, encoding="utf-8")
+                profile.write_text(original, encoding="utf-8")
+
+            for role in ("product-designer", "code-reviewer"):
+                retired = write(root, f"src/agents/{role}.md", "Obsolete profile")
+                self.assertTrue(any("retired role is still installable" in item
+                                    for item in check_shared_specialists_and_routing(root)))
+                retired.unlink()
 
             feature.write_text(
                 "---\nname: feature-driver\n---\ncompatibility $goal-to-delivery never autonomous\n"

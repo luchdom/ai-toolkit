@@ -16,13 +16,15 @@ Carry the acceptance checks into `task` and `qa`. In QA, run the planned cases u
 
 ## Audit before implementation
 
-Use an independent auditor when work is high risk, ambiguous, unusually large, or touches security, tenancy, billing, or migrations. Small routine work can use an inline plan and task breakdown.
+Assign an independent Staff Engineer when work is high risk, ambiguous, unusually large, or touches security, tenancy, billing, or migrations. An entry or project can require an audit for every issue, as the OpenBot Software Factory does. For an existing workflow that explicitly assigns the `auditor` profile, use the same [audit checklist](../../task-audit-breakdown/references/audit-checklist.md). Elsewhere small routine work can use an inline plan and task breakdown.
+
+The auditor reads the requirements, plan, tasks and applicable design directly from the registered work. Record findings, the owner of each correction and a `PASS` or `FAIL` in the dated `*-audit.md`. Any P1 or P2 finding requires a `FAIL`. After corrections, record a fresh verdict before implementation.
 
 ## Verify the implementation
 
 1. Run focused tests for the changed area.
-2. For changed rendered UI or interaction, obtain a current product-designer `PASS` using the [design gates](./design-gates.md).
-3. Run QA for behavioral acceptance criteria. Exercise the real HTTP, browser, CLI, or other runtime path and record the result.
+2. For changed rendered UI or interaction, the QA Engineer checks the rendered result against the [design gates](./design-gates.md) and records a current `PASS` or `FAIL`.
+3. Run QA for behavioral acceptance criteria. Exercise the real HTTP, browser, CLI, or other runtime path and record the result. Applicable design and behavioral checks must both pass.
 4. Complete one independent code review before publishing code or finishing automatic code delivery. Review the exact diff or commit with the applicable QA and design results.
 5. Update durable docs when behavior, architecture, setup, or operations changed.
 6. Before merge, verify that the PR head passed the standard local validation command and all applicable gates. Reuse results for that head.
@@ -31,9 +33,9 @@ The [Linear loop](../../linear-delivery-loop/SKILL.md#checkpoint-or-split-the-wo
 
 ## Independent code review
 
-Use `code-reviewer` by default. When `staff-engineer` reviews, choose one who was independent of the decisions and implementation under review. Apply the same review requirements to either role.
+Assign `staff-engineer` to the independent code review. The reviewer must be independent of the implementation and material decisions under review. A Staff Engineer who proposed the chosen architecture, authored the plan under audit, or contributed code returns that gate to the caller for another independent Staff Engineer. A read-only readiness audit alone does not make its author the implementer. If no independent engineer is available, record the open gate.
 
-Record the target and base, findings with file references and impact, and a `PASS` or `FAIL` verdict. A P1 or P2 finding requires a `FAIL`. A required design or QA result must pass for the reviewed target. If the target changes, rerun the affected checks and review before claiming completion.
+Inspect the exact diff, affected callers and tests. Record the target and base, findings with file and line references and impact, test gaps, and a `PASS` or `FAIL` verdict in the dated `*-code-review.md` in the registered `artifactFolder`. A P1 or P2 finding requires a `FAIL`. A required design or QA result must pass for the reviewed target. If the target changes, rerun the affected checks and review before claiming completion.
 
 ## Evidence and failures
 

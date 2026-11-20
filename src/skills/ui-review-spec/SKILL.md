@@ -5,7 +5,7 @@ description: Produce an implementer-ready UI design spec or a post-build rendere
 
 # UI Review Spec
 
-Turn current-product evidence into the registered workflow's design specification or design-conformance review. The caller entry selects the operation and controls advancement.
+Turn current-product evidence into the registered workflow's design specification or design-conformance review. The implementer owns the design specification. The independent QA Engineer owns the rendered design conformance review. The caller selects the operation and controls advancement.
 
 ## Workflow
 

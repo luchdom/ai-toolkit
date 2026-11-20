@@ -13,7 +13,7 @@ from typing import Iterable
 
 from .errors import CollisionError, UnsafePathError, ValidationError
 
-LINEAR_KEY_PATTERN = re.compile(r"^SAAS-[1-9][0-9]*$")
+LINEAR_KEY_PATTERN = re.compile(r"^(?:SAAS|LUCH)-[1-9][0-9]*$")
 LOCAL_KEY_PATTERN = re.compile(r"^[0-9]{3,}$")
 SLUG_PATTERN = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,46}[a-z0-9])?$")
 REPOSITORY_KEY_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]{0,47}$")
@@ -28,7 +28,7 @@ def validate_provider_key(provider: str, key: str) -> str:
     if not isinstance(provider, str) or provider.casefold() != "linear":
         raise ValidationError(f"Unsupported provider for canonical work-key validation: {provider}")
     if not isinstance(key, str) or not LINEAR_KEY_PATTERN.fullmatch(key):
-        raise ValidationError("Linear work key must match ^SAAS-[1-9][0-9]*$")
+        raise ValidationError(f"Linear work key must match {LINEAR_KEY_PATTERN.pattern}")
     return key
 
 

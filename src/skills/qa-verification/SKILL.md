@@ -5,7 +5,7 @@ description: Independently verify implemented work with repository-owned local c
 
 # QA Verification
 
-Verify the exact implementation target against observable acceptance criteria.
+Verify the exact implementation target against observable acceptance criteria. When the work changes rendered UI or interaction, use the [design gates](../spec-driven-delivery/references/design-gates.md) and [UI Review Spec](../ui-review-spec/SKILL.md) to record your independent design conformance verdict first. A shared browser run can support both the design and behavior results.
 
 ## Discover the local gate
 

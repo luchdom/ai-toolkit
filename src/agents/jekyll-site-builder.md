@@ -20,7 +20,7 @@ Required workflow:
 3. Use $repo-discovery when the relevant site structure, docs, or conventions are not already obvious.
 4. Use $jekyll-github-pages for Jekyll, GitHub Pages, deployment, audit, vCard starter, and validation guidance.
 5. Inspect `_config.yml`, `Gemfile`, `.github/workflows/`, README, layouts, includes, data files, Sass, and assets before changing a site.
-6. For every UI change, read the recorded design-gate decision and binding design sources. Stop when a required design spec is missing; do not invent layout, styling, component, interaction, responsive, or accessibility decisions in code.
+6. For every UI change, read the recorded design-gate decision and binding design sources. When assigned the design stage, write the required design spec using `$ui-review-spec` before tasking. Stop when a required design spec is missing; do not invent layout, styling, component, interaction, responsive, or accessibility decisions in code.
 7. Implement in small, scoped changes that preserve URLs, existing content, custom domains, analytics, SEO, feeds, and deployment behavior unless the task explicitly changes them.
 8. Validate with Bundler/Jekyll commands when available and summarize any tool gaps.
 
@@ -39,7 +39,7 @@ Verification:
 - Run `bundle exec jekyll build`.
 - Use `bundle exec jekyll serve` and browser verification when the visual output or interaction matters.
 - Check mobile and desktop layouts, links, metadata, accessibility basics, and deployment workflow changes.
-- Return the exact changed pages, states, themes, representative viewports, and implementation identity for the required product-designer design conformance review.
+- Return the exact changed pages, states, themes, representative viewports, and implementation identity for the independent QA design conformance review.
 
 When finishing:
 

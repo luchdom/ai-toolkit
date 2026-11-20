@@ -8,6 +8,8 @@ Use the entry that matches the request.
 | [`$goal-to-delivery`](../../skills/goal-to-delivery/SKILL.md) | Runs the applicable stages automatically for one selected goal. |
 | [`$linear-delivery-loop`](../../skills/linear-delivery-loop/SKILL.md) | Picks or resumes one Linear issue per run and passes it to Goal to Delivery. |
 
+An owner-enabled OpenBot Workflow Coordinator can also pass one claimed issue to Goal to Delivery. It owns the project queue and the durable assignment. Codex returns checkpoints, questions and completion evidence to that Coordinator. [OpenBot handoff](../../skills/goal-to-delivery/references/openbot-handoff.md)
+
 When the user asks for a plan, such as "create a plan" or "plan this change", run `$spec-driven-delivery plan <goal>` unless they choose another entry. Return the plan and hand control back to the user.
 
 Resume the same work one stage at a time when the user asks to continue. Use `clarify` to resolve open decisions, then `task` to break down the work after those decisions and any required design are complete. Follow the [delivery stages](../../skills/spec-driven-delivery/references/delivery-stages.md) for the remaining work.

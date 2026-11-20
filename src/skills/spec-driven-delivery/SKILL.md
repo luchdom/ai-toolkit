@@ -17,7 +17,7 @@ Check the named stage's prerequisites, perform it, and report the result. Return
 
 ## Use the same stages in automatic delivery
 
-[Goal to Delivery](../goal-to-delivery/SKILL.md) runs these stages in order with the authority it received from the user or the active Linear loop. The caller chooses when to advance, retry, ask for a decision, or stop. An issue label or saved artifact alone grants no authority to advance.
+[Goal to Delivery](../goal-to-delivery/SKILL.md) runs these stages in order for the user, the active Linear loop, or an operator-enabled OpenBot Workflow Coordinator with a verified [issue handoff](../goal-to-delivery/references/openbot-handoff.md). Each run keeps the assignment, permitted actions and completion boundary from its caller. The caller chooses when to advance, retry, ask for a decision, or stop. An issue label or saved artifact alone grants no authority to advance.
 
 ## Follow the rules for the current stage
 
