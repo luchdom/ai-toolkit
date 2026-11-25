@@ -65,7 +65,7 @@ Before a requested sync, compare and back up any intentional local changes to to
 
 Normal sync preflights the selected external imports before writing repository-generated output. External imports use ownership receipts and preserve unmanaged directories or locally modified imports; `--force` does not bypass these checks. Resolve a reported conflict using [external skill recovery](../EXTERNAL-SKILLS.md#ownership-conflicts-and-recovery), or explicitly select `--skip-external` to sync only repository-generated content.
 
-Normal project sync updates only toolkit-managed blocks and preserves text between and around them. Markers are standalone comments. Quoted or fenced examples stay intact. Malformed or overlapping markers leave the file intact. Sync names the file and exits nonzero. Correct the markers and retry. Sync skips unmarked files. `--force` replaces the entire project `AGENTS.md`.
+Normal project sync updates only toolkit-managed blocks and preserves text between and around them. Marker comments start in the first column on their own lines. Quoted or fenced examples stay intact. Malformed or overlapping markers leave the file intact. Sync names the file and exits nonzero. Correct the markers and retry. Sync skips unmarked files. `--force` replaces the entire project `AGENTS.md`.
 
 After sync, verify the intended destination files exist and inspect the rendered docs path. To undo a sync, restore the backed-up managed files and instruction blocks. Do not delete unrelated skills or tool configuration. Repo development needs build/validation only; syncing live user homes is a separate installation action.
 

@@ -102,6 +102,9 @@ def test_marker_examples_are_unmanaged() -> None:
             f"`{sync.MARKER_START}`\r\n# Personal rule\r\n`{sync.MARKER_END}`\r\n\r\n"
             f"````markdown\r\n```\r\n{LEGACY_BODY}````\r\n\r\n"
             f"~~~html\n{sync.MARKER_START}\n{sync.MARKER_END}\n~~~\n"
+            f"- ```markdown\r\n  {sync.MARKER_START}\r\n  # Example\r\n  {sync.MARKER_END}\r\n  ```\r\n\r\n"
+            f"10. ~~~html\n    {sync.MARKER_START}\n    {sync.MARKER_END}\n    ~~~\n\n"
+            f"  ```\n    ```\n{sync.MARKER_START}\n{sync.MARKER_END}\n  ```\n\n"
         )
         write(dest, examples)
         assert sync.write_or_splice_template(src, dest, False) == "skipped"
@@ -110,6 +113,12 @@ def test_marker_examples_are_unmanaged() -> None:
         write(dest, examples + LEGACY_BODY + "# Personal footer\r\n")
         assert sync.write_or_splice_template(src, dest, False) == "spliced"
         assert read(dest) == examples + BODY.rstrip("\r\n") + "\r\n# Personal footer\r\n"
+
+        # This list ends without an explicit fence closer when it reaches the real block.
+        open_list_example = f"- ```\n  {sync.MARKER_START}\n  {sync.MARKER_END}\n\n"
+        write(dest, open_list_example + LEGACY_BODY)
+        assert sync.write_or_splice_template(src, dest, False) == "spliced"
+        assert read(dest) == open_list_example + BODY
 
 
 def test_docs_override_prefers_toolkit_and_supports_legacy() -> None:

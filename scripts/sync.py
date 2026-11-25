@@ -197,24 +197,33 @@ def project_marker_spans(text: str, path: Path) -> list[tuple[int, int]]:
     end_by_start = dict(((MARKER_START, MARKER_END), *LEGACY_MARKER_PAIRS))
     markers = "|".join(re.escape(marker) for marker in (*end_by_start, *end_by_start.values()))
     pattern = re.compile(
-        rf"^ {{0,3}}(?:(?P<marker>{markers})[ \t]*|(?P<fence>`{{3,}}|~{{3,}})(?P<info>[^\r\n]*))\r?$",
+        rf"^(?:(?P<marker>{markers})[ \t]*"
+        r"| *(?P<list>(?:[-+*]|[0-9]{1,9}[.)])[ \t]+)?"
+        r"(?P<fence>`{3,}|~{3,})(?P<info>[^\r\n]*))\r?$",
         re.MULTILINE,
     )
     error = f"Malformed toolkit markers in {path}. Fix unmatched or overlapping blocks and rerun sync."
     spans: list[tuple[int, int]] = []
     start: re.Match[str] | None = None
     fence = ""
+    fence_indent = 0
     for match in pattern.finditer(text):
         delimiter = match.group("fence")
-        if delimiter is not None:
-            info = match.group("info")
-            if fence:
+        column = match.start("fence") - match.start() if delimiter else 0
+        list_fence = match.group("list") is not None
+        info = match.group("info") or ""
+
+        # A list's code block ends when the document returns to its parent.
+        if fence and column < fence_indent:
+            fence = ""
+        if fence:
+            if delimiter and not list_fence and column <= fence_indent + 3:
                 if delimiter.startswith(fence) and not info.strip():
                     fence = ""
-            elif delimiter[0] == "~" or "`" not in info:
-                fence = delimiter
             continue
-        if fence:
+        if delimiter is not None:
+            if (list_fence or column <= 3) and (delimiter[0] == "~" or "`" not in info):
+                fence, fence_indent = delimiter, column if list_fence else 0
             continue
 
         marker = match.group("marker")
