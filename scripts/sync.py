@@ -39,6 +39,17 @@ CODE_FENCE = re.compile(r"(`{3,}|~{3,})(.*)")
 LIST_ITEM = re.compile(r"([-+*]|[0-9]{1,9}[.)])(?= |$)( *)")
 THEMATIC_BREAK = re.compile(r"(?:(?:- *){3,}|(?:\* *){3,}|(?:_ *){3,})$")
 HEADING = re.compile(r"#{1,6}(?: |$)")
+HTML_BLOCK_TAGS = """
+address article aside base basefont blockquote body caption center col colgroup dd
+details dialog dir div dl dt fieldset figcaption figure footer form frame frameset
+h1 h2 h3 h4 h5 h6 head header hr html iframe legend li link main menu menuitem nav
+noframes ol optgroup option p param pre script search section style summary table
+tbody td textarea tfoot th thead title tr track ul
+"""
+HTML_BLOCK_START = re.compile(
+    r"<(?:[!?]|/?(?:" + "|".join(HTML_BLOCK_TAGS.split()) + r")(?=[ />]|$))",
+    re.IGNORECASE,
+)
 # Known retired adapters from 3f4ba06 and the 6dcfbef writing-rule build.
 RETIRED_AGENT_DIGESTS = {
     "codex": {
@@ -200,6 +211,13 @@ def consume_newline(text: str, position: int) -> int:
     return position
 
 
+def opening_code_fence(content: str) -> str:
+    match = CODE_FENCE.match(content)
+    if match and (match[1][0] == "~" or "`" not in match[2]):
+        return match[1]
+    return ""
+
+
 def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
     """Find standalone, first-column markers outside Markdown code fences."""
     lists: list[int] = []
@@ -228,11 +246,21 @@ def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
             # Outdenting a list ends its fence, even without a closing delimiter.
             fence = ""
 
-        # A plain paragraph can continue on an unindented line inside a list.
-        if lists and column < lists[-1] and paragraph and content[0].isalpha():
-            continue
-        while lists and column < lists[-1]:
-            lists.pop()
+        # Markdown lets a list paragraph continue without the list indent.
+        # Keep the list open until a blank line or another block ends the paragraph.
+        if lists and column < lists[-1]:
+            if paragraph and not (
+                LIST_ITEM.match(content)
+                or opening_code_fence(content)
+                or THEMATIC_BREAK.fullmatch(content)
+                or HEADING.match(content)
+                or HTML_BLOCK_START.match(content)
+                or content.startswith(">")
+            ):
+                continue
+            while lists and column < lists[-1]:
+                lists.pop()
+            paragraph = False
         indent = lists[-1] if lists else 0
         if raw in PROJECT_MARKERS:
             yield raw, line.start()
@@ -257,12 +285,16 @@ def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
             column = indent
             paragraph = False
 
-        if column <= indent + 3 and (opening := CODE_FENCE.match(content)):
-            if opening[1][0] == "~" or "`" not in opening[2]:
-                fence, fence_indent = opening[1], indent
-                paragraph = False
-                continue
-        paragraph = bool(content and not HEADING.match(content) and not re.fullmatch(r"-+|=+", content))
+        if column <= indent + 3 and (opening := opening_code_fence(content)):
+            fence, fence_indent = opening, indent
+            paragraph = False
+            continue
+        paragraph = bool(content) and not (
+            HEADING.match(content)
+            or HTML_BLOCK_START.match(content)
+            or content.startswith(">")
+            or re.fullmatch(r"-+|=+", content)
+        )
 
 
 def project_marker_spans(text: str, path: Path) -> list[tuple[int, int]]:

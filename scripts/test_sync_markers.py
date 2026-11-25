@@ -124,6 +124,9 @@ def test_marker_examples_are_unmanaged() -> None:
         examples = (
             ("- Maintainer example", "  "),
             ("- Maintainer example\nContinue the paragraph.", "  "),
+            ("- Maintainer example\n2026 notes continue the paragraph.", "  "),
+            ("- Maintainer example\n(Continue the paragraph.)", "  "),
+            ("- Maintainer example\n<https://example.com>", "  "),
             ("10. Maintainer example", "    "),
             ("- Example\n  - Nested item", "    "),
         )
@@ -138,9 +141,15 @@ def test_marker_examples_are_unmanaged() -> None:
                 assert sync.write_or_splice_template(src, dest, False) == "spliced"
                 assert read(dest) == prefix + BODY
 
-        # Neither a thematic break nor an ordered item starting at 2
-        # in the middle of a paragraph creates a list around the fence.
-        for prefix in ("- - -\n", "A paragraph\n2. More text\n", "-\n\n"):
+        # These prefixes leave the following two-space fence outside a list.
+        for prefix in (
+            "- - -\n",
+            "A paragraph\n2. More text\n",
+            "A paragraph\n01. More text\n-\n",
+            "-\n\n",
+            "- Maintainer example\n2. New ordered list\n\n",
+            "- Maintainer example\n<div>\n</div>\n\n",
+        ):
             example = f"{prefix}  ```markdown\n{LEGACY_BODY}  ```\n"
             write(dest, example)
             assert sync.write_or_splice_template(src, dest, False) == "skipped"
