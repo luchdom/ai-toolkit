@@ -2,6 +2,17 @@
 
 Use the repository's local commands and collect enough evidence to check each acceptance criterion. Run the required local validation even when hosted checks pass.
 
+## Repository rules
+
+- **Plan.** Follow the root `AGENTS.md` links to the applicable product, design, architecture, and other repository docs. Identify the rules the change affects. Include observable requirements in acceptance criteria and identify the structural rules for code review.
+- **Implement.** Add or extend the smallest useful deterministic check for an affected, stable rule when practical. Use the repository's architecture suite if it has one. Include required checks in the normal validation command and identify what still needs review or runtime evidence.
+- **QA.** Run the required checks, including applicable architecture tests. Verify documented design and behavior through the relevant rendered or runtime evidence.
+- **Code review.** Compare the code and its callers with the affected structural rules. Check that architecture tests select the intended files and types and fail on violations.
+
+In the existing QA and code review reports, cite each applicable rule's doc section, evidence, and verdict for the same target. Leave a required check open when evidence is missing.
+
+Changing an established architecture rule, reducing its test coverage, or bypassing the check requires a recorded, owner-approved architecture decision and independent Staff Engineer review.
+
 ## Critical workflows
 
 Apply these checks when work adds or materially changes a workflow whose failure can block an essential user task, compromise access or data, affect billing, or require operator recovery. Reuse existing telemetry and admin tools where they meet the need.

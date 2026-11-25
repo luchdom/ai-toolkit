@@ -9,7 +9,13 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-from validation.delivery_contracts import CANONICAL_REFERENCES, WORKFLOW_ROUTES, _resolved_local_links
+from validation.delivery_contracts import (
+    CANONICAL_REFERENCES,
+    REPOSITORY_RULE_SOURCES,
+    STAGE_REFERENCES,
+    WORKFLOW_ROUTES,
+    _resolved_local_links,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("markdown_sync", ROOT / "scripts" / "sync.py")
@@ -69,10 +75,18 @@ class DeliveryRoutingSyncTests(unittest.TestCase):
     def assert_delivery_links_resolve(self, installed_root: Path) -> None:
         for reference in {*CANONICAL_REFERENCES, *WORKFLOW_ROUTES}:
             installed = installed_root / reference.relative_to("src")
+            if installed_root.name == ".codex" and reference.parent == Path("src/agents"):
+                installed = installed.with_suffix(".toml")
             self.assertTrue(installed.is_file(), installed)
-            if installed.suffix == ".md":
+            if reference in REPOSITORY_RULE_SOURCES:
+                for source in (ROOT / reference, installed):
+                    self.assertIn("quality-gates.md#repository-rules)", source.read_text(encoding="utf-8"), source)
+            if installed.suffix in {".md", ".toml"}:
                 for target in _resolved_local_links(installed):
                     self.assertTrue(target.is_file() and installed_root.resolve() in target.parents, target)
+
+        quality_gates = installed_root / STAGE_REFERENCES.relative_to("src") / "quality-gates.md"
+        self.assertIn("## Repository rules", quality_gates.read_text(encoding="utf-8").splitlines())
 
     def test_sync_installs_portable_delivery_links_and_upgrades_old_worktree_route(self) -> None:
         installations = (

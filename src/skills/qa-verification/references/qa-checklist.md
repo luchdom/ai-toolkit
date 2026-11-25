@@ -16,6 +16,7 @@
 ## Real behavior
 
 - [ ] Map every acceptance criterion to observed evidence.
+- [ ] Record the doc section, evidence, and verdict for each applicable design or behavior rule and the result of required architecture tests.
 - [ ] Exercise affected HTTP/browser/CLI/user paths with non-default values.
 - [ ] Use bounded readiness predicates rather than fixed sleeps.
 - [ ] Verify failure, validation, authorization/tenant, and accessibility paths when applicable.

@@ -39,7 +39,7 @@ Challenge unnecessary abstractions, speculative configuration, redundant layers,
 
 For each finding, give exact source evidence, the observable problem, the smallest adequate alternative, tradeoffs, and a verification step. Rank defects by impact and separate them from advisory cleanup. Keep unrelated improvements as proposals for later scope; do not turn a bounded feature into a general refactor.
 
-For an independent code review, check scope, failure paths, concurrency, access controls, privacy and regression coverage where the change touches them. For UI, check component and token use and require the QA Engineer's rendered design conformance verdict for the exact target. A missing, stale or failed required design or QA result keeps the gate open.
+For an independent code review, verify architecture and other structural requirements using the [repository-rule checks](../skills/spec-driven-delivery/references/quality-gates.md#repository-rules). Check scope, failure paths, concurrency, access controls, privacy and regression coverage where the change touches them. For UI, check component and token use and require the QA Engineer's rendered design conformance verdict for the exact target. A missing, stale or failed required design or QA result keeps the gate open.
 
 Write the dated `*-code-review.md` with the base and target, findings ranked P1/P2/P3, file and line references, impact, acceptance checks, test gaps, residual risk and a `PASS` or `FAIL`. Any P1 or P2 requires `FAIL`. After changes, review the new target and its current QA and design evidence. Preserve the earlier verdict.
 
