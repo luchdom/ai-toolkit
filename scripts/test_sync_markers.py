@@ -120,6 +120,32 @@ def test_marker_examples_are_unmanaged() -> None:
         assert sync.write_or_splice_template(src, dest, False) == "spliced"
         assert read(dest) == open_list_example + BODY
 
+        # List continuation paragraphs can also contain an implicitly closed fence.
+        examples = (
+            ("- Maintainer example", "  "),
+            ("- Maintainer example\nContinue the paragraph.", "  "),
+            ("10. Maintainer example", "    "),
+            ("- Example\n  - Nested item", "    "),
+        )
+        for heading, padding in examples:
+            prefix = (
+                f"{heading}\n\n{padding}```markdown\n"
+                f"{padding}{sync.MARKER_START}\n{padding}# Preserve this example\n"
+                f"{padding}{sync.MARKER_END}\n\n"
+            )
+            write(dest, prefix + LEGACY_BODY)
+            for _ in range(2):
+                assert sync.write_or_splice_template(src, dest, False) == "spliced"
+                assert read(dest) == prefix + BODY
+
+        # Neither a thematic break nor an ordered item starting at 2
+        # in the middle of a paragraph creates a list around the fence.
+        for prefix in ("- - -\n", "A paragraph\n2. More text\n", "-\n\n"):
+            example = f"{prefix}  ```markdown\n{LEGACY_BODY}  ```\n"
+            write(dest, example)
+            assert sync.write_or_splice_template(src, dest, False) == "skipped"
+            assert read(dest) == example
+
 
 def test_docs_override_prefers_toolkit_and_supports_legacy() -> None:
     with tempfile.TemporaryDirectory() as directory:

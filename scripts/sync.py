@@ -11,6 +11,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 
 
@@ -32,6 +33,12 @@ REPLACEMENT_AGENTS = (build.SENIOR_AGENT, "staff-engineer", "product-manager", "
 MARKER_START = "<!-- AI-TOOLKIT-LUCHDOM:START -->"
 MARKER_END = "<!-- AI-TOOLKIT-LUCHDOM:END -->"
 LEGACY_MARKER_PAIRS = (("<!-- AI-CONFIG-LUCHDOM:START -->", "<!-- AI-CONFIG-LUCHDOM:END -->"),)
+MARKER_ENDS = dict(((MARKER_START, MARKER_END), *LEGACY_MARKER_PAIRS))
+PROJECT_MARKERS = MARKER_ENDS.keys() | set(MARKER_ENDS.values())
+CODE_FENCE = re.compile(r"(`{3,}|~{3,})(.*)")
+LIST_ITEM = re.compile(r"([-+*]|[0-9]{1,9}[.)])(?= |$)( *)")
+THEMATIC_BREAK = re.compile(r"(?:(?:- *){3,}|(?:\* *){3,}|(?:_ *){3,})$")
+HEADING = re.compile(r"#{1,6}(?: |$)")
 # Known retired adapters from 3f4ba06 and the 6dcfbef writing-rule build.
 RETIRED_AGENT_DIGESTS = {
     "codex": {
@@ -193,44 +200,80 @@ def consume_newline(text: str, position: int) -> int:
     return position
 
 
-def project_marker_spans(text: str, path: Path) -> list[tuple[int, int]]:
-    end_by_start = dict(((MARKER_START, MARKER_END), *LEGACY_MARKER_PAIRS))
-    markers = "|".join(re.escape(marker) for marker in (*end_by_start, *end_by_start.values()))
-    pattern = re.compile(
-        rf"^(?:(?P<marker>{markers})[ \t]*"
-        r"| *(?P<list>(?:[-+*]|[0-9]{1,9}[.)])[ \t]+)?"
-        r"(?P<fence>`{3,}|~{3,})(?P<info>[^\r\n]*))\r?$",
-        re.MULTILINE,
-    )
-    error = f"Malformed toolkit markers in {path}. Fix unmatched or overlapping blocks and rerun sync."
-    spans: list[tuple[int, int]] = []
-    start: re.Match[str] | None = None
+def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
+    """Find standalone, first-column markers outside Markdown code fences."""
+    lists: list[int] = []
     fence = ""
     fence_indent = 0
-    for match in pattern.finditer(text):
-        delimiter = match.group("fence")
-        column = match.start("fence") - match.start() if delimiter else 0
-        list_fence = match.group("list") is not None
-        info = match.group("info") or ""
-
-        # A list's code block ends when the document returns to its parent.
-        if fence and column < fence_indent:
-            fence = ""
+    paragraph = False
+    empty_item = False
+    for line in re.finditer(r"([^\r\n]*)(?:\r\n|\n|\r|$)", text):
+        raw = line[1].rstrip(" \t")
+        if not raw:
+            paragraph = False
+            if empty_item:
+                lists.pop()
+                empty_item = False
+            continue
+        empty_item = False
+        expanded = raw.expandtabs(4)
+        content = expanded.lstrip(" ")
+        column = len(expanded) - len(content)
         if fence:
-            if delimiter and not list_fence and column <= fence_indent + 3:
-                if delimiter.startswith(fence) and not info.strip():
+            if column >= fence_indent:
+                closing = CODE_FENCE.match(content)
+                if closing and column <= fence_indent + 3 and closing[1].startswith(fence) and not closing[2]:
                     fence = ""
+                continue
+            # Outdenting a list ends its fence, even without a closing delimiter.
+            fence = ""
+
+        # A plain paragraph can continue on an unindented line inside a list.
+        if lists and column < lists[-1] and paragraph and content[0].isalpha():
             continue
-        if delimiter is not None:
-            if (list_fence or column <= 3) and (delimiter[0] == "~" or "`" not in info):
-                fence, fence_indent = delimiter, column if list_fence else 0
+        while lists and column < lists[-1]:
+            lists.pop()
+        indent = lists[-1] if lists else 0
+        if raw in PROJECT_MARKERS:
+            yield raw, line.start()
+            paragraph = False
+            continue
+        if column <= indent + 3 and THEMATIC_BREAK.fullmatch(content):
+            paragraph = False
             continue
 
-        marker = match.group("marker")
-        if start is None and marker in end_by_start:
-            start = match
-        elif start is not None and marker == end_by_start[start.group("marker")]:
-            spans.append((start.start("marker"), match.end("marker")))
+        # Remember the list's content column across blank lines. A list can
+        # open a fence on the same line or in a later paragraph.
+        while column <= indent + 3 and (item := LIST_ITEM.match(content)):
+            label, padding = item.groups()
+            tail = content[item.end():]
+            if paragraph and (not tail or (len(label) > 1 and label[:-1] != "1")):
+                break
+            width = len(label) + (len(padding) if 1 <= len(padding) <= 4 else 1)
+            indent = column + width
+            lists.append(indent)
+            empty_item = not tail
+            content = content[width:]
+            column = indent
+            paragraph = False
+
+        if column <= indent + 3 and (opening := CODE_FENCE.match(content)):
+            if opening[1][0] == "~" or "`" not in opening[2]:
+                fence, fence_indent = opening[1], indent
+                paragraph = False
+                continue
+        paragraph = bool(content and not HEADING.match(content) and not re.fullmatch(r"-+|=+", content))
+
+
+def project_marker_spans(text: str, path: Path) -> list[tuple[int, int]]:
+    error = f"Malformed toolkit markers in {path}. Fix unmatched or overlapping blocks and rerun sync."
+    spans: list[tuple[int, int]] = []
+    start: tuple[str, int] | None = None
+    for marker, position in project_marker_lines(text):
+        if start is None and marker in MARKER_ENDS:
+            start = (marker, position)
+        elif start is not None and marker == MARKER_ENDS[start[0]]:
+            spans.append((start[1], position + len(marker)))
             start = None
         else:
             raise ValueError(error)
