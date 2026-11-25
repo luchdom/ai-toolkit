@@ -93,6 +93,25 @@ def test_separated_blocks_preserve_all_unmanaged_bytes() -> None:
             assert read(dest) == prefix + BODY.rstrip("\r\n") + middle + suffix
 
 
+def test_marker_examples_are_unmanaged() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        src, dest = source(root), root / "target.md"
+        examples = (
+            f"Sync updates the block between `{sync.MARKER_START}` and `{sync.MARKER_END}`.\r\n"
+            f"`{sync.MARKER_START}`\r\n# Personal rule\r\n`{sync.MARKER_END}`\r\n\r\n"
+            f"````markdown\r\n```\r\n{LEGACY_BODY}````\r\n\r\n"
+            f"~~~html\n{sync.MARKER_START}\n{sync.MARKER_END}\n~~~\n"
+        )
+        write(dest, examples)
+        assert sync.write_or_splice_template(src, dest, False) == "skipped"
+        assert read(dest) == examples
+
+        write(dest, examples + LEGACY_BODY + "# Personal footer\r\n")
+        assert sync.write_or_splice_template(src, dest, False) == "spliced"
+        assert read(dest) == examples + BODY.rstrip("\r\n") + "\r\n# Personal footer\r\n"
+
+
 def test_docs_override_prefers_toolkit_and_supports_legacy() -> None:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -175,6 +194,7 @@ def main() -> int:
         test_legacy_and_force,
         test_malformed_and_newline_preservation,
         test_separated_blocks_preserve_all_unmanaged_bytes,
+        test_marker_examples_are_unmanaged,
         test_docs_override_prefers_toolkit_and_supports_legacy,
         test_project_help_names_tool_instruction_destination,
         test_sync_tool_instructions_reads_renamed_dist_root,

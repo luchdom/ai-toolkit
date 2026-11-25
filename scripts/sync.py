@@ -195,15 +195,33 @@ def consume_newline(text: str, position: int) -> int:
 
 def project_marker_spans(text: str, path: Path) -> list[tuple[int, int]]:
     end_by_start = dict(((MARKER_START, MARKER_END), *LEGACY_MARKER_PAIRS))
-    pattern = "|".join(re.escape(marker) for marker in (*end_by_start, *end_by_start.values()))
+    markers = "|".join(re.escape(marker) for marker in (*end_by_start, *end_by_start.values()))
+    pattern = re.compile(
+        rf"^ {{0,3}}(?:(?P<marker>{markers})[ \t]*|(?P<fence>`{{3,}}|~{{3,}})(?P<info>[^\r\n]*))\r?$",
+        re.MULTILINE,
+    )
     error = f"Malformed toolkit markers in {path}. Fix unmatched or overlapping blocks and rerun sync."
     spans: list[tuple[int, int]] = []
     start: re.Match[str] | None = None
-    for marker in re.finditer(pattern, text):
-        if start is None and marker.group() in end_by_start:
-            start = marker
-        elif start is not None and marker.group() == end_by_start[start.group()]:
-            spans.append((start.start(), marker.end()))
+    fence = ""
+    for match in pattern.finditer(text):
+        delimiter = match.group("fence")
+        if delimiter is not None:
+            info = match.group("info")
+            if fence:
+                if delimiter.startswith(fence) and not info.strip():
+                    fence = ""
+            elif delimiter[0] == "~" or "`" not in info:
+                fence = delimiter
+            continue
+        if fence:
+            continue
+
+        marker = match.group("marker")
+        if start is None and marker in end_by_start:
+            start = match
+        elif start is not None and marker == end_by_start[start.group("marker")]:
+            spans.append((start.start("marker"), match.end("marker")))
             start = None
         else:
             raise ValueError(error)

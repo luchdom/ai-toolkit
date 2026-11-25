@@ -102,8 +102,9 @@ class ProjectDocsSyncTests(unittest.TestCase):
     def test_project_sync_preserves_unmanaged_foundations(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             project = Path(directory)
+            custom_rules = f"# Custom project rules\r\n\r\nExamples: `{sync.MARKER_START}` and `{sync.MARKER_END}`.\r\n"
             originals = {
-                "AGENTS.md": b"# Custom project rules\r\n",
+                "AGENTS.md": custom_rules.encode("utf-8"),
                 "docs/product.md": b"# Existing product brief\r\n",
                 "docs/design/tokens.md": b"# Existing token guide\r\n",
             }
