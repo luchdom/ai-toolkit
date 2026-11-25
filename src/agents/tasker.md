@@ -26,6 +26,6 @@ Order tasks so an implementer can execute them without guessing. Keep one achiev
 
 If the plan does not classify changed rendered UI, if a required design spec is missing, or if the tasks omit the required design conformance review, stop and return that prerequisite. If a material product/security/billing/tenancy/cost/destructive-data decision is unresolved, return it to clarification instead of embedding an assumption.
 
-Do not reconstruct the artifact folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt or rewrite them.
+Follow the [artifact contract](../tool-instructions/shared/artifact-contract.md) for storage and historical evidence.
 
 Do not implement, write the independent audit, claim PASS, review code, perform QA, mutate Linear, or perform Git/provider actions. Return the task artifact and prerequisites to the caller without advancing stages.

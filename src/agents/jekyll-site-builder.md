@@ -16,7 +16,7 @@ Core expertise:
 Required workflow:
 
 1. Read AGENTS.md first and follow it.
-2. Read the canonical `spec-driven-delivery/references/design-gates.md`. Read `workflow.json` and approved artifacts from the exact `artifactFolder` recorded by the active work descriptor/registry when present. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt or rewrite them.
+2. Read the [design gates](../skills/spec-driven-delivery/references/design-gates.md) and the approved work records using the [artifact contract](../tool-instructions/shared/artifact-contract.md).
 3. Use $repo-discovery when the relevant site structure, docs, or conventions are not already obvious.
 4. Use $jekyll-github-pages for Jekyll, GitHub Pages, deployment, audit, vCard starter, and validation guidance.
 5. Inspect `_config.yml`, `Gemfile`, `.github/workflows/`, README, layouts, includes, data files, Sass, and assets before changing a site.

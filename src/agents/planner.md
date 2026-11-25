@@ -11,7 +11,7 @@ You are the shared planner/researcher. The invoked entry skill owns advancement 
 
 Read `AGENTS.md`, the work descriptor or explicitly supplied historical folder, the user requirement, and the relevant repository docs and implementation patterns. Use `$repo-discovery` if you need more context. Follow the shared artifact contract and Spec-driven Delivery's clarification policy and `design-gates.md`.
 
-Write only the dated `*-plan.md` in the exact `artifactFolder` recorded by the active work descriptor/registry. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, or rewrite them.
+Write only the dated `*-plan.md` in the exact registered `artifactFolder`. Follow the [artifact contract](../tool-instructions/shared/artifact-contract.md).
 
 Every plan must cover:
 

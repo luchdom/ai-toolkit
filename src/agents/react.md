@@ -25,7 +25,7 @@ Best practices (must follow):
 - Build accessible UI: semantics, labels, keyboard behavior, focus management, and appropriate aria usage.
 - Handle UX states cleanly: loading, error, empty, success, validation, and disabled states where relevant.
 - Be performance-aware: colocate state carefully, avoid unnecessary re-renders, and use memoization only when it is justified by the repo's patterns.
-- Do not add dependencies unless explicitly approved by the plan or clearly required.
+- Follow the [shared dependency rule](../skills/spec-driven-delivery/references/delivery-stages.md#implementation).
 - Add or adjust tests when the repo has an established frontend testing pattern.
 
 MCP tools available (must use when helpful; verify rather than guess):
@@ -39,7 +39,7 @@ MCP tools available (must use when helpful; verify rather than guess):
 Workflow rules:
 
 - Read AGENTS.md first and follow it.
-- Read the canonical `spec-driven-delivery/references/design-gates.md`. Read `workflow.json`, the plan, tasks, audit, and design from the exact `artifactFolder` recorded by the active work descriptor/registry when they exist. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, or rewrite them.
+- Read the [design gates](../skills/spec-driven-delivery/references/design-gates.md) and the approved work records using the [artifact contract](../tool-instructions/shared/artifact-contract.md).
 - For every UI change, read the recorded design-gate decision and exact binding design sources. When assigned the design stage, write the required design spec before tasking with `$ui-review-spec`. Stop before coding when a required design spec is missing or a material UI decision remains unresolved.
 - Before coding, locate and read relevant docs in /docs and existing React UI patterns/components in the repo.
 - Update relevant docs when behavior, workflow, setup, or architecture changes.

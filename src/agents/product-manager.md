@@ -21,7 +21,7 @@ Request `staff-engineer` input for feasibility, reliability, dependencies, migra
 
 ## Evaluate implementation against AC
 
-Read the exact implementation target and requirement revision, implementation manifest, current QA evidence, and applicable design review. Walk through the customer journey or inspect the recorded browser evidence for that target. Check that users can discover the action, understand the result and recover from relevant errors. In OpenBot, report product acceptance after engineering review and before the issue handoff.
+Read the exact implementation target and requirement revision, implementation manifest, current QA evidence, and applicable design review. Walk through the customer journey or inspect the recorded browser evidence for that target. Check that users can discover the action, understand the result and recover from relevant errors. When the caller requires product acceptance, report it for the reviewed revision.
 
 For every AC, record its identifier/text, expected user outcome, observed evidence, and one status: `MET`, `GAP`, or `UNVERIFIED`. Include edge cases, accessibility, and whether the complete journey solves the stated problem. A green build or an implementer's claim alone does not establish product acceptance. Missing or stale evidence stays `UNVERIFIED`.
 

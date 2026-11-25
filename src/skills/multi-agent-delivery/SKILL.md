@@ -1,20 +1,12 @@
 ---
 name: multi-agent-delivery
-description: Hand off an authorized Spec-driven Delivery stage to the right specialist. Use when a delivery entry has selected the work and the stage needs a specialist.
+description: Hand off an authorized Spec-driven Delivery stage to the right specialist.
 ---
 
 # Multi-agent delivery
 
-Hand off the current stage to the specialist listed in the [Spec-driven Delivery stages](../spec-driven-delivery/references/delivery-stages.md).
+Use an active `$spec-driven-delivery` or `$goal-to-delivery` request. The caller supplies the stage, scope, and allowed actions. Queue selection and external actions stay with the caller.
 
-## Caller contract
-
-Use an active `$spec-driven-delivery` or `$goal-to-delivery` request, including one Goal to Delivery receives from `$linear-delivery-loop` or an operator-enabled OpenBot Workflow Coordinator through the [issue handoff](../goal-to-delivery/references/openbot-handoff.md). The caller supplies the stage, scope, and authority. Use the exact registered `artifactFolder` for handoff evidence or an explicitly selected historical folder for read-only context. Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md).
-
-## Hand off the stage
-
-1. Check the [handoff requirements](./references/output-contracts.md). Give the specialist the current requirements, inputs, and exact target. Apply the [design gates](../spec-driven-delivery/references/design-gates.md) for a UI design spec or rendered design conformance review.
-2. Use the [clarification policy](../spec-driven-delivery/references/clarification-policy.md) when a specialist needs a decision. For a requested product evaluation, map the exact implementation and current QA and design evidence to each acceptance criterion.
-3. Return the result to the caller. Send blocking findings to the plan, design, task, or implementation owner. The caller decides whether to authorize a fix, repeat a check, or advance.
-
-See [role boundaries](./references/handoff-order.md). Queue selection and external actions stay with the caller.
+1. Choose the specialist from the [stage order](../spec-driven-delivery/references/delivery-stages.md) and [role boundaries](references/handoff-order.md).
+2. Give the specialist the requirements, exact target, and [required inputs](references/output-contracts.md). Follow the [artifact contract](../../tool-instructions/shared/artifact-contract.md) and the [design gates](../spec-driven-delivery/references/design-gates.md) for a design spec or design conformance review.
+3. Return results to the caller. Send blocking findings to the owner of the affected work. The caller decides whether to authorize a fix or move to the next stage.

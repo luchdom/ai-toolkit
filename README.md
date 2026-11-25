@@ -1,151 +1,44 @@
 # ai-toolkit
 
-Reusable AI agents, skills, and project instructions for Codex and Claude Code.
+Reusable agents, skills, and project instructions for Codex and Claude Code.
 
-## Delivery workflows
+## Run delivery
 
-Choose one of the three [delivery entries](src/tool-instructions/shared/delivery-workflow.md).
+Use [Spec-driven Delivery](src/skills/spec-driven-delivery/SKILL.md) for one named stage. Use [Goal to Delivery](src/skills/goal-to-delivery/SKILL.md) to run the applicable stages for one selected goal. The [shared workflow](src/tool-instructions/shared/delivery-workflow.md) routes ordinary requests and defines where to stop.
 
-- [Spec-driven Delivery](src/skills/spec-driven-delivery/SKILL.md) defines the process. Use `$spec-driven-delivery <stage> <goal-or-selector>` to run one stage.
-- [Goal to Delivery](src/skills/goal-to-delivery/SKILL.md) runs the applicable stages automatically for one goal. Use `$goal-to-delivery <goal-or-selected-issue>` to stop at tested working-tree changes by default.
-- [Linear Delivery Loop](src/skills/linear-delivery-loop/SKILL.md) selects or resumes one eligible Linear issue and runs Goal to Delivery for it. Invoke `$linear-delivery-loop` from a scheduled task or an attended pilot.
+An external runner can call an agent or pass one verified assignment to Goal to Delivery. The runner owns scheduling and issue state. Existing users can follow the [OpenBot handoff](src/skills/goal-to-delivery/references/openbot-handoff.md) or the [standalone Linear loop guide](docs/mvp-linear-delivery-loop.md).
 
-Plan the work, clarify decisions, break it into tasks, audit when required, and implement. Run applicable QA before code review, then publish to the authorized boundary. For the full sequence and when each stage applies, see the [delivery stages](src/skills/spec-driven-delivery/references/delivery-stages.md).
-
-Use the shared [artifact contract](src/tool-instructions/shared/artifact-contract.md) for plans and evidence and the [worktree policy](src/tool-instructions/shared/worktrees.md) for linked Git worktrees.
-
-## Project documentation
-
-Use [`$project-docs`](src/skills/project-docs/SKILL.md) to create or refine a repository's product brief, design system, architecture, and root `AGENTS.md`. It includes templates, checks the actual repository, and works through open decisions with you. Use [`$project-docs-review`](src/skills/project-docs-review/SKILL.md) for coverage, placement, and consistency findings without edits. Existing equivalent documents are reused; projects without a UI can mark the design system not applicable.
-
-Templates provide populated examples and minimum coverage requirements. For UI projects, the skill also defines a working component catalogue using the real tokens/components, with its source and startup/access instructions linked from the project docs map. Implement the catalogue within authorized UI work, or record a concrete proposal during docs-only work.
-
-Sync adds a shared docs-discovery rule to user instructions and generated project/specialist instructions. Agents suggest the specific missing documentation when relevant, honor earlier declines, and keep applicable docs current within the active task. Codex and Claude Code share `AGENTS.md`. See [Project documentation](docs/project-documentation.md) for examples, placement, and installation.
-
-## Product and engineering specialists
-
-Say "I want to refine ..." or invoke [`$refine`](src/skills/refine/SKILL.md) to pressure-test a goal before delivery. If you leave the output open, the skill asks you to choose one. For example, `$refine choose a migration approach --with staff --output rfc` starts an interview with Staff Engineer and produces a proposal for review.
+### Agents
 
 | Agent | Use it for |
-|---|---|
-| [`dotnet`](src/agents/dotnet.md) | Authorized C#/.NET backend implementation, including ASP.NET Core APIs, persistence, authorization, workers, and tests. |
-| [`senior-full-stack-engineer`](src/agents/senior-full-stack-engineer.md) | Plan, clarify, break down and implement one selected OpenBot issue across the stack, including its UI specification when needed. |
-| [`product-manager`](src/agents/product-manager.md) | Clarify the user journey, set acceptance criteria, compare relevant products and judge the delivered experience. Write PRDs on request. |
-| [`qa`](src/agents/qa.md) | Verify the running change against its criteria and check changed screens in a real browser. |
-| [`staff-engineer`](src/agents/staff-engineer.md) | Assess technical feasibility, audit readiness and independently review the exact implementation. Write requested RFCs, ADRs and engineering guidance. |
+| --- | --- |
+| [Senior Full-Stack Engineer](src/agents/senior-full-stack-engineer.md) | Plan and implement one assignment, including its UI specification when needed. |
+| [Product Manager](src/agents/product-manager.md) | Clarify the user journey and acceptance criteria, then evaluate the result. |
+| [Staff Engineer](src/agents/staff-engineer.md) | Assess technical choices and independently audit readiness or review code. |
+| [QA Engineer](src/agents/qa.md) | Check running behavior and verify changed screens in a browser. |
+| [.NET Engineer](src/agents/dotnet.md) | Implement C#/.NET backend changes with [`$dotnet-implementation`](src/skills/dotnet-implementation/SKILL.md). |
 
-For .NET implementation, use [`$dotnet-implementation`](src/skills/dotnet-implementation/SKILL.md) to route the work and apply the same guidance when working inline. The skill bundles a [modular monolith guide](src/skills/dotnet-implementation/references/modular-monolith.md) for projects that use or explicitly adopt module-first vertical slices. Codex sync adds the route to the user instructions so it also applies in projects without toolkit instructions.
-
-In OpenBot, the Senior Full-Stack Engineer carries one assignment through planning and implementation. QA checks rendered design and real behavior, the Staff Engineer reviews the exact change, and the Product Manager checks the user journey before handoff. Assign another independent Staff Engineer when a reviewer materially authored a decision or change under review. See the [clarification policy](src/skills/spec-driven-delivery/references/clarification-policy.md) and [quality gates](src/skills/spec-driven-delivery/references/quality-gates.md).
-
-The staff engineer uses [Twelve-Factor for agentic development](docs/twelve-factor-for-agentic-development.md) when refining plans and designs, writing engineering docs, and reviewing pull requests.
-
-Examples: ask PM to evaluate a named implementation against its approved AC or draft a PRD; ask Staff Engineer to compare simpler implementation options, review a named diff, or document an architectural decision. Both use the repository's canonical agent metadata; regenerate and sync after changing their configuration.
-
-## MVP autonomous loop
-
-The MVP deliberately uses existing systems instead of a separate orchestration service:
-
-- Linear stores queue state, checkpoints, decisions, and completion.
-- `.ai/loop.json` stores the repository-specific team, labels, states, Git policy, and budgets.
-- A deterministic user-local lease prevents overlapping invocations from working the same Linear queue.
-- A Codex scheduled task invokes `$linear-delivery-loop` every 15 minutes from one dedicated chat/project context.
-- Git branches and pull requests store implementation history and review.
-- Linear comments are the authoritative human-decision channel; listed choices and explicit custom suggestions are supported, while ntfy is optional best-effort attention that links directly to the issue.
-
-The loop resumes eligible active work before selecting a labeled backlog issue. An active attended issue pauses intake. The loop moves an issue to Done after it verifies the boundary reported by Goal to Delivery. See the [loop guide](docs/mvp-linear-delivery-loop.md) for checkpoints, continuations, and quiet runs.
-
-Linear labels have separate responsibilities:
-
-- `autonomous` grants the scheduled loop permission to select a refined backlog issue.
-- `needs-decision` marks backlog work that needs one owner choice before it can be refined or made autonomous. It is a lightweight curation label, not another delivery workflow.
-- `needs-human` pauses an issue that is already active in the autonomous loop.
-
-Unlabeled backlog issues may be reviewed and refined collaboratively without starting a full delivery workflow. Record any material owner decision in Linear, remove `needs-decision` when resolved, and add `autonomous` only after the goal and acceptance criteria are bounded and locally testable.
-
-See [MVP Linear delivery loop](docs/mvp-linear-delivery-loop.md) for setup and operation.
-
-## Harness coverage
-
-A useful engineering harness needs seven capabilities. The MVP covers all seven without turning each one into a service:
-
-| Component | MVP coverage |
-|---|---|
-| System prompt | Repository instructions plus the three explicit entry skills define behavior and authority. |
-| Tools | Codex local tools, Linear, Git/GitHub, and optional browser/HTTP checks provide only the needed capabilities. |
-| Context management | Skills load progressively; `.ai/loop.json`, the selected issue, repository instructions, and relevant code form the working set. |
-| Verification | Focused tests, applicable UI design conformance and runtime QA, independent code review, and the repository's local validation command check the work. |
-| Memory | Linear comments/issues, Git/PR history, curated docs, and optional concise notes in the exact registered `artifactFolder` persist useful knowledge. |
-| Sandboxes | Codex repository/worktree isolation and repository-owned disposable test data constrain execution. |
-| Human hooks | `needs-decision` marks pre-work owner choices; `needs-human`, a structured Linear choice or custom suggestion, the Codex task inbox, and an optional issue-linked ntfy notification pause active work safely. |
-
-Memory curation and observability are intentionally modest: persist decisions and useful documentation, and rely on scheduled-task history plus Linear/Git records. Add more machinery only after the MVP exposes a concrete gap.
-
-## Repository layout
-
-- `src/agents/`: canonical specialist agent definitions
-- `src/skills/`: canonical reusable skills and references
-- `src/tool-instructions/`: shared workflow rules and project-local instructions for each supported tool
-- `scripts/build.py`: generate tool adapters into `dist/`
-- `scripts/sync.py`: install generated output and selected external skills into user homes and optional projects
-- `external-skills.toml`: selected upstream skill directories, pinned revisions, and compatible tools
-- `scripts/external_skills.py`: preview or install external skill imports independently
-- `scripts/validate.py`: local repository validation
-- `scripts/platform_info.py`: read-only execution-host and tool availability probe
-- `dist/tool-instructions/`: generated project-local projections for each supported tool
-- `dist/`: generated projections; never edit directly
-
-Save delivery notes in `.ai/work` and use the exact registered `artifactFolder` when a workflow has one. See the [artifact contract](src/tool-instructions/shared/artifact-contract.md) for registration and legacy folders.
+Use [`$refine`](src/skills/refine/SKILL.md) to pressure-test a goal or decision before planning delivery. Use the [Twelve-Factor guide](docs/twelve-factor-for-agentic-development.md) for engineering decisions and review.
 
 ## Build, validate, and install
 
-Start with [platform support](docs/platform-support.md): detect the execution host and shell, then choose a Python **3.11+** executable. Use the same verified interpreter throughout. The probe also runs on older Python 3.9+ so it can report an upgrade requirement.
-
-Windows / PowerShell:
-
-```powershell
-py -3 scripts/platform_info.py
-py -3 scripts/build.py
-py -3 scripts/validate.py
-py -3 scripts/sync.py --tool all
-```
-
-macOS / zsh:
+Follow [platform support](docs/platform-support.md) to choose a verified Python 3.11 or newer. The local validation command builds the adapters and runs the tests.
 
 ```sh
 python3 scripts/platform_info.py
-python3 scripts/build.py
 python3 scripts/validate.py
 python3 scripts/sync.py --tool all
 ```
 
-Install project-local tool instructions too (use the actual target path):
+On Windows use `py -3` or the verified interpreter. Use `--tool codex` or `--tool claude` to install for one tool. Add `--project "<project-path>"` to install project guidance in its shared `AGENTS.md`. Back up local agent and skill customizations before syncing.
 
-```powershell
-py -3 scripts/sync.py --tool all --project "C:/path/to/repo"
-```
+Normal project sync preserves text outside managed blocks. If markers are malformed, fix the reported file and retry. `--force` replaces the entire project `AGENTS.md`. See [sync recovery](docs/platform-support.md#sync-verification-and-recovery).
 
-```sh
-python3 scripts/sync.py --tool all --project "$HOME/path/to/repo"
-```
+Normal sync includes pinned imports from [external-skills.toml](external-skills.toml). Use `--skip-external` to install repository content only. See the [external skill guide](EXTERNAL-SKILLS.md), [companion tools](EXTERNAL-TOOLS.md), and [MCP servers](MCP-SERVERS.md) for setup.
 
-Use `--tool codex` or `--tool claude` to install for one tool. Use `--tool all` for both. `LUCHDOM_AI_TOOLKIT_DOCS` can override the shared curated-docs path rendered into tool instructions; the legacy `LUCHDOM_AI_CONFIG_DOCS` name remains supported.
+## Maintain the toolkit
 
-User sync installs the shared delivery references next to the skills in each tool's home. When upgrading an existing project, rerun sync with `--project "<project-path>"` to refresh its managed instruction block.
-
-Normal sync includes the compatible external imports selected in [external-skills.toml](external-skills.toml). The manifest header contains the preview and sync commands. See the [external skill guide](EXTERNAL-SKILLS.md) for selection, updates, and recovery.
-
-Normal sync updates only marker-managed blocks in existing project instruction files and preserves content outside them. Use `--force` to adopt an unmarked project instruction file. Repository-generated user-level agents and skills are refreshed on every sync; back up intentional local preferences first. See [sync verification and recovery](docs/platform-support.md#sync-verification-and-recovery).
-
-For a fresh Codex environment, start with the [import manifest](external-skills.toml) and the [external skill guide](EXTERNAL-SKILLS.md). For older system and plugin skills, consult the historical [additional skill restore checklist](docs/codex-skill-restore.md) and follow current upstream instructions.
-
-## Maintenance
-
-Markdown edits must pass the [Markdown linting workflow](docs/markdown-linting.md). Install with `npm ci`, then run `npm run lint:md:files -- ":path/to/changed.md"`; use `npm run lint:md` for an all-file audit. The Python gate remains dependency-free. Toolkit sync installs a dedicated Markdown rule in user-level Codex and Claude Code instructions and includes it in generated specialist agents and project routers. Install the global CLI separately for use outside this repository.
-
-- Change `src/`, regenerate `dist/`, and validate; do not edit generated output.
-- Keep tool instructions as concise routers rather than copies of the canonical protocol.
-- Keep legacy artifact-root literals limited to the validator's reviewed path-and-purpose allowlist.
-- Keep credentials in environment variables, never repository files.
-- Use [External Tools](EXTERNAL-TOOLS.md) for companion CLIs, the [external skill guide](EXTERNAL-SKILLS.md) to maintain imports, and [MCP Servers](MCP-SERVERS.md) for server setup.
-- Preserve unrelated user changes and historical artifact evidence.
+- Edit `src/agents/`, `src/skills/`, and `src/tool-instructions/`. Build the generated adapters in `dist/` with `python3 scripts/build.py`.
+- Use the [project documentation guide](docs/project-documentation.md) for docs ownership, templates, and reviews.
+- Use the [artifact contract](src/tool-instructions/shared/artifact-contract.md) for plans and evidence and the [worktree policy](src/tool-instructions/shared/worktrees.md) for linked Git worktrees.
+- Apply the [plain-English rule](src/tool-instructions/shared/reply-style.md) to shared instructions. Run [Markdown lint](docs/markdown-linting.md) on changed files.

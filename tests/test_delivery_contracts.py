@@ -1,4 +1,4 @@
-"""Semantic regression tests for the three delivery workflows."""
+"""Semantic regression tests for delivery stages and supported callers."""
 from __future__ import annotations
 
 import json
@@ -94,6 +94,8 @@ def canonical_fixture(root: Path) -> None:
         for target in targets:
             relative = Path(os.path.relpath(target, start=source.parent)).as_posix()
             links.append(f"- [{target.name}]({relative})")
+            if not (root / target).is_file():
+                write(root, target, f"# {target.name}\n")
         write(root, source, "\n".join(links))
 
 
@@ -241,16 +243,13 @@ class DeliveryContractTests(unittest.TestCase):
             self.assertTrue(check_tool_instruction_cutover(root))
 
     def test_tool_instruction_paths_and_identifiers_are_canonical(self) -> None:
-        expected = (
-            "src/tool-instructions/codex/AGENTS.md",
-            "src/tool-instructions/claude/AGENTS.md",
-        )
-        self.assertTrue(all((ROOT / relative).is_file() for relative in expected))
+        self.assertTrue((ROOT / "src/tool-instructions/shared/project-agents.md").is_file())
         self.assertFalse((ROOT / "src" / ("project" + "-templates")).exists())
-        for relative in expected:
-            instruction = (ROOT / relative).read_text(encoding="utf-8")
-            self.assertIn("`tool-instructions/shared/delivery-workflow.md`", instruction)
-            self.assertNotIn("goal-to-delivery/references/", instruction)
+        generated = ROOT / "dist/tool-instructions"
+        instruction = (generated / "codex/AGENTS.md").read_text(encoding="utf-8")
+        self.assertEqual(instruction, (generated / "claude/AGENTS.md").read_text(encoding="utf-8"))
+        self.assertIn("`tool-instructions/shared/delivery-workflow.md`", instruction)
+        self.assertNotIn("goal-to-delivery/references/", instruction)
 
         build = (ROOT / "scripts/build.py").read_text(encoding="utf-8")
         sync = (ROOT / "scripts/sync.py").read_text(encoding="utf-8")
@@ -330,31 +329,25 @@ class DeliveryContractTests(unittest.TestCase):
     def test_entry_policy_drift_fails(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            write(
-                root,
-                "src/skills/goal-to-delivery/SKILL.md",
-                "automatically working-tree queue selection only when called by the active loop "
-                "one focused question Staff Engineer authorized boundary is verified "
-                "owner-enabled OpenBot Workflow Coordinator references/openbot-handoff.md",
+            roles = (
+                ("src/skills/goal-to-delivery/SKILL.md", "allowed actions from the trusted caller", "automatic delivery"),
+                ("src/skills/spec-driven-delivery/SKILL.md", "exactly one", "manual entry policy"),
+                ("src/skills/linear-delivery-loop/SKILL.md", "autonomous label", "autonomous entry policy"),
+                ("src/skills/goal-to-delivery/references/openbot-handoff.md",
+                 "zero push or pull request attempts", "OpenBot publication permission"),
+                ("src/tool-instructions/shared/delivery-workflow.md",
+                 "stop at the pull request", "direct request routes and stopping points"),
             )
-            write(
-                root,
-                "src/skills/spec-driven-delivery/SKILL.md",
-                "manual exactly one return control one focused question explicit request for that stage "
-                "registered `artifactFolder`",
-            )
-            linear = write(
-                root,
-                "src/skills/linear-delivery-loop/SKILL.md",
-                "autonomous .ai/loop.json autonomous label human-decision label at most one "
-                "In Progress Backlog Done continuation issue "
-                "DECIDE <ISSUE> CUSTOM <SUGGESTION> notification click target "
-                "quiet standalone scheduled run set_thread_archived raw archive directive "
-                "record any new decisions verify that Goal to Delivery reached",
-            )
+            for relative, _, _ in roles:
+                write(root, relative, (ROOT / relative).read_text(encoding="utf-8"))
             self.assertEqual([], check_entry_policies(root))
-            linear.write_text("autonomous helper", encoding="utf-8")
-            self.assertTrue(check_entry_policies(root))
+            for relative, required, label in roles:
+                with self.subTest(relative=relative):
+                    path = root / relative
+                    original = path.read_text(encoding="utf-8")
+                    path.write_text(original.replace(required, ""), encoding="utf-8")
+                    self.assertTrue(any(label in item for item in check_entry_policies(root)))
+                    path.write_text(original, encoding="utf-8")
 
     def test_linear_loop_archives_only_quiet_standalone_runs(self) -> None:
         skill = (ROOT / "src/skills/linear-delivery-loop/SKILL.md").read_text(encoding="utf-8")
@@ -426,7 +419,7 @@ class DeliveryContractTests(unittest.TestCase):
             write(
                 root,
                 "src/skills/multi-agent-delivery/SKILL.md",
-                "$goal-to-delivery $spec-driven-delivery $linear-delivery-loop "
+                "$goal-to-delivery $spec-driven-delivery "
                 "caller supplies the stage. queue selection and external actions stay with the caller. "
                 "design conformance review",
             )

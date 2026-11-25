@@ -17,11 +17,15 @@ Run the following command with the verified Python interpreter. Resolve `<skill>
 
 A successful check prints `verified` and the workflow ID. It verifies the physical linked worktree, registered paths, completion boundary and Linear identifier. The registry accepts the `LUCH` and `SAAS` Linear team prefixes. A matching prefix alone says nothing about project membership. The Coordinator must verify the live project, claim and allowed actions.
 
+### Check publication permission
+
+Use `verified` as registration evidence. Before changing Git or provider state, check `allowedActions` in the trusted assignment. For a `pr` boundary, check that the assignment allows both pushing and opening a pull request. When a required action is missing, return `blocked` for the same `runId` and name the missing grant. On that path, make zero push or pull request attempts. With the required grants, complete the checks before opening the pull request and stop at the agreed boundary.
+
 For a local test board, the saved fixture assignment must map its issue ID to the descriptor's exact `workKey`. Pass this value as `--local-work-key <workKey>`. This mode accepts an untracked local registration and the `artifact` or `working-tree` boundary.
 
 ## Deliver in the issue worktree
 
-The Senior Full-Stack Engineer owns the plan, clarification, task breakdown and implementation. The Product Manager resolves product and user experience questions and evaluates the delivered outcome. Before implementation, an independent Staff Engineer audits readiness. QA checks the running result and verifies changed UI in a browser. A Staff Engineer independent of the work under review checks the exact revision. Save plans, tasks, decisions and evidence in the registered product artifact folder. [Delivery stages](../../spec-driven-delivery/references/delivery-stages.md)
+The Senior Full-Stack Engineer owns the plan, clarification, required UI design, task breakdown, and implementation. The Product Manager resolves product and user experience questions. An independent Staff Engineer audits readiness before implementation. QA checks the running result and changed UI. A Staff Engineer independent of the work reviews the exact revision. The Product Manager records product acceptance after engineering review and before handoff. Save evidence in the registered artifact folder. [Delivery stages](../../spec-driven-delivery/references/delivery-stages.md)
 
 ## Report to the Coordinator
 

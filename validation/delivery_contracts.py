@@ -29,7 +29,7 @@ WORKFLOW_ROUTES = {
     WORKFLOW_GUIDE: (
         SKILLS / "spec-driven-delivery/SKILL.md",
         SKILLS / "goal-to-delivery/SKILL.md",
-        SKILLS / "linear-delivery-loop/SKILL.md",
+        STAGE_REFERENCES / "delivery-stages.md",
         *SHARED_CONTRACTS,
     ),
     SKILLS / "spec-driven-delivery/SKILL.md": (
@@ -39,6 +39,7 @@ WORKFLOW_ROUTES = {
     ),
     SKILLS / "goal-to-delivery/SKILL.md": (
         SKILLS / "spec-driven-delivery/SKILL.md",
+        SKILLS / "goal-to-delivery/references/openbot-handoff.md",
         WORKFLOW_GUIDE,
     ),
     SKILLS / "linear-delivery-loop/SKILL.md": (
@@ -48,7 +49,7 @@ WORKFLOW_ROUTES = {
 }
 DELIVERY_STAGE_ORDER = (
     "discover", "plan", "clarify", "design", "task", "audit", "implement",
-    "design_review", "qa", "review", "docs", "commit", "pr", "merge", "post_merge",
+    "docs", "design_review", "qa", "review", "commit", "pr", "merge", "post_merge",
 )
 SPECIALIST_AGENTS = (
     "planner",
@@ -66,8 +67,7 @@ SPECIALIST_AGENTS = (
 GUIDANCE_FILES = (
     "AGENTS.md",
     "README.md",
-    "src/tool-instructions/codex/AGENTS.md",
-    "src/tool-instructions/claude/AGENTS.md",
+    "src/tool-instructions/shared/project-docs.md",
 )
 FORBIDDEN_OPERATIONAL_PATTERNS = (
     ("retired state name", re.compile(r"\bReady for Codex\b", re.IGNORECASE)),
@@ -365,11 +365,10 @@ def check_entry_policies(root: Path) -> list[str]:
             (
                 "automatically",
                 "working-tree",
-                "queue selection",
-                "only when called by the active loop",
+                "one selected goal",
+                "allowed actions from the trusted caller",
+                "caller owns queue selection",
                 "one focused question",
-                "Staff Engineer",
-                "owner-enabled OpenBot Workflow Coordinator",
                 "references/openbot-handoff.md",
                 "authorized boundary is verified",
             ),
@@ -389,6 +388,33 @@ def check_entry_policies(root: Path) -> list[str]:
                 "registered `artifactFolder`",
             ),
             "manual entry policy",
+        )
+    )
+    findings.extend(
+        _require_fragments(
+            root,
+            root / WORKFLOW_GUIDE,
+            (
+                "create a plan",
+                "return control",
+                "run a named stage",
+                "scoped working-tree changes",
+                "stop at the pull request",
+            ),
+            "direct request routes and stopping points",
+        )
+    )
+    findings.extend(
+        _require_fragments(
+            root,
+            skills / "goal-to-delivery" / "references" / "openbot-handoff.md",
+            (
+                "Use `verified` as registration evidence",
+                "`allowedActions` in the trusted assignment",
+                "`blocked` for the same `runId`",
+                "zero push or pull request attempts",
+            ),
+            "OpenBot publication permission",
         )
     )
     findings.extend(
@@ -599,7 +625,6 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
             (
                 "$goal-to-delivery",
                 "$spec-driven-delivery",
-                "$linear-delivery-loop",
                 "caller supplies the stage",
                 "queue selection and external actions stay with the caller",
                 "design conformance review",
@@ -607,6 +632,15 @@ def check_shared_specialists_and_routing(root: Path) -> list[str]:
             "policy-neutral specialist handoff primitive",
         )
     )
+    dependency_rule = "../skills/spec-driven-delivery/references/delivery-stages.md#implementation"
+    findings.extend(
+        _require_fragments(
+            root, stages, ("ask the caller to approve it before adding it",), "shared dependency approval"
+        )
+    )
+    for name in ("react", "nextjs-mui"):
+        path = root / "src" / "agents" / f"{name}.md"
+        findings.extend(_require_fragments(root, path, (dependency_rule,), "shared dependency approval link"))
     return findings
 
 

@@ -70,36 +70,18 @@ def write_skill_sources() -> None:
 
 
 def write_tool_instructions() -> None:
-    codex_dir = SRC_TOOL_INSTRUCTIONS / "codex"
-    claude_dir = SRC_TOOL_INSTRUCTIONS / "claude"
-    codex_dir.mkdir(parents=True, exist_ok=True)
-    claude_dir.mkdir(parents=True, exist_ok=True)
-
-    codex_instruction = codex_dir / "AGENTS.md"
-    claude_instruction = claude_dir / "AGENTS.md"
-
-    defaults = {
-        codex_instruction: (
-            "# Project AI Instructions\n\n"
-            "- Keep project-specific rules here.\n"
-            "- Keep reusable workflows in the shared ai-toolkit skills.\n"
-            "- Follow this repo's docs, architecture notes, and established patterns before coding.\n"
-            "- Prefer existing components, abstractions, and tests over new ones.\n"
-        ),
-        claude_instruction: (
-            "# Project AI Instructions\n\n"
-            "- Keep project-specific rules here.\n"
-            "- Keep reusable workflows in the shared ai-toolkit skills.\n"
-            "- Read this repo's docs, architecture notes, and established patterns before coding.\n"
-            "- Prefer existing components, abstractions, and tests over new ones.\n"
-        ),
-    }
-
-    for instruction, text in defaults.items():
-        if instruction.exists():
-            print(f"Skipped existing tool instruction {instruction}")
-            continue
-        instruction.write_text(text, encoding="utf-8")
+    instruction = SRC_TOOL_INSTRUCTIONS / "shared" / "project-agents.md"
+    if instruction.exists():
+        print(f"Skipped existing tool instruction {instruction}")
+        return
+    instruction.parent.mkdir(parents=True, exist_ok=True)
+    instruction.write_text(
+        "<!-- AI-TOOLKIT-LUCHDOM:START -->\n"
+        "# Project AI instructions\n\n"
+        "{{PROJECT_DOCUMENTATION_GUIDANCE}}\n\n"
+        "<!-- AI-TOOLKIT-LUCHDOM:END -->\n",
+        encoding="utf-8",
+    )
 
 
 def main() -> None:

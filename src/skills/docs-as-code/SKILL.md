@@ -20,11 +20,7 @@ Verify project tool instructions still route to the actual docs map. For a worki
 5. Verify commands, links, navigation, and any repository documentation gate available locally.
 6. Return changed pages, checks performed, and residual gaps. Do not claim code review or behavioral QA.
 
-Use only the registered artifact identity:
-
-- Do not reconstruct the artifact folder from a root literal or select it by recency or a similar slug.
-- New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder.
-- Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, migrate, or rewrite them.
+Use the [artifact contract](../../tool-instructions/shared/artifact-contract.md) to locate the registered work and historical evidence.
 
 Keep evidence separate from durable knowledge:
 
@@ -34,6 +30,6 @@ Keep evidence separate from durable knowledge:
 - Link useful evidence; do not add raw run logs or whole workflow folders to primary documentation navigation.
 - Keep Linear comments concise and link artifacts rather than copying full documents.
 
-The canonical cross-tool delivery protocol remains under `$goal-to-delivery` references. Repository docs may link to it and add repository-specific commands or stricter rules; they must not create a second normative copy.
+Link to the [shared delivery rules](../../tool-instructions/shared/delivery-workflow.md). Use repository docs for local commands and requirements.
 
 Edit docs only when the caller's active stage and repository authority allow it. A docs-only artifact can finish at the `artifact` boundary after its acceptance and documentation checks pass; never create an empty code change merely to publish evidence.

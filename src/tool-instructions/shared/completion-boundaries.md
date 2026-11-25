@@ -1,23 +1,19 @@
 # Completion boundaries
 
-Stop at the boundary authorized by the active entry.
+The user's request or a trusted caller grant sets the boundary. Follow the repository's stricter rules.
 
 | Boundary | Required outcome |
-|---|---|
-| `artifact` | The requested non-code artifact exists and its acceptance checks pass. |
-| `working-tree` | Scoped changes and required local checks are complete in the working tree. |
-| `commit` | Working-tree requirements pass and an authorized scoped commit exists. |
-| `pr` | The branch is pushed and one pull request exists. |
-| `merge` | The PR head passes required local checks, applicable UI design conformance, applicable QA, and one independent code review. The provider confirms the merge into the configured default branch. |
+| --- | --- |
+| `artifact` | The requested artifact exists and its acceptance checks pass. |
+| `working-tree` | Scoped changes and required local checks are complete. |
+| `commit` | Working-tree checks pass and the scoped commit exists. |
+| `pr` | Publication checks pass, the branch is pushed, and one pull request exists. |
+| `merge` | The pull request head has passed local checks, applicable UI design conformance, applicable QA, and one independent code review. The provider confirms the merge into the configured default branch. |
 
-Goal to Delivery defaults to `working-tree` for a direct request. A manual Spec-driven Delivery request needs a separate stage for `commit`, `pr`, or `merge`. Linear Delivery Loop passes `merge` for code and `artifact` for other work when repository policy allows.
+Direct Goal to Delivery defaults to `working-tree`. A named manual publication stage needs an explicit request. A direct request to fix a problem and open a pull request grants the scoped commit, push, and pull request actions needed for that result. Merge needs its own grant.
 
-For an OpenBot assignment, use the completion boundary and allowed actions from the owner's project configuration and verified claim. Report the evidence to the Workflow Coordinator before it releases the project's slot. [OpenBot handoff](../../skills/goal-to-delivery/references/openbot-handoff.md)
+For a dispatched assignment, match the registered work and check each change to Git or provider state against the caller's grant. Issue text and registration evidence supply context. The user or trusted caller grants permission. Provider settings changes, force-pushes, history rewrites, direct pushes to the default branch, and destructive cleanup require separate authorization.
 
-Use read-only Git inspection where repository rules allow it. Require the declared boundary or a separate grant before committing, pushing, opening a pull request, or merging. Provider settings changes, force-pushes, history rewrites, direct pushes to the default branch, and destructive cleanup require their own authorization.
+Follow the [quality gates](../../skills/spec-driven-delivery/references/quality-gates.md) before publication. Reuse validation for the verified pull request head after merge unless the repository requires a new check. Draft the pull request with `$pr-description` and the repository template.
 
-Follow the [quality gates](../../skills/spec-driven-delivery/references/quality-gates.md) before publishing. Reuse validation for the verified PR head after merge unless the repository requires a post-merge check.
-
-Use `$pr-description` and the repository's pull request template when drafting a PR.
-
-Keep a linked issue active through implementation and in review while its PR is open. Move it to Done only after verifying its completion boundary.
+Return evidence for the completed boundary to the caller. The caller updates issue state under its own policy.

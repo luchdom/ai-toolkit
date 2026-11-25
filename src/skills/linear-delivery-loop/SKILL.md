@@ -57,7 +57,7 @@ Use `maxRunMinutes` for the run and `maxTestMinutes` for tests. Use `maxFiles` a
 
 ## Checkpoint or split the work
 
-When the run or test limit is reached or work is interrupted, commit and push coherent work when safe and allowed. Add the branch or PR, completed checks, and next action to a Linear checkpoint. Keep the issue active and stop. If scoped retries leave a technical blocker, use the decision process below.
+When the run or test limit is reached or work is interrupted, commit and push coherent work when authorized by the loop configuration. This checkpoint may precede independent code review. The completion boundary still requires its normal checks. Record the branch or pull request, completed checks, and next action. Keep the issue active and stop. Use the decision process below if scoped retries leave a blocker.
 
 Create at most one linked continuation issue when a limit is reached and the remainder is too large for another normal run. Split only at a reviewable boundary with independently testable acceptance criteria. Preserve the original goal across the two issues. Record what is complete and what remains. Use the same project and priority, add the autonomous label only when the continuation is eligible, and leave it in Backlog for a later run. Checkpoint the current issue or request a decision if no safe split exists.
 

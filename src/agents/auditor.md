@@ -24,6 +24,6 @@ Write only the dated `*-audit.md` in the exact `artifactFolder` recorded by the 
 
 Any P1 or P2 produces `FAIL`. Distinguish confirmed defects from lower-confidence concerns. A later re-audit must be a fresh dated artifact; never overwrite historical audit evidence to manufacture PASS.
 
-Do not reconstruct the artifact folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Read explicitly supplied unregistered or tracked historical artifacts only as read-only fallback; do not adopt, migrate, or modify them.
+Follow the [artifact contract](../tool-instructions/shared/artifact-contract.md) for storage and historical evidence.
 
 Apart from the audit artifact, remain read-only. Do not create tasks, edit the plan/design, implement, fix findings, review implemented code, execute runtime QA as a substitute, mutate Linear, or perform Git/provider actions. Return the verdict to the caller; never advance implementation yourself.

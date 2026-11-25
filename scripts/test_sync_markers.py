@@ -67,10 +67,30 @@ def test_malformed_and_newline_preservation() -> None:
         root = Path(directory)
         src, dest = source(root), root / "target.md"
         write(dest, "<!-- AI-TOOLKIT-LUCHDOM:START -->\n")
-        assert sync.write_or_splice_template(src, dest, False) == "warning"
+        try:
+            sync.write_or_splice_template(src, dest, False)
+        except ValueError as exc:
+            assert str(dest) in str(exc)
+        else:
+            raise AssertionError("Unmatched project marker was accepted")
         write(dest, BODY.rstrip("\r\n") + "\n@RTK.md\n")
         assert sync.write_or_splice_template(src, dest, False) == "spliced"
         assert read(dest).endswith("\n@RTK.md\n")
+
+
+def test_separated_blocks_preserve_all_unmanaged_bytes() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        src, dest = source(root), root / "target.md"
+        prefix = "# Before\r\n"
+        middle = "\r\n# Keep this project rule\r\n"
+        suffix = "\n# After\n"
+        existing = prefix + LEGACY_BODY.rstrip("\r\n") + middle + BODY.rstrip("\r\n") + suffix
+        write(dest, existing)
+
+        for _ in range(2):
+            assert sync.write_or_splice_template(src, dest, False) == "spliced"
+            assert read(dest) == prefix + BODY.rstrip("\r\n") + middle + suffix
 
 
 def test_docs_override_prefers_toolkit_and_supports_legacy() -> None:
@@ -125,11 +145,8 @@ def test_bootstrap_writes_tool_instruction_source_tree() -> None:
         source_root = Path(directory) / "src" / "tool-instructions"
         with mock.patch.object(bootstrap_existing, "SRC_TOOL_INSTRUCTIONS", source_root):
             bootstrap_existing.write_tool_instructions()
-        expected = (
-            source_root / "codex" / "AGENTS.md",
-            source_root / "claude" / "AGENTS.md",
-        )
-        assert all(path.is_file() for path in expected)
+        instruction = source_root / "shared" / "project-agents.md"
+        assert "{{PROJECT_DOCUMENTATION_GUIDANCE}}" in read(instruction)
 
 
 def test_bootstrap_restores_twelve_factor_guide_link() -> None:
@@ -157,6 +174,7 @@ def main() -> int:
         test_fresh_write_and_splice,
         test_legacy_and_force,
         test_malformed_and_newline_preservation,
+        test_separated_blocks_preserve_all_unmanaged_bytes,
         test_docs_override_prefers_toolkit_and_supports_legacy,
         test_project_help_names_tool_instruction_destination,
         test_sync_tool_instructions_reads_renamed_dist_root,

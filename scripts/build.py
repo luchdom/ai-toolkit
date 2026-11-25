@@ -15,6 +15,7 @@ SKILL_REF_PATTERN = re.compile(r"\$([a-z0-9][a-z0-9-]*)")
 MANIFEST_VERSION = 1
 SKILL_ADAPTERS = ("codex", "claude")
 SENIOR_AGENT = "senior-full-stack-engineer"
+PROJECT_INSTRUCTIONS = Path("tool-instructions/shared/project-agents.md")
 TWELVE_FACTOR_GUIDE = Path("docs/twelve-factor-for-agentic-development.md")
 SHARED_DELIVERY_FILES = (
     "artifact-contract.md",
@@ -163,7 +164,10 @@ def rebuild_dist() -> None:
     projections: dict[Path, list[Path]] = {}
 
     shared = Path("tool-instructions/shared")
+    project_source = SRC / PROJECT_INSTRUCTIONS
     for source in (*sorted((SRC / shared).glob("*.md")), ROOT / TWELVE_FACTOR_GUIDE):
+        if source == project_source:
+            continue
         destinations = [DIST]
         if source.name in SHARED_DELIVERY_FILES:
             # Match the source layout so links from skills work after sync.
@@ -176,6 +180,10 @@ def rebuild_dist() -> None:
 
     markdown_guidance = (SRC / shared / "markdown-lint.md").read_text(encoding="utf-8")
     project_docs_guidance = (SRC / shared / "project-docs.md").read_text(encoding="utf-8")
+    reply_guidance = (SRC / shared / "reply-style.md").read_text(encoding="utf-8")
+    agent_guidance = "\n\n".join(guidance.strip() for guidance in (
+        markdown_guidance, project_docs_guidance, reply_guidance
+    ))
     config_source = SRC / shared / "markdownlint.json"
     config_output = DIST / shared / "markdownlint-cli2.jsonc"
     config_output.write_text(
@@ -188,7 +196,7 @@ def rebuild_dist() -> None:
     for agent_path in sorted((SRC / "agents").glob("*.md")):
         meta, body = parse_frontmatter(agent_path.read_text(encoding="utf-8"))
         body = body.replace(f"../../{TWELVE_FACTOR_GUIDE.as_posix()}", f"../{installed_guide.as_posix()}")
-        body = body.rstrip() + "\n\n" + markdown_guidance + "\n" + project_docs_guidance
+        body = body.rstrip() + "\n\n" + agent_guidance
         codex_text = render_codex_toml(meta, body)
         claude_text = render_claude_agent(meta, body)
         outputs = [
@@ -221,18 +229,13 @@ def rebuild_dist() -> None:
                 relative = source.relative_to(skill_dir)
                 projections[source] = [destination / relative for destination in destinations]
 
-    for tool in SKILL_ADAPTERS:
-        relative = Path(tool) / "AGENTS.md"
-        source = SRC / "tool-instructions" / relative
-        if source.exists():
-            output = DIST / "tool-instructions" / relative
-            output.write_text(
-                source.read_text(encoding="utf-8").replace(
-                    "{{PROJECT_DOCUMENTATION_GUIDANCE}}", project_docs_guidance.rstrip()
-                ),
-                encoding="utf-8",
-            )
-            projections[source] = [output]
+    project_text = project_source.read_text(encoding="utf-8").replace(
+        "{{PROJECT_DOCUMENTATION_GUIDANCE}}", project_docs_guidance.rstrip()
+    )
+    outputs = [DIST / "tool-instructions" / tool / "AGENTS.md" for tool in SKILL_ADAPTERS]
+    for output in outputs:
+        output.write_text(project_text, encoding="utf-8")
+    projections[project_source] = outputs
 
     write_projection_manifest(projections)
 

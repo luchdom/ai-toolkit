@@ -10,12 +10,12 @@ The caller entry policy controls advancement and authority throughout.
 | `tasker` | Ordered execution tasks and completeness notes | Independent audit verdict |
 | `auditor` when explicitly assigned | Independent pre-implementation audit | Tasks, code changes, code review |
 | Implementer | Required UI spec, shared components and tokens, scoped changes, focused tests and changed files | Approval of its own work or publication authority |
-| `senior-full-stack-engineer` in OpenBot | The selected issue's plan, clarification, UI spec when needed, task breakdown, implementation and fixes | Queue selection, independent audit, QA or code review |
+| `senior-full-stack-engineer` | Plan, clarification, required UI spec, tasks, implementation, and fixes for one assignment | Queue selection or independent audit, QA, and review |
 | `qa` | Independent rendered design conformance and acceptance-mapped runtime results for the same revision | Code fixes, code review or product acceptance |
 | docs skills | Durable docs update or no-impact record | Review/QA substitution |
 
 Hand back a failed artifact to its owner. Return failed post-build design conformance to the implementer, then rerun the affected review on the new implementation identity. Do not silently let one specialist absorb another's independence contract.
 
-Use the [clarification policy](../../spec-driven-delivery/references/clarification-policy.md) for decisions. Assign a separate Staff Engineer if prior material involvement would compromise the [independent review](../../spec-driven-delivery/references/quality-gates.md#independent-code-review). In OpenBot, the Product Manager evaluates the user journey after engineering review and returns any unmet criteria before handoff.
+Use the [clarification policy](../../spec-driven-delivery/references/clarification-policy.md) for decisions and the [quality gates](../../spec-driven-delivery/references/quality-gates.md#independent-code-review) to choose an independent reviewer.
 
 Specialists return their results to the caller. The caller handles tracking, Git, and publication.

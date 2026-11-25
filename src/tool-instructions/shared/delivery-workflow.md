@@ -1,23 +1,19 @@
 # Delivery workflow
 
-Use the entry that matches the request.
+Use the entry and stopping point the user requested.
 
-| Entry | Scope |
-|---|---|
-| [`$spec-driven-delivery`](../../skills/spec-driven-delivery/SKILL.md) | Defines the delivery process. A direct request runs exactly one stage. |
-| [`$goal-to-delivery`](../../skills/goal-to-delivery/SKILL.md) | Runs the applicable stages automatically for one selected goal. |
-| [`$linear-delivery-loop`](../../skills/linear-delivery-loop/SKILL.md) | Picks or resumes one Linear issue per run and passes it to Goal to Delivery. |
+| Request | Route and stopping point |
+| --- | --- |
+| Create a plan | Run [Spec-driven Delivery](../../skills/spec-driven-delivery/SKILL.md) `plan` and return control. |
+| Run a named stage or continue a manual delivery | Run the requested or next applicable stage. Check its prerequisites and return control. |
+| Fix a problem | Use Goal to Delivery for scoped working-tree changes and local checks. |
+| Fix a problem and open a pull request | Use Goal to Delivery, complete the required checks, and stop at the pull request. |
+| Run Goal to Delivery | Use [Goal to Delivery](../../skills/goal-to-delivery/SKILL.md) for one selected goal. |
 
-An owner-enabled OpenBot Workflow Coordinator can also pass one claimed issue to Goal to Delivery. It owns the project queue and the durable assignment. Codex returns checkpoints, questions and completion evidence to that Coordinator. [OpenBot handoff](../../skills/goal-to-delivery/references/openbot-handoff.md)
+The [stage order](../../skills/spec-driven-delivery/references/delivery-stages.md) defines the prerequisites. Follow the repository's commands and stricter rules. Protect unrelated changes.
 
-When the user asks for a plan, such as "create a plan" or "plan this change", run `$spec-driven-delivery plan <goal>` unless they choose another entry. Return the plan and hand control back to the user.
+An external runner selects the work and manages scheduling, decisions, and issue state. It supplies a verified assignment and the allowed actions for that run. The toolkit reports the result for the assigned work.
 
-Resume the same work one stage at a time when the user asks to continue. Use `clarify` to resolve open decisions, then `task` to break down the work after those decisions and any required design are complete. Follow the [delivery stages](../../skills/spec-driven-delivery/references/delivery-stages.md) for the remaining work.
-
-For other non-trivial delivery requests without a selected entry, use Spec-driven Delivery and run only the requested stage.
-
-Follow user and system requirements, then stricter repository rules, then the authority granted by the active entry. The repository owns its local commands and acceptance checks. Resolve any conflict about authority before implementing or changing external state. Keep unrelated changes intact.
-
-- Use the [artifact contract](artifact-contract.md) when saving plans and delivery evidence.
-- Use the [completion boundaries](completion-boundaries.md) to verify what the current request authorizes.
-- Use the [worktree policy](worktrees.md) before creating, resuming, or removing a linked Git worktree.
+- Save plans and evidence using the [artifact contract](artifact-contract.md).
+- Check the [completion boundaries](completion-boundaries.md) before publishing.
+- Follow the [worktree policy](worktrees.md) when creating, resuming, or removing a linked Git worktree.
