@@ -5,11 +5,13 @@ import hashlib
 import importlib.util
 import io
 import json
+import runpy
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest import mock
@@ -39,7 +41,7 @@ class RetiredAgentSyncTests(unittest.TestCase):
         self.enterContext(mock.patch.object(Path, "home", return_value=self.home))
         self.old = b"former toolkit profile\n"
         digest = hashlib.sha256(self.old).hexdigest()
-        test_hashes = {tool: dict.fromkeys(names, digest) for tool, names in sync.RETIRED_AGENT_DIGESTS.items()}
+        test_hashes = {tool: dict.fromkeys(names, (digest,)) for tool, names in sync.RETIRED_AGENT_DIGESTS.items()}
         self.enterContext(mock.patch.dict(sync.RETIRED_AGENT_DIGESTS, test_hashes))
 
     def build(self) -> None:
@@ -179,3 +181,64 @@ class RetiredAgentSyncTests(unittest.TestCase):
                     (self.dist / "claude/agents/code-reviewer.md").write_bytes(self.old)
                 self.assertIn("Rebuild dist", self.install(succeeds=False))
                 self.assertEqual(before, self.snapshot())
+
+
+class WritingRuleUpgradeTests(unittest.TestCase):
+    def install(self, script: Path, user_home: Path) -> None:
+        with (
+            mock.patch.object(Path, "home", return_value=user_home),
+            mock.patch.object(sys, "argv", [str(script), "--tool", "all", "--no-build", "--skip-external"]),
+            redirect_stdout(io.StringIO()),
+            redirect_stderr(io.StringIO()) as errors,
+            self.assertRaises(SystemExit) as result,
+        ):
+            runpy.run_path(str(script), run_name="__main__")
+        self.assertEqual(result.exception.code, 0, errors.getvalue())
+
+    def test_upgrade_real_plain_english_install(self) -> None:
+        revision = "6dcfbef7d1294fa4c469cc784d747fbe4c83a78c"
+        available = subprocess.run(["git", "cat-file", "-e", revision], cwd=ROOT, capture_output=True)
+        if available.returncode:
+            self.skipTest("Plain-English baseline commit is absent from this checkout")
+        archive = subprocess.check_output(["git", "archive", "--format=zip", revision], cwd=ROOT)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            old = root / "baseline"
+            with zipfile.ZipFile(io.BytesIO(archive)) as source:
+                source.extractall(old)
+            subprocess.run([sys.executable, "scripts/build.py"], cwd=old, capture_output=True, check=True)
+
+            script = ROOT / "scripts/sync.py"
+            fresh = root / "fresh"
+            upgrade = root / "upgrade"
+            customized = root / "customized"
+            self.install(old / "scripts/sync.py", upgrade)
+            shutil.copytree(upgrade, customized)
+            tool_configs = {"codex": "AGENTS.md", "claude": "CLAUDE.md"}
+            expected_custom = {}
+            for tool, extension in sync.AGENT_EXTENSIONS.items():
+                relative = Path(f".{tool}/agents/code-reviewer.{extension}")
+                local_profile = customized / relative
+                expected_custom[relative] = local_profile.read_bytes() + b"\nMy review rules.\n"
+                local_profile.write_bytes(expected_custom[relative])
+
+            self.install(script, fresh)
+            self.install(script, upgrade)
+            self.install(script, customized)
+            first = {path.relative_to(upgrade): path.read_bytes() for path in upgrade.rglob("*") if path.is_file()}
+            self.install(script, upgrade)
+            second = {path.relative_to(upgrade): path.read_bytes() for path in upgrade.rglob("*") if path.is_file()}
+            self.assertEqual(first, second)
+            for tool, instruction in tool_configs.items():
+                agent_files = Path(f".{tool}/agents")
+                self.assertEqual(
+                    sorted(path.name for path in (fresh / agent_files).iterdir()),
+                    sorted(path.name for path in (upgrade / agent_files).iterdir()),
+                )
+                for name in sync.RETIRED_AGENT_DIGESTS[tool]:
+                    self.assertFalse((upgrade / agent_files / name).exists())
+                for user_home in (fresh, upgrade, customized):
+                    text = (user_home / f".{tool}" / instruction).read_bytes()
+                    self.assertEqual(text.count(b"<!-- AI-TOOLKIT-REPLY-STYLE:START -->"), 1)
+            for relative, expected in expected_custom.items():
+                self.assertEqual((customized / relative).read_bytes(), expected)

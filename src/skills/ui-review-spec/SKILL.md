@@ -17,7 +17,7 @@ Turn current-product evidence into the registered workflow's design specificatio
 6. Cover responsive behavior, accessibility, keyboard/focus, loading, empty, error, success, disabled, and validation states where relevant.
 7. Write `<date>-<slug>-design.md` using [spec-template.md](./references/spec-template.md), or `<date>-<slug>-design-review.md` using [design-review-template.md](./references/design-review-template.md), in the exact `artifactFolder` recorded by the active work descriptor/registry. If the base name exists, preserve the terminal artifact type and insert deterministic `--02`, `--03`, and later sequences before `-design.md` or `-design-review.md`; never overwrite prior evidence.
 
-Do not allocate or reconstruct an artifact folder, invent a work key, or select a folder by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, rewrite, or add synthetic identity metadata to them.
+Use the [artifact contract](../../tool-instructions/shared/artifact-contract.md). Ask the caller to register the work before writing when required.
 
 Do not implement, perform code review, replace runtime QA, advance stages, or resolve a material product decision without the caller's clarification policy. Cite exact paths/tools and tie every recommendation or finding to the user goal, binding design sources, and observed rendered behavior.
 

@@ -22,6 +22,8 @@ Before design or implementation, initialize or resume the workflow when [design 
 
 Use the exact absolute `artifactFolder` from the descriptor and registry. Resume using an explicit issue, branch or pull request, workflow ID, or exact registered path. Let the workflow helper manage the identity fields in `workflow.json`. See the [descriptor schema](../../skills/goal-to-delivery/references/work-descriptor.schema.json) for field definitions.
 
+Resolve the folder through the registration. Never infer it from a root path, date, or similar slug.
+
 Use the [workflow helper](../../skills/goal-to-delivery/scripts/cli.py) to register local work and resume existing work. For a new Linear-backed registration, pass the observed issue to the helper's [`initialize_provider` API](../../skills/goal-to-delivery/scripts/workflow_init.py). Before allocating a new folder, check for an existing registration for the selected issue.
 
 ## Registered legacy compatibility

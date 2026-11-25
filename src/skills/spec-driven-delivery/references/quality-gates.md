@@ -16,20 +16,20 @@ Carry the acceptance checks into `task` and `qa`. In QA, run the planned cases u
 
 ## Audit before implementation
 
-Assign an independent Staff Engineer when work is high risk, ambiguous, unusually large, or touches security, tenancy, billing, or migrations. An entry or project can require an audit for every issue, as the OpenBot Software Factory does. For an existing workflow that explicitly assigns the `auditor` profile, use the same [audit checklist](../../task-audit-breakdown/references/audit-checklist.md). Elsewhere small routine work can use an inline plan and task breakdown.
+Assign an independent Staff Engineer when work is high risk, ambiguous, unusually large, or touches security, tenancy, billing, or migrations. Apply stricter audit rules from the caller or repository. An assigned `auditor` uses the same [audit checklist](../../task-audit-breakdown/references/audit-checklist.md). Small routine work can use an inline plan and task breakdown.
 
 The auditor reads the requirements, plan, tasks and applicable design directly from the registered work. Record findings, the owner of each correction and a `PASS` or `FAIL` in the dated `*-audit.md`. Any P1 or P2 finding requires a `FAIL`. After corrections, record a fresh verdict before implementation.
 
 ## Verify the implementation
 
 1. Run focused tests for the changed area.
-2. For changed rendered UI or interaction, the QA Engineer checks the rendered result against the [design gates](./design-gates.md) and records a current `PASS` or `FAIL`.
-3. Run QA for behavioral acceptance criteria. Exercise the real HTTP, browser, CLI, or other runtime path and record the result. Applicable design and behavioral checks must both pass.
+2. Update durable docs before recording the target for independent checks.
+3. Have QA verify changed UI or interaction against the [design gates](design-gates.md). Exercise the real entry points for behavioral acceptance criteria. Applicable design and behavioral checks must both pass.
 4. Complete one independent code review before publishing code or finishing automatic code delivery. Review the exact diff or commit with the applicable QA and design results.
-5. Update durable docs when behavior, architecture, setup, or operations changed.
+5. Record any product acceptance the caller or repository requires for the same target.
 6. Before merge, verify that the PR head passed the standard local validation command and all applicable gates. Reuse results for that head.
 
-The [Linear loop](../../linear-delivery-loop/SKILL.md#checkpoint-or-split-the-work) can commit and push an authorized checkpoint before review. Keep the issue active until the work passes review and reaches its completion boundary.
+An integration may allow an interim checkpoint before review. Require the caller's explicit grant for that checkpoint and verify all applicable checks before reporting completion.
 
 ## Independent code review
 

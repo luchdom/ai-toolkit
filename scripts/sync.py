@@ -11,6 +11,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
 
 
@@ -32,15 +33,59 @@ REPLACEMENT_AGENTS = (build.SENIOR_AGENT, "staff-engineer", "product-manager", "
 MARKER_START = "<!-- AI-TOOLKIT-LUCHDOM:START -->"
 MARKER_END = "<!-- AI-TOOLKIT-LUCHDOM:END -->"
 LEGACY_MARKER_PAIRS = (("<!-- AI-CONFIG-LUCHDOM:START -->", "<!-- AI-CONFIG-LUCHDOM:END -->"),)
-# Last shipped adapters from 3f4ba06, hashed with LF line endings on both platforms.
+MARKER_ENDS = dict(((MARKER_START, MARKER_END), *LEGACY_MARKER_PAIRS))
+PROJECT_MARKERS = MARKER_ENDS.keys() | set(MARKER_ENDS.values())
+CODE_FENCE = re.compile(r"(`{3,}|~{3,})(.*)")
+LIST_ITEM = re.compile(r"([-+*]|[0-9]{1,9}[.)])(?= |$)( *)")
+THEMATIC_BREAK = re.compile(r"(?:(?:- *){3,}|(?:\* *){3,}|(?:_ *){3,})$")
+HEADING = re.compile(r"#{1,6}(?: |$)")
+HTML_BLOCK_TAGS = """
+address article aside base basefont blockquote body caption center col colgroup dd
+details dialog dir div dl dt fieldset figcaption figure footer form frame frameset
+h1 h2 h3 h4 h5 h6 head header hr html iframe legend li link main menu menuitem nav
+noframes ol optgroup option p param search section summary table tbody td tfoot th
+thead title tr track ul
+"""
+HTML_BLOCK_START = re.compile(
+    r"<(?:(?P<comment>!--)|(?P<instruction>\?)|(?P<cdata>!\[CDATA\[)|(?P<declaration>![a-z])"
+    r"|(?P<raw>pre|script|style|textarea)(?=[ >]|$)"
+    r"|/?(?:" + "|".join(HTML_BLOCK_TAGS.split()) + r")(?=[ >]|/>|$))",
+    re.IGNORECASE,
+)
+HTML_TAG_LINE = re.compile(
+    r"</[a-z][a-z0-9-]* *+>"
+    r"|<[a-z][a-z0-9-]*(?: ++[a-z_:][a-z0-9_.:-]*(?: *+= *+(?:[^ \"'=<>`]++|\"[^\"]*\"|'[^']*'))?)* *+/?>",
+    re.IGNORECASE,
+)
+HTML_UNTIL_BLANK = re.compile(r"^$")
+HTML_BLOCK_ENDS = {
+    "comment": re.compile(r"-->"),
+    "instruction": re.compile(r"\?>"),
+    "cdata": re.compile(r"\]\]>"),
+    "declaration": re.compile(r">"),
+    "raw": re.compile(r"</(?:pre|script|style|textarea)>", re.IGNORECASE),
+}
+# Known retired adapters from 3f4ba06 and the 6dcfbef writing-rule build.
 RETIRED_AGENT_DIGESTS = {
     "codex": {
-        "product-designer.toml": "a2e6f1f839e76f22ec9c5260867db669e00ac5a8d8b277bc1337d3c24eb09d26",
-        "code-reviewer.toml": "decf8c891dd2db7dd5cea5fa979ff05f64d20b2d5f7ae8e19e11be5c338dfd19",
+        "product-designer.toml": (
+            "a2e6f1f839e76f22ec9c5260867db669e00ac5a8d8b277bc1337d3c24eb09d26",
+            "0eb1dd0f8df61e5bf6965478769c7c7c9b68172f136042088d8596b119f13eed",
+        ),
+        "code-reviewer.toml": (
+            "decf8c891dd2db7dd5cea5fa979ff05f64d20b2d5f7ae8e19e11be5c338dfd19",
+            "767945a9ea614eec50f839ee4bbf51c4396c18a291b9324ac023957fa91e8d9c",
+        ),
     },
     "claude": {
-        "product-designer.md": "4e662143ad3220631d770316f9c2824d6a7da1f6305696e6aa126a0932eb4504",
-        "code-reviewer.md": "de171546c105817c1f92b5d21d596ee5561b559273a882a7664b9ae945f0db23",
+        "product-designer.md": (
+            "4e662143ad3220631d770316f9c2824d6a7da1f6305696e6aa126a0932eb4504",
+            "2523a50ccb0a65fd5af4be3b342fe3dd0e041702f6eaabd344b592c8a5cd0515",
+        ),
+        "code-reviewer.md": (
+            "de171546c105817c1f92b5d21d596ee5561b559273a882a7664b9ae945f0db23",
+            "031c9e41d53f1d24cd13e097afcf6087d0c64fcae9fc088f7cfb3f30c8e2fa95",
+        ),
     },
 }
 
@@ -141,7 +186,7 @@ def sync_agents(tool: str, tool_home: Path, pattern: str) -> None:
         else:
             sync_file(source, destination / source.name)
 
-    for name, previous_hash in retired.items():
+    for name, previous_hashes in retired.items():
         target = destination / name
         if not os.path.lexists(target):
             continue
@@ -149,7 +194,7 @@ def sync_agents(tool: str, tool_home: Path, pattern: str) -> None:
             print(f"Preserved retired agent path {target} (link or special file)")
             continue
         content = target.read_bytes().replace(b"\r\n", b"\n")
-        if hashlib.sha256(content).hexdigest() == previous_hash:
+        if hashlib.sha256(content).hexdigest() in previous_hashes:
             target.unlink(missing_ok=True)
             print(f"Removed retired toolkit agent {target}")
         else:
@@ -181,6 +226,135 @@ def consume_newline(text: str, position: int) -> int:
     return position
 
 
+def opening_code_fence(content: str) -> str:
+    match = CODE_FENCE.match(content)
+    if match and (match[1][0] == "~" or "`" not in match[2]):
+        return match[1]
+    return ""
+
+
+def opening_html_block(content: str, paragraph: bool) -> re.Pattern[str] | None:
+    if match := HTML_BLOCK_START.match(content):
+        return HTML_BLOCK_ENDS.get(match.lastgroup, HTML_UNTIL_BLANK)
+    if not paragraph and HTML_TAG_LINE.fullmatch(content):
+        return HTML_UNTIL_BLANK
+    return None
+
+
+def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
+    """Find standalone markers in the first column, outside literal examples."""
+    bom_length = int(text.startswith("\ufeff"))
+    lists: list[int] = []
+    fence = ""
+    fence_indent = 0
+    html_end: re.Pattern[str] | None = None
+    html_indent = 0
+    paragraph = False
+    empty_item = False
+    for line in re.finditer(r"([^\r\n]*)(?:\r\n|\n|\r|$)", text[bom_length:]):
+        raw = line[1].rstrip(" \t")
+        if not raw:
+            paragraph = False
+            if html_end is HTML_UNTIL_BLANK:
+                html_end = None
+            if empty_item:
+                lists.pop()
+                empty_item = False
+            continue
+        empty_item = False
+        expanded = raw.expandtabs(4)
+        content = expanded.lstrip(" ")
+        column = len(expanded) - len(content)
+        if fence:
+            if column >= fence_indent:
+                closing = CODE_FENCE.match(content)
+                if closing and column <= fence_indent + 3 and closing[1].startswith(fence) and not closing[2]:
+                    fence = ""
+                continue
+            # Outdenting a list ends its fence, even without a closing delimiter.
+            fence = ""
+
+        if html_end:
+            # Fence-looking lines inside an HTML block are literal. Standalone
+            # marker comments also end an ordinary HTML block in project instructions.
+            if column >= html_indent and (html_end is not HTML_UNTIL_BLANK or raw not in PROJECT_MARKERS):
+                if html_end.search(content):
+                    html_end = None
+                continue
+            html_end = None
+
+        # Markdown lets a list paragraph continue without the list indent.
+        # Keep the list open until a blank line or another block ends the paragraph.
+        if lists and column < lists[-1]:
+            if paragraph and not (
+                LIST_ITEM.match(content)
+                or opening_code_fence(content)
+                or THEMATIC_BREAK.fullmatch(content)
+                or HEADING.match(content)
+                or HTML_BLOCK_START.match(content)
+                or content.startswith(">")
+            ):
+                continue
+            while lists and column < lists[-1]:
+                lists.pop()
+            paragraph = False
+        indent = lists[-1] if lists else 0
+        if raw in PROJECT_MARKERS:
+            yield raw, bom_length + line.start()
+            paragraph = False
+            continue
+        if column <= indent + 3 and THEMATIC_BREAK.fullmatch(content):
+            paragraph = False
+            continue
+
+        # Remember the list's content column across blank lines. A list can
+        # open a fence on the same line or in a later paragraph.
+        while column <= indent + 3 and (item := LIST_ITEM.match(content)):
+            label, padding = item.groups()
+            tail = content[item.end():]
+            if paragraph and (not tail or (len(label) > 1 and label[:-1] != "1")):
+                break
+            width = len(label) + (len(padding) if 1 <= len(padding) <= 4 else 1)
+            indent = column + width
+            lists.append(indent)
+            empty_item = not tail
+            content = content[width:]
+            column = indent
+            paragraph = False
+
+        if column <= indent + 3 and (opening := opening_code_fence(content)):
+            fence, fence_indent = opening, indent
+            paragraph = False
+            continue
+        if column <= indent + 3 and (ending := opening_html_block(content, paragraph)):
+            if not ending.search(content):
+                html_end, html_indent = ending, indent
+            paragraph = False
+            continue
+        paragraph = bool(content) and not (
+            HEADING.match(content)
+            or content.startswith(">")
+            or re.fullmatch(r"-+|=+", content)
+        )
+
+
+def project_marker_spans(text: str, path: Path) -> list[tuple[int, int]]:
+    error = f"Malformed toolkit markers in {path}. Fix unmatched or overlapping blocks and rerun sync."
+    spans: list[tuple[int, int]] = []
+    start: tuple[str, int] | None = None
+    for marker, position in project_marker_lines(text):
+        if start is None and marker in MARKER_ENDS:
+            start = (marker, position)
+        elif start is not None and marker == MARKER_ENDS[start[0]]:
+            spans.append((start[1], position + len(marker)))
+            start = None
+        else:
+            raise ValueError(error)
+    if start is not None:
+        raise ValueError(error)
+    return spans
+
+
 def write_or_splice_template(src: Path, dest: Path, force: bool) -> str:
     """Render a new managed file or refresh only its marker-owned content."""
     rendered = render_template_text(src)
@@ -201,37 +375,22 @@ def write_or_splice_template(src: Path, dest: Path, force: bool) -> str:
     with open(dest, "r", encoding="utf-8", newline="") as file:
         existing = file.read()
 
-    marker_spans: list[tuple[int, int, int, int]] = []
-    for start_marker, end_marker in ((MARKER_START, MARKER_END), *LEGACY_MARKER_PAIRS):
-        start_positions = [match.start() for match in re.finditer(re.escape(start_marker), existing)]
-        end_positions = [match.start() for match in re.finditer(re.escape(end_marker), existing)]
-        if not start_positions and not end_positions:
-            continue
-        if not start_positions or not end_positions:
-            print(f"Warning: malformed markers in {dest} (start/end mismatch), skipped")
-            return "warning"
-
-        first_start = min(start_positions)
-        last_end = max(end_positions)
-        if first_start >= last_end:
-            print(f"Warning: malformed markers in {dest} (markers out of order), skipped")
-            return "warning"
-        marker_spans.append((first_start, last_end + len(end_marker), len(start_positions), len(end_positions)))
-
-    if not marker_spans:
-        print(f"Skipped existing {dest} (no markers; re-run with --force to adopt)")
+    spans = project_marker_spans(existing, dest)
+    if not spans:
+        print(f"Skipped unmarked {dest}. Use --force only to replace the whole file.")
         return "skipped"
 
-    first_start = min(span[0] for span in marker_spans)
-    last_end = max(span[1] for span in marker_spans)
-    if len(marker_spans) > 1 or any(starts > 1 or ends > 1 for _, _, starts, ends in marker_spans):
-        print(f"Warning: multiple marker pairs found in {dest}, using outermost")
-
-    prefix = existing[:first_start]
-    suffix = existing[consume_newline(existing, last_end):]
-    with open(dest, "w", encoding="utf-8", newline="") as file:
-        file.write(prefix + rendered + suffix)
-    print(f"Spliced {dest} (preserved external content)")
+    first_start, end = spans[0]
+    parts = [existing[:first_start], rendered.rstrip("\r\n")]
+    for start, next_end in spans[1:]:
+        parts.append(existing[end:start])
+        end = next_end
+    parts.append(existing[end:])
+    updated = "".join(parts)
+    if updated != existing:
+        with open(dest, "w", encoding="utf-8", newline="") as file:
+            file.write(updated)
+        print(f"Spliced {dest} (preserved text outside managed blocks)")
     return "spliced"
 
 
@@ -282,6 +441,11 @@ def sync_project_docs_guidance(dest: Path) -> None:
     sync_user_instruction_block(dest, source.read_text(encoding="utf-8"), "PROJECT-DOCS", "Project documentation")
 
 
+def sync_reply_guidance(dest: Path) -> None:
+    source = DIST / "tool-instructions" / "shared" / "reply-style.md"
+    sync_user_instruction_block(dest, source.read_text(encoding="utf-8"), "REPLY-STYLE", "Writing")
+
+
 def sync_delivery_guidance(tool: str, tool_home: Path, instructions: Path) -> None:
     shared = Path("tool-instructions/shared")
     for source in sorted((DIST / tool / shared).glob("*.md")):
@@ -304,6 +468,7 @@ def sync_codex() -> None:
     sync_skill_dirs(DIST / "codex" / "skills", codex_home / "skills")
     sync_markdown_guidance(codex_home / "AGENTS.md")
     sync_project_docs_guidance(codex_home / "AGENTS.md")
+    sync_reply_guidance(codex_home / "AGENTS.md")
     sync_delivery_guidance("codex", codex_home, codex_home / "AGENTS.md")
     dotnet_routing = DIST / "tool-instructions" / "shared" / "dotnet-routing.md"
     sync_user_instruction_block(
@@ -320,6 +485,7 @@ def sync_claude() -> None:
     sync_skill_dirs(DIST / "claude" / "skills", claude_home / "skills")
     sync_markdown_guidance(claude_home / "CLAUDE.md")
     sync_project_docs_guidance(claude_home / "CLAUDE.md")
+    sync_reply_guidance(claude_home / "CLAUDE.md")
     sync_delivery_guidance("claude", claude_home, claude_home / "CLAUDE.md")
 
 
@@ -345,7 +511,7 @@ def main() -> int:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Hard-overwrite project tool instructions and adopt unmarked legacy files.",
+        help="Replace the entire project AGENTS.md, including personal or unmarked instructions.",
     )
     parser.add_argument(
         "--skip-external", action="store_true",
@@ -375,8 +541,12 @@ def main() -> int:
     except (OSError, ValueError, TypeError, AttributeError, KeyError, external_skills.ImportError) as exc:
         print(f"AGENT SYNC ERROR: {exc}", file=sys.stderr)
         return 1
-    for project in args.project:
-        sync_tool_instructions(Path(project), tools, args.force)
+    try:
+        for project in args.project:
+            sync_tool_instructions(Path(project), tools, args.force)
+    except (OSError, ValueError) as exc:
+        print(f"PROJECT SYNC ERROR: {exc}", file=sys.stderr)
+        return 1
 
     if not args.skip_external:
         try:

@@ -1,13 +1,11 @@
 <!-- AI-TOOLKIT-PROJECT-DOCS:START -->
 ## Project documentation
 
-When the user asks to refine a product goal, feature request, or engineering decision, use `$refine`. Recognize requests such as "I want to refine ..." or "Help me pressure-test this feature" as invocations.
+For a plan or delivery request, follow `tool-instructions/shared/delivery-workflow.md` in the active tool's home. Use `$refine` when the user asks to pressure-test a goal or decision.
 
-When the user asks for a plan, run `$spec-driven-delivery plan <goal>` unless they choose another workflow. Return the plan and hand control back to the user. Follow the skill's artifact contract when saving a plan. Read `tool-instructions/shared/delivery-workflow.md` in the active tool's home to continue with `clarify`, `task`, and later stages.
+Before substantial planning or implementation, follow the docs links in the project's root `AGENTS.md`. Read the product, design, and architecture documents that apply to the work. Use `$project-docs-review` for missing or conflicting guidance and `$project-docs` to establish a needed document.
 
-Before substantive project planning or implementation, locate the root `AGENTS.md` and relevant product, design, and architecture docs. New projects default to `docs/PRD.md`, `docs/DESIGN_SYSTEM.md` (when a UI exists), and `docs/ARCHITECTURE.md`; reuse existing equivalents and follow their actual links. Read the sections needed for the task. Use `$project-docs-review` for missing, misplaced, outdated, or conflicting foundations, and suggest `$project-docs` for specific creation or refinement. Respect earlier declines and continue authorized work when gaps are nonblocking. Keep the relevant docs current within the active editing scope. Project setup uses `AGENTS.md` as its shared entry point.
+For UI work, follow the working design-system guide in `$project-docs`. Verify the shared components in the runnable catalogue before composing pages. For a docs-only task, record the catalogue proposal.
 
-For frontend work, locate the written design system, shared component sources, and runnable catalogue. Before building pages, use `$project-docs` and its working design-system guide to establish the design system or catalogue if either is missing. Within authorized UI work, demonstrate the required shared components and variants in the runnable catalogue first. Compose pages with those same implementations and tokens. During docs-only work, record the catalogue proposal and remaining implementation.
-
-When documentation edits are in scope, maintain a direct docs map in project `AGENTS.md` and point existing project-specific tool routers to it with valid relative paths. For a working catalogue, record its source, local URL, startup command, and access conditions in the map or linked design-system guide.
+Keep the root docs map and existing tool links current when editing docs. Record the catalogue source, URL, startup command, and access rules where they apply.
 <!-- AI-TOOLKIT-PROJECT-DOCS:END -->

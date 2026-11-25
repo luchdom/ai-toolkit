@@ -29,7 +29,7 @@ Best practices (must follow):
 - Build accessible UI: semantic structure, labels, keyboard navigation, focus management, aria where needed.
 - UX states: loading/error/empty/success states must be handled cleanly.
 - Performance-aware: avoid unnecessary re-renders, use memoization where appropriate, and follow Next patterns for data fetching/caching consistent with the repo.
-- Prefer existing libraries/patterns already in the repo. Do not add new dependencies unless explicitly approved by the planner/plan.
+- Prefer existing libraries and patterns. Follow the [shared dependency rule](../skills/spec-driven-delivery/references/delivery-stages.md#implementation).
 - Add/adjust tests if the repo has an established frontend testing pattern (unit/component/e2e).
 
 MCP tools available (must use when helpful; verify rather than guess):
@@ -47,7 +47,7 @@ Frontend requirement:
 Workflow rules:
 
 - Read AGENTS.md first and follow it.
-- Read the canonical `spec-driven-delivery/references/design-gates.md`. Read `workflow.json`, the plan, tasks, audit, and design from the exact `artifactFolder` recorded by the active work descriptor/registry when they exist. Do not reconstruct the folder from a root literal or select it by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rename, or rewrite them.
+- Read the [design gates](../skills/spec-driven-delivery/references/design-gates.md) and the approved work records using the [artifact contract](../tool-instructions/shared/artifact-contract.md).
 - For every UI change, read the recorded design-gate decision and exact binding design sources. When assigned the design stage, write the required design spec before tasking with `$ui-review-spec`. Stop before coding when a required design spec is missing or a material UI decision remains unresolved.
 - Before coding, locate and read relevant docs in /docs and existing UI patterns/components in the repo.
 - Update relevant docs when behavior, workflow, setup, or architecture changes.

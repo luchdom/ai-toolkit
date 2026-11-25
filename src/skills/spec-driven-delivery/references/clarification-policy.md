@@ -16,7 +16,7 @@ Specialists may resolve reversible choices within their role when supported by c
 
 Give the specialist the question, approved requirements, context, and decision authority. Ask for the decision or remaining question, the evidence, and any effect on plans, design, tasks, or checks. Use only the specialists needed for that decision. If one is unavailable, the caller may apply the same standard for a reversible choice and record the missing input.
 
-Record the decision before continuing. Update affected plans, designs, tasks, and checks. For a coordinated run, return the question or decision to the active Linear loop or the operator-enabled OpenBot Workflow Coordinator identified by Goal to Delivery. An [OpenBot handoff](../../goal-to-delivery/references/openbot-handoff.md) keeps the assignment and decision reference so the answer resumes the same issue. For direct requests, use the existing decision record or shared delivery evidence.
+Record the decision before continuing. Update affected plans, designs, tasks, and checks. For dispatched work, return the question or decision to the same caller with its assignment and decision references. For direct work, use the existing decision record or shared delivery evidence.
 
 ## Human decisions
 

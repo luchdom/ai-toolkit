@@ -15,7 +15,7 @@ Draft PR text that is easy for reviewers to scan and test.
 4. Keep the PR title under 70 characters.
 5. Write `<date>-<slug>-pr-description.md` to the exact `artifactFolder` recorded by the active work descriptor/registry.
 
-Do not allocate or reconstruct a workflow folder, and do not select one by recency or a similar slug. New/current registered work resolves under `.ai/work`; an exactly registered legacy workflow continues in its exact registered folder. Explicitly supplied unregistered or tracked historical artifacts are read-only fallback; never adopt, rewrite, or migrate them.
+Use the [artifact contract](../../tool-instructions/shared/artifact-contract.md) to find existing evidence.
 
 ## Writing Rules
 
