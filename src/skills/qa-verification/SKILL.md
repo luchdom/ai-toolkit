@@ -9,13 +9,13 @@ Verify the exact implementation target against observable acceptance criteria. W
 
 ## Discover the local gate
 
-- Read `AGENTS.md`, `README`, relevant docs, and manifests/scripts to discover the repository's real build, test, lint, type, documentation, and aggregate validation commands.
+- Read `AGENTS.md` and the relevant docs it links to identify applicable rules. Use the docs, `README`, and manifests or scripts to find the repository's build, test, lint, type, documentation, and aggregate validation commands.
 - Derive commands from the repository. Never hardcode machine paths, ports, URLs, tokens, or environment identifiers.
 - Identify the exact working tree or SHA under test and fail on ambiguity.
 
 ## Exercise behavior
 
-1. Run the smallest relevant checks first, then the full repository-required local aggregate.
+1. Run the smallest relevant checks first, then the full repository-required local aggregate. Apply the [repository-rule checks](../spec-driven-delivery/references/quality-gates.md#repository-rules) to the affected design and behavior and run any applicable architecture tests.
 2. Map every acceptance criterion to a concrete observed result.
 3. Use real HTTP/browser/CLI/user flows for behavioral criteria. Mock only true boundaries.
 4. Use environment guards, non-default values, isolated disposable data, bounded readiness predicates, and verified cleanup. Avoid fixed sleeps.

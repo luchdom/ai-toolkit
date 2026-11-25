@@ -19,7 +19,7 @@ Every plan must cover:
 - current state and exact sources consulted;
 - proposed architecture, contracts, data/storage, and flows as applicable;
 - ordered implementation approach;
-- test and real-behavior acceptance strategy;
+- test and real-behavior acceptance strategy, including [affected repository rules](../skills/spec-driven-delivery/references/quality-gates.md#repository-rules) and how to verify them;
 - observability/debuggability, rollout/rollback, risks, and open questions;
 - documentation impact as exact pages or `none` with a reason;
 - for frontend/UI scope, the rendered-UI change classification, exact binding design sources, whether a pre-implementation design spec is required and why, and the required post-implementation design-conformance path;

@@ -22,7 +22,7 @@ Start a stage when its inputs are ready. Run the applicable stages in order. Whe
 
 ## Prerequisites
 
-- In `plan`, cover affected [critical workflows](quality-gates.md#critical-workflows).
+- In `plan`, identify the affected [repository rules](quality-gates.md#repository-rules) and cover [critical workflows](quality-gates.md#critical-workflows).
 - Resolve material decisions with the [clarification policy](clarification-policy.md) and finish any required [design specification](design-gates.md) before task breakdown.
 - Finish tracked docs before design review, QA, and code review record the target. Use the [quality gates](quality-gates.md) to decide which checks apply.
 - Use [completion boundaries](../../../tool-instructions/shared/completion-boundaries.md) for Git and publication. A caller or repository can require product acceptance in addition to the shared checks.

@@ -25,6 +25,14 @@ SHARED_CONTRACTS = (
     SHARED_REFERENCES / "worktrees.md",
 )
 CANONICAL_REFERENCES = (*STAGE_CONTRACTS, *SHARED_CONTRACTS, WORKFLOW_GUIDE, DESCRIPTOR_SCHEMA)
+REPOSITORY_RULE_SOURCES = (
+    STAGE_REFERENCES / "delivery-stages.md",
+    SKILLS / "dotnet-implementation/SKILL.md",
+    SKILLS / "qa-verification/SKILL.md",
+    Path("src/agents/planner.md"),
+    Path("src/agents/qa.md"),
+    Path("src/agents/staff-engineer.md"),
+)
 WORKFLOW_ROUTES = {
     WORKFLOW_GUIDE: (
         SKILLS / "spec-driven-delivery/SKILL.md",
@@ -46,6 +54,7 @@ WORKFLOW_ROUTES = {
         SKILLS / "goal-to-delivery/SKILL.md",
         WORKFLOW_GUIDE,
     ),
+    **dict.fromkeys(REPOSITORY_RULE_SOURCES, (STAGE_REFERENCES / "quality-gates.md",)),
 }
 DELIVERY_STAGE_ORDER = (
     "discover", "plan", "clarify", "design", "task", "audit", "implement",
