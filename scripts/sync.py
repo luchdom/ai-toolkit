@@ -43,13 +43,28 @@ HTML_BLOCK_TAGS = """
 address article aside base basefont blockquote body caption center col colgroup dd
 details dialog dir div dl dt fieldset figcaption figure footer form frame frameset
 h1 h2 h3 h4 h5 h6 head header hr html iframe legend li link main menu menuitem nav
-noframes ol optgroup option p param pre script search section style summary table
-tbody td textarea tfoot th thead title tr track ul
+noframes ol optgroup option p param search section summary table tbody td tfoot th
+thead title tr track ul
 """
 HTML_BLOCK_START = re.compile(
-    r"<(?:[!?]|/?(?:" + "|".join(HTML_BLOCK_TAGS.split()) + r")(?=[ />]|$))",
+    r"<(?:(?P<comment>!--)|(?P<instruction>\?)|(?P<cdata>!\[CDATA\[)|(?P<declaration>![a-z])"
+    r"|(?P<raw>pre|script|style|textarea)(?=[ >]|$)"
+    r"|/?(?:" + "|".join(HTML_BLOCK_TAGS.split()) + r")(?=[ >]|/>|$))",
     re.IGNORECASE,
 )
+HTML_TAG_LINE = re.compile(
+    r"</[a-z][a-z0-9-]* *+>"
+    r"|<[a-z][a-z0-9-]*(?: ++[a-z_:][a-z0-9_.:-]*(?: *+= *+(?:[^ \"'=<>`]++|\"[^\"]*\"|'[^']*'))?)* *+/?>",
+    re.IGNORECASE,
+)
+HTML_UNTIL_BLANK = re.compile(r"^$")
+HTML_BLOCK_ENDS = {
+    "comment": re.compile(r"-->"),
+    "instruction": re.compile(r"\?>"),
+    "cdata": re.compile(r"\]\]>"),
+    "declaration": re.compile(r">"),
+    "raw": re.compile(r"</(?:pre|script|style|textarea)>", re.IGNORECASE),
+}
 # Known retired adapters from 3f4ba06 and the 6dcfbef writing-rule build.
 RETIRED_AGENT_DIGESTS = {
     "codex": {
@@ -218,17 +233,30 @@ def opening_code_fence(content: str) -> str:
     return ""
 
 
+def opening_html_block(content: str, paragraph: bool) -> re.Pattern[str] | None:
+    if match := HTML_BLOCK_START.match(content):
+        return HTML_BLOCK_ENDS.get(match.lastgroup, HTML_UNTIL_BLANK)
+    if not paragraph and HTML_TAG_LINE.fullmatch(content):
+        return HTML_UNTIL_BLANK
+    return None
+
+
 def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
-    """Find standalone, first-column markers outside Markdown code fences."""
+    """Find standalone markers in the first column, outside literal examples."""
+    bom_length = int(text.startswith("\ufeff"))
     lists: list[int] = []
     fence = ""
     fence_indent = 0
+    html_end: re.Pattern[str] | None = None
+    html_indent = 0
     paragraph = False
     empty_item = False
-    for line in re.finditer(r"([^\r\n]*)(?:\r\n|\n|\r|$)", text):
+    for line in re.finditer(r"([^\r\n]*)(?:\r\n|\n|\r|$)", text[bom_length:]):
         raw = line[1].rstrip(" \t")
         if not raw:
             paragraph = False
+            if html_end is HTML_UNTIL_BLANK:
+                html_end = None
             if empty_item:
                 lists.pop()
                 empty_item = False
@@ -245,6 +273,15 @@ def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
                 continue
             # Outdenting a list ends its fence, even without a closing delimiter.
             fence = ""
+
+        if html_end:
+            # Fence-looking lines inside an HTML block are literal. Standalone
+            # marker comments also end an ordinary HTML block in project instructions.
+            if column >= html_indent and (html_end is not HTML_UNTIL_BLANK or raw not in PROJECT_MARKERS):
+                if html_end.search(content):
+                    html_end = None
+                continue
+            html_end = None
 
         # Markdown lets a list paragraph continue without the list indent.
         # Keep the list open until a blank line or another block ends the paragraph.
@@ -263,7 +300,7 @@ def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
             paragraph = False
         indent = lists[-1] if lists else 0
         if raw in PROJECT_MARKERS:
-            yield raw, line.start()
+            yield raw, bom_length + line.start()
             paragraph = False
             continue
         if column <= indent + 3 and THEMATIC_BREAK.fullmatch(content):
@@ -289,9 +326,13 @@ def project_marker_lines(text: str) -> Iterator[tuple[str, int]]:
             fence, fence_indent = opening, indent
             paragraph = False
             continue
+        if column <= indent + 3 and (ending := opening_html_block(content, paragraph)):
+            if not ending.search(content):
+                html_end, html_indent = ending, indent
+            paragraph = False
+            continue
         paragraph = bool(content) and not (
             HEADING.match(content)
-            or HTML_BLOCK_START.match(content)
             or content.startswith(">")
             or re.fullmatch(r"-+|=+", content)
         )

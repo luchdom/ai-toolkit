@@ -156,6 +156,48 @@ def test_marker_examples_are_unmanaged() -> None:
             assert read(dest) == example
 
 
+def test_html_blocks_do_not_open_markdown_fences() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        src, dest = source(root), root / "target.md"
+        fenced_example = f"```markdown\n{LEGACY_BODY}```\n"
+        prefixes = (
+            "<pre>\n```\n</pre>\n\n",
+            "<SCRIPT type='text/plain'>\n~~~\n</SCRIPT>\n",
+            "<textarea>\n```\n</textarea>\n",
+            "<!--\n```\n-->\n",
+            "<div>\n```\n</div>\n\n",
+            "<sample data-lang='text/plain'>\n~~~\n</sample>\n\n",
+            "- Example\n\n  <pre>\n  ```\n\n",
+        )
+        for prefix in prefixes:
+            write(dest, prefix + fenced_example)
+            assert sync.write_or_splice_template(src, dest, False) == "skipped"
+            assert read(dest) == prefix + fenced_example
+
+            write(dest, prefix + LEGACY_BODY)
+            assert sync.write_or_splice_template(src, dest, False) == "spliced"
+            assert read(dest) == prefix + BODY
+
+        raw_example = f"<pre>\n{LEGACY_BODY}</pre>\n"
+        write(dest, raw_example + LEGACY_BODY)
+        assert sync.write_or_splice_template(src, dest, False) == "spliced"
+        assert read(dest) == raw_example + BODY
+
+
+def test_utf8_bom_is_preserved_when_refreshing_first_marker() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        src, dest = source(root, BODY.replace("# Template", "# Updated")), root / "target.md"
+        signature = b"\xef\xbb\xbf"
+        footer = "# Instruções locais\r\n".encode()
+        for managed in (BODY, LEGACY_BODY):
+            dest.write_bytes(signature + managed.encode() + footer)
+            for _ in range(2):
+                assert sync.write_or_splice_template(src, dest, False) == "spliced"
+                assert dest.read_bytes() == signature + src.read_bytes() + footer
+
+
 def test_docs_override_prefers_toolkit_and_supports_legacy() -> None:
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
@@ -239,6 +281,8 @@ def main() -> int:
         test_malformed_and_newline_preservation,
         test_separated_blocks_preserve_all_unmanaged_bytes,
         test_marker_examples_are_unmanaged,
+        test_html_blocks_do_not_open_markdown_fences,
+        test_utf8_bom_is_preserved_when_refreshing_first_marker,
         test_docs_override_prefers_toolkit_and_supports_legacy,
         test_project_help_names_tool_instruction_destination,
         test_sync_tool_instructions_reads_renamed_dist_root,
