@@ -87,6 +87,11 @@ class DeliveryRoutingSyncTests(unittest.TestCase):
 
         quality_gates = installed_root / STAGE_REFERENCES.relative_to("src") / "quality-gates.md"
         self.assertIn("## Repository rules", quality_gates.read_text(encoding="utf-8").splitlines())
+        dotnet_skill = installed_root / "skills/dotnet-implementation"
+        testing_reference = (dotnet_skill / "references/testing.md").resolve()
+        self.assertTrue(testing_reference.is_file())
+        for guide in (dotnet_skill / "SKILL.md", quality_gates):
+            self.assertIn(testing_reference, _resolved_local_links(guide))
 
     def test_sync_installs_portable_delivery_links_and_upgrades_old_worktree_route(self) -> None:
         installations = (

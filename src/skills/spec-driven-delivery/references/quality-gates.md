@@ -11,6 +11,8 @@ Use the repository's local commands and collect enough evidence to check each ac
 
 In the existing QA and code review reports, cite each applicable rule's doc section, evidence, and verdict for the same target. Leave a required check open when evidence is missing.
 
+If a documented rule and its deterministic check disagree, show the repository owner the conflict. Identify which dependencies the test exercises and which it replaces when reporting what it proves. For .NET work, see the optional [testing reference](../../dotnet-implementation/references/testing.md).
+
 Changing an established architecture rule, reducing its test coverage, or bypassing the check requires a recorded, owner-approved architecture decision and independent Staff Engineer review.
 
 ## Critical workflows
