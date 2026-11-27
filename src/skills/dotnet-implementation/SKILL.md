@@ -13,9 +13,11 @@ description: Implement or fix C#/.NET backend code, including ASP.NET Core APIs,
 
 Follow the [repository-rule checks](../spec-driven-delivery/references/quality-gates.md#repository-rules). Reuse the repository's architecture tests. A dedicated test project can enforce stable rules about names, file layout, or dependencies as part of the normal solution validation.
 
+When choosing which dependencies a test should exercise, consult the optional [.NET testing reference](references/testing.md).
+
 ## Implementation checks
 
-- **Empty collections.** Use the C# collection expression `[]` in projects that support collection expressions. Declare an explicit target type as needed.
+- **Empty collections.** Follow the target repository's C# style and analyzer configuration. Where the repo adopts `[]`, preserve the intended collection type and overload.
 - **API and access:** Validate and map input at the boundary; keep business rules in the repo's application layer. Reuse its result/error mapping. Check the authenticated principal, required policy, and resource ownership before access. Resolve tenant access server-side, then constrain every affected query and mutation by that tenant. A request ID, route, or header alone grants no authority.
 - **Persistence:** Filter, order, project, and page in the database where needed; use no-tracking reads when entities will not be updated. Match the owning context and migration conventions. Protect concurrent writes with the appropriate database constraint, transaction, or concurrency token. Preserve atomic state and audit writes when the existing contract requires them.
 - **Async and dependencies:** Pass `CancellationToken` through dispatch, EF, and outbound I/O. Keep `DbContext` and other scoped dependencies inside a request or a worker's explicit scope for each unit of work. Use validated Options and the repo's `IHttpClientFactory` or equivalent client setup; retry writes only when the operation can safely repeat.
